@@ -1,0 +1,12 @@
+bin/
+_*/
+obj/
+Release/
+others/
+Dyn/
+.vs/
+*.lnk
+**/*.bat
+!compile.bat
+*.dll
+*.csproj
