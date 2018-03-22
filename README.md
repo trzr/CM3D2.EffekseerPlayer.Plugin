@@ -56,46 +56,21 @@ CM3D2/COM3D2上で設定した再生レシピはJSON形式で以下に保存さ�
 ~~~
 
 #### ◇補足
-* Effect音の再生
+* Effect音の再生  
 Effekseerプロジェクト上ではwavファイルを指定していても、  
 そのwavを配置すべきパスにoggファイルを配置すれば読み込むことができます。  
 (wavがない場合にoggを探すよう動作します)
 
-#### ◇Known Issues
-* エンドフレームを超えて再生され続けるEffectがある(Effekseer側の仕様？)
-* メインウィンドウのツリーでリピートを変更しても保存しない
 
-#### ◇TODOリスト
-* targetLocationの指定
-* 位置指定：3D上の矢印操作
-* 回転指定：3D上の回転操作
-* 再生ディレイの設定(N msec or frame 後に再生開始)
-* 再生時間の設定 (N msec or frame 後に自動停止)
-  (エンドフレームの指定)
-* AssetBundleファイルを指定してエフェクトのロード
-* アタッチ先のバリエーション追加
-  * 存在するメイドすべてに複製してアタッチ (/複数のメイド選択)
-  * 特定のアイテムが装着されていた場合のみアタッチ など
-* UI周りの改良 
-  * 削除操作時の確認表示
-  * 同名設定上書き時の確認表示
-  * 再読み込み時の確認表示
-  * UNDO/REDO
-  * efk再読み込みボタン
-  * efkコンボのフィルタリング
-  * 再生設定レシピの変更フラグ(dirty チェック)
-  * レシピファイルに指定されたefkが参照できない場合の画面上の表示(グレーアウトなど)
-  * アイテム未選択時のボタン操作の無効化
-  * 座標の相対位置保持モード(回転を無視した相対位置)
-
+#### ◇その他
+Known IssuesとTODOは、[memo][]ページを参照。
 
 #### ◇License
-本プロジェクトのコードやリソースは、MITライセンスです。
+本プロジェクトのコードやリソースは、MITライセンスとなります。
 
 * Effekseer/以下のコード  
 は、[EffekseerForUnity][] のサンプルコードを改造したものです。  
-また、同梱DLLは以下のMITライセンスとなります。  
-* EffekseerUnity.dll  
+また、同梱の **EffekseerUnity.dll** は下記のMITライセンスとなります。  
 ~~~
 Copyright (c) 2011 Effekseer Project
 Released under the MIT License
@@ -109,3 +84,4 @@ https://github.com/effekseer/Effekseer/blob/master/LICENSE
 [Releases]:https://github.com/trzr/CM3D2.EffekseerPlayer.Plugin/releases
 [Effekseer]:https://github.com/effekseer/Effekseer
 [EffekseerForUnity]:https://github.com/effekseer/EffekseerForUnity
+[memo]:https://github.com/trzr/CM3D2.EffekseerPlayer.Plugin/wiki/memo
