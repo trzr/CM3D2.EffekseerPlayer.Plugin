@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 
-namespace EffekseerPlayerPlugin.Unity.UI
-{
+namespace EffekseerPlayerPlugin.Unity.UI {
     /// <summary>
     /// スクロールビュー抽象クラス
     /// </summary>

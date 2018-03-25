@@ -3,13 +3,11 @@ using System.Linq;
 using EffekseerPlayerPlugin.Unity.Data;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.Unity.UI
-{
+namespace EffekseerPlayerPlugin.Unity.UI {
     /// <summary>
     /// 連動するテキストフィールドとスライダー（水平）を並べたコントロールの複数セット.
     /// </summary>
-    public class CustomTextSliders : BaseTextSlider<EditTextValues>
-    {
+    public class CustomTextSliders : BaseTextSlider<EditTextValues> {
         #region Methods
         /// <inheritdoc />
         /// <summary>コンストラクタ.</summary>
@@ -124,7 +122,7 @@ namespace EffekseerPlayerPlugin.Unity.UI
                 // スライダー
                 colorStore.SetColor(ref textColor, ref backgroundColor);
                 try {
-                    editVal.Value = GUI.HorizontalSlider(sliderRect, editVal.Value, editVal.Min, editVal.Max);
+                    editVal.Value = GUI.HorizontalSlider(sliderRect, editVal.Value, editVal.SoftMin, editVal.SoftMax);
                 } finally {
                     colorStore.Restore();
                 }

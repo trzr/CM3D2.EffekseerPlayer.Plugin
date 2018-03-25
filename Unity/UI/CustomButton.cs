@@ -1,13 +1,11 @@
 ﻿using System;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.Unity.UI
-{
+namespace EffekseerPlayerPlugin.Unity.UI {
     /// <summary>
     /// カスタムボタンUIコントロール
     /// </summary>
-    public class CustomButton : GUIControl
-    {
+    public class CustomButton : GUIControl {
         #region Methods
         /// <summary>デフォルトコンストラクタ</summary>
         /// <param name="parent">親要素</param>

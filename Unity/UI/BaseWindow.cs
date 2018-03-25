@@ -1,14 +1,12 @@
 ﻿using UnityEngine;
 
-namespace EffekseerPlayerPlugin.Unity.UI
-{
+namespace EffekseerPlayerPlugin.Unity.UI　{
     /// <summary>
     /// ウィンドウを実現する抽象クラス.
     /// ただし、DropDownを実現するため、GUI.WindowではなくあくまでBoxとして疑似的なウィンドウを実現する.
     /// 
     /// </summary>
-    public abstract class BaseWindow : GUIControl
-    {
+    public abstract class BaseWindow : GUIControl　{
         protected BaseWindow(UIParamSet uiParams) : base(uiParams) { }
 
         /// <summary>

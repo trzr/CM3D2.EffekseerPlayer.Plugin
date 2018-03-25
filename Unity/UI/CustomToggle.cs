@@ -1,14 +1,12 @@
 ﻿using System;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.Unity.UI
-{
+namespace EffekseerPlayerPlugin.Unity.UI {
     /// <inheritdoc />
     /// <summary>
     /// トグルUIコントロール.
     /// </summary>
-    public class CustomToggle : GUIControl
-    {
+    public class CustomToggle : GUIControl {
         #region Methods
         /// <summary>コンストラクタ</summary>
         /// <param name="uiParams">UIパラメータ</param>

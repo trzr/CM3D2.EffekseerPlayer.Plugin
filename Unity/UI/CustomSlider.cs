@@ -2,13 +2,11 @@
 using EffekseerPlayerPlugin.Unity.Data;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.Unity.UI
-{
+namespace EffekseerPlayerPlugin.Unity.UI {
     /// <summary>
     /// スライダーコントロール
     /// </summary>
-    public class CustomSlider : GUIControl
-    {
+    public class CustomSlider : GUIControl {
         #region Methods
         /// <summary>デフォルトコンストラクタ.</summary>
         /// <param name="parent">親要素</param>
@@ -39,7 +37,7 @@ namespace EffekseerPlayerPlugin.Unity.UI
                 // スライダー表示
                 _colorStore.SetColor(ref textColor, ref backgroundColor);
                 try {
-                    Value.Value = GUI.HorizontalSlider(Rect, Value.Value, Value.Min, Value.Max);
+                    Value.Value = GUI.HorizontalSlider(Rect, Value.Value, Value.SoftMin, Value.SoftMax);
                 } finally {
                     _colorStore.Restore();
                 }

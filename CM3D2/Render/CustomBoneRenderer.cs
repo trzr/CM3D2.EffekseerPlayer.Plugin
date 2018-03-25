@@ -4,7 +4,8 @@ using UnityEngine;
 namespace EffekseerPlayerPlugin.CM3D2.Render {
     ///
     /// ボーン描画クラス.
-    ///  ボーンにアタッチさせた方が恐らく容易だが、極力オリジナルのオブジェクトへのアタッチを避けて実装.
+    ///  オリジナルのオブジェクトへのアタッチを避け、
+    ///  Updateにより位置を適宜更新する.
     ///
     public class CustomBoneRenderer {
         #region Fields

@@ -1,14 +1,10 @@
-﻿using System;
-using EffekseerPlayerPlugin.Unity.Util;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace EffekseerPlayerPlugin.Unity.UI
-{
+namespace EffekseerPlayerPlugin.Unity.UI {
     /// <summary>
     /// ラベル コントロール
     /// </summary>
-    public class CustomLabel : GUIControl
-    {
+    public class CustomLabel : GUIControl {
         #region Methods
         public CustomLabel(GUIControl parent) : base(parent) {
             // disable once DoNotCallOverridableMethodsInConstructor

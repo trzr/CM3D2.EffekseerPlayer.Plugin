@@ -1,7 +1,6 @@
 ﻿using System;
 
-namespace EffekseerPlayerPlugin.Unity.Data
-{
+namespace EffekseerPlayerPlugin.Unity.Data {
     /// <inheritdoc />
     /// <summary>
     /// 編集用の文字列と浮動小数点の変数を扱うクラス.
@@ -11,8 +10,7 @@ namespace EffekseerPlayerPlugin.Unity.Data
     /// isSynchedは _valueと _textの同期状態
     /// IsDirtyは_valueの変更状態（SrcValueとの不一致）
     /// </summary>
-    public class EditTextValue : EditFloatValue
-    {
+    public class EditTextValue : EditFloatValue {
         #region Methods
         public EditTextValue(string name, float val1, int _decimal, float min, float max)
             : this(name, val1, new EditRange(_decimal, min, max), null) { }

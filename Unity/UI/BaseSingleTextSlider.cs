@@ -3,13 +3,11 @@ using System.Linq;
 using EffekseerPlayerPlugin.Unity.Data;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.Unity.UI
-{
+namespace EffekseerPlayerPlugin.Unity.UI {
     /// <summary>
     /// テキストフィールドとスライダー（水平）を横に並べ、連動するコントロールの抽象クラス
     /// </summary>
-    public abstract class BaseSingleTextSlider<T> : BaseTextSlider<T> where T : EditTextValue
-    {
+    public abstract class BaseSingleTextSlider<T> : BaseTextSlider<T> where T : EditTextValue {
         #region Methods
         /// <summary>コンストラクタ.</summary>
         /// <param name="parent">親要素</param>
@@ -100,7 +98,7 @@ namespace EffekseerPlayerPlugin.Unity.UI
         }
 
         protected virtual void OnSlider() {
-            Value.Value = GUI.HorizontalSlider(sliderRect, Value.Value, Value.Min, Value.Max);
+            Value.Value = GUI.HorizontalSlider(sliderRect, Value.Value, Value.SoftMin, Value.SoftMax);
         }
 
         internal override void Relayout(UIParamSet uiparams) {

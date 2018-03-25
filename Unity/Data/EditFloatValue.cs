@@ -8,8 +8,7 @@ namespace EffekseerPlayerPlugin.Unity.Data {
     /// Value   :変数値
     /// IsDirtyはValueの変更状態（SrcValueとの不一致）
     /// </summary>
-    public class EditFloatValue
-    {
+    public class EditFloatValue {
         #region Methods
         public EditFloatValue(float val1, int _decimal, float min, float max) 
             : this(val1, new EditRange(_decimal, min, max)) { }
@@ -88,6 +87,8 @@ namespace EffekseerPlayerPlugin.Unity.Data {
         protected readonly EditRange range;
         public float Max { get { return range.Max;} }
         public float Min { get { return range.Min;} }
+        public float SoftMax { get { return range.SoftMax;} }
+        public float SoftMin { get { return range.SoftMin;} }
         #endregion
 
         #region Events

@@ -8,8 +8,7 @@ namespace EffekseerPlayerPlugin.Unity.UI {
     /// 指定された範囲を超えた場合に色を変える動作を行う.
     /// 変更時のイベントハンドラはEditTextValueのハンドラを利用する.
     /// </summary>
-    public class CustomNumTextField : GUIControl
-    {
+    public class CustomNumTextField : GUIControl {
         /// <inheritdoc />
         /// <summary>コンストラクタ</summary>
         /// <param name="parent">親要素</param>

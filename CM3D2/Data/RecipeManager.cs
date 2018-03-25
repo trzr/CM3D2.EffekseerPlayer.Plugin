@@ -4,8 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace EffekseerPlayerPlugin.CM3D2.Data
-{
+namespace EffekseerPlayerPlugin.CM3D2.Data {
 
     /// <summary>
     /// 再生レシピのセーブ・ロードを行う管理するマネージャクラス.

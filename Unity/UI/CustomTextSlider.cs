@@ -1,14 +1,12 @@
 ﻿using EffekseerPlayerPlugin.Unity.Data;
 
-namespace EffekseerPlayerPlugin.Unity.UI
-{
+namespace EffekseerPlayerPlugin.Unity.UI {
     /// <inheritdoc />
     /// <summary>
     /// テキストフィールドとスライダー（水平）を横に並べ、連動するコントロール.
     /// warnColorは未指定の場合、red
     /// </summary>
-    public class CustomTextSlider : BaseSingleTextSlider<EditTextValue>
-    {
+    public class CustomTextSlider : BaseSingleTextSlider<EditTextValue> {
         #region Methods
         /// <inheritdoc />
         /// <summary>コンストラクタ.</summary>

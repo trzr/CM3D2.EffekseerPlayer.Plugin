@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace EffekseerPlayerPlugin.Unity.Data
-{
+namespace EffekseerPlayerPlugin.Unity.Data {
     /// <summary>
     /// 複数のEditTextValueにアクセスするクラス.
     /// 
@@ -12,8 +11,7 @@ namespace EffekseerPlayerPlugin.Unity.Data
     /// isSynchedは _valueと _textの同期状態
     /// IsDirtyは_valueの変更状態（SrcValueとの不一致）
     /// </summary>
-    public class EditTextValues
-    {
+    public class EditTextValues {
         #region Methods
         public EditTextValues(IList<string> names, IList<float> vals, int _decimal, float min, float max)
             : this(names, vals, new EditRange(_decimal, min, max)) { }

@@ -1,14 +1,12 @@
 ﻿using System;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.Unity.UI
-{
+namespace EffekseerPlayerPlugin.Unity.UI {
     /// <summary>
     /// テキストフィールド コントロール.
     /// hasErrorフラグをtrueにすると背景色をerrorColorに設定する.
     /// </summary>
-    public class CustomTextField : GUIControl
-    {
+    public class CustomTextField : GUIControl {
         #region Methods
         public CustomTextField(GUIControl parent) : this(parent, string.Empty) {}
 

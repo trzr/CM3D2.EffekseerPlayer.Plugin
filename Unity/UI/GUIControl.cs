@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.Unity.UI
-{
+namespace EffekseerPlayerPlugin.Unity.UI {
     /// <summary>
     /// カスタムコントロールクラス.
     /// コントロールの抽象クラス.
     /// </summary>
-    public abstract class GUIControl
-    {
+    public abstract class GUIControl {
         #region Methods
         protected GUIControl(UIParamSet uiParams) {
             this.uiParams = uiParams;

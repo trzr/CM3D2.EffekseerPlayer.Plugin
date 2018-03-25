@@ -3,8 +3,7 @@ using EffekseerPlayerPlugin.CM3D2.Data;
 using EffekseerPlayerPlugin.Effekseer;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.CM3D2
-{
+namespace EffekseerPlayerPlugin.CM3D2 {
     public class PlayManager {
         
         ~PlayManager() {

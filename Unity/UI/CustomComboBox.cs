@@ -7,8 +7,7 @@ namespace EffekseerPlayerPlugin.Unity.UI {
     /// <summary>
     /// コンボボックス
     /// </summary>
-    public sealed class CustomComboBox : GUIControl
-    {
+    public sealed class CustomComboBox : GUIControl {
         #region Methods
         /// <summary>デフォルトコンストラクタ</summary>
         public CustomComboBox(GUIControl parent):this (parent, new GUIContent[0]) { }

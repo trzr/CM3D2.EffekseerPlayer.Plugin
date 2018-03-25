@@ -2,13 +2,11 @@
 using EffekseerPlayerPlugin.Unity.Data;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.Unity.UI
-{
+namespace EffekseerPlayerPlugin.Unity.UI {
     /// <summary>
     /// CustomTextSliderを拡張し、スライダーを対数の縮尺で動作させるクラス.
     /// </summary>
-    public class CustomTextLogSlider : BaseSingleTextSlider<EditTextLogValue>
-    {
+    public class CustomTextLogSlider : BaseSingleTextSlider<EditTextLogValue> {
         #region Methods
         /// <summary>コンストラクタ.</summary>
         /// <param name="parent">親要素</param>

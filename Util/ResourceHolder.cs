@@ -3,13 +3,11 @@ using System.IO;
 using System.Reflection;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.Util
-{
+namespace EffekseerPlayerPlugin.Util {
     /// <summary>
     /// リソースのロードユーティリティ
     /// </summary>
-    public sealed class ResourceHolder
-    {
+    public sealed class ResourceHolder {
         private static readonly ResourceHolder INSTANCE = new ResourceHolder();
         public static ResourceHolder Instance {
             get {
