@@ -8,5 +8,7 @@ Dyn/
 *.lnk
 **/*.bat
 !compile.bat
+!compile_base.bat
+!compile_cm3d2.bat
 *.dll
 *.csproj
