@@ -82,6 +82,9 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
         public void ToEditView(PlayRecipe recipe) {
             scaleSlider.Num = recipe.scale;
             speedSlider.Num = recipe.speed;
+            endFrameSlider.Num  = recipe.endFrame;
+            delaySlider.Num     = recipe.delayFrame;
+            postDelaySlider.Num = recipe.postDelayFrame;
             _color = recipe.color;
             var cols = new[]{_color.r, _color.g, _color.b, _color.a };
             colorSlider.Value.Set(cols, true);
@@ -279,6 +282,31 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
 
             var val = (EditTextValue)obj;
             currentEmitter.Speed = val.Value;
+        }
+
+        private void EndFrameChanged(object obj, EventArgs args) {
+            if (currentEmitter == null) return;
+
+            var val = (EditTextValue)obj;
+            currentEmitter.endFrame = val.Value;
+            frameSlider.Value.SoftMax =
+                (int)currentEmitter.endFrame == 0
+                    ? frameSlider.Value.Max 
+                    : currentEmitter.endFrame;
+        }
+
+        private void DelayChanged(object obj, EventArgs args) {
+            if (currentEmitter == null) return;
+
+            var val = (EditTextValue)obj;
+            currentEmitter.delayFrame = val.Value;
+        }
+
+        private void PostDelayChanged(object obj, EventArgs args) {
+            if (currentEmitter == null) return;
+
+            var val = (EditTextValue)obj;
+            currentEmitter.postDelayFrame = val.Value;
         }
 
         private void ColorsChanged(object obj, EventArgs args) {

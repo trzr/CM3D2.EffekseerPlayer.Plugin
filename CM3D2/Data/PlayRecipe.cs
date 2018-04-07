@@ -52,6 +52,9 @@ namespace EffekseerPlayerPlugin.CM3D2.Data {
         public string maid;             // メイドの識別子
         public float scale = 1f;
         public float speed = 1f;
+        public float endFrame;
+        public float delayFrame;
+        public float postDelayFrame;
         public Color color = Color.white;
         public Vector3 location;
         public Quaternion rotation;
@@ -100,6 +103,9 @@ namespace EffekseerPlayerPlugin.CM3D2.Data {
             emitter.EffectName = effectName;
             emitter.loop = repeat;
             emitter.Speed = speed;
+            emitter.endFrame = endFrame;
+            emitter.delayFrame = delayFrame;
+            emitter.postDelayFrame = postDelayFrame;
             emitter.SetAllColor(color);
             emitter.transform.localScale = One * scale;
 
@@ -236,6 +242,15 @@ namespace EffekseerPlayerPlugin.CM3D2.Data {
             WriteField(builder, "maid", maid, pretty, subIndent);
             WriteField(builder, "scale", scale, pretty, subIndent);
             WriteField(builder, "speed", speed, pretty, subIndent);
+            if (endFrame > 0) {
+                WriteField(builder, "endFrame", endFrame, pretty, subIndent);
+            }
+            if (delayFrame > 0) {
+                WriteField(builder, "delayFrame", delayFrame, pretty, subIndent);
+            }
+            if (postDelayFrame > 0) {
+                WriteField(builder, "postDelayFrame", postDelayFrame, pretty, subIndent);
+            }
             WriteField(builder, "color", color, pretty, subIndent);
             WriteField(builder, "location", location, pretty, subIndent);
             WriteField(builder, "rotation", rotation, pretty, subIndent, false);

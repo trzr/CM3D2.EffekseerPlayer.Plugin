@@ -32,6 +32,7 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
             var settings = Settings.Instance;
             var scaleRange = new EditRange(5, 0.00001f, settings.maxScale);
             var speedRange = new EditRange(5, 0.0001f, settings.maxSpeed);
+            var frameRange = new EditRange(0, 0f, settings.maxFrame);
             var posRange = new EditRange(5, -settings.maxLocation, settings.maxLocation);
 
             scaleSlider = new CustomTextLogSlider(this, 1.0f, scaleRange) {
@@ -68,6 +69,52 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
                 nextListeners = new[] {
                     new PresetListener<EditTextLogValue>(">", 20, val => val.Multiply(2f, true)),
                     new PresetListener<EditTextLogValue>(">>", 30, val => val.Multiply(10f, true)),
+                },
+            };
+            endFrameSlider = new CustomTextSlider(this, 0f, frameRange) {
+                Text = "◆エンドフレーム",
+                listeners = new[] {
+                    new PresetListener<EditTextValue>("0", 20, val => val.Set(0, true)),
+                },
+                prevListeners = new[] {
+                    new PresetListener<EditTextValue>("<<", 30, val => val.Add(-120, true)),
+                    new PresetListener<EditTextValue>("<", 20, val => val.Add(-60, true)),
+                },
+                nextListeners = new[] {
+                    new PresetListener<EditTextValue>(">", 20, val => val.Add(+60, true)),
+                    new PresetListener<EditTextValue>(">>", 30, val => val.Add(+120, true)),
+                },
+            };
+            frameSlider = new CustomTextSlider(this, 0f, frameRange) {
+                Text = "◇フレーム",
+                Enabled = false,
+            };
+            delaySlider = new CustomTextSlider(this, 0f, frameRange) {
+                Text = "◇ディレイ",
+                listeners = new[] {
+                    new PresetListener<EditTextValue>("0", 20, val => val.Set(0, true)),
+                },
+                prevListeners = new[] {
+                    new PresetListener<EditTextValue>("<<", 30, val => val.Add(-120, true)),
+                    new PresetListener<EditTextValue>("<", 20, val => val.Add(-60, true)),
+                },
+                nextListeners = new[] {
+                    new PresetListener<EditTextValue>(">", 20, val => val.Add(+60, true)),
+                    new PresetListener<EditTextValue>(">>", 30, val => val.Add(+120, true)),
+                },
+            };
+            postDelaySlider = new CustomTextSlider(this, 0f, frameRange) {
+                Text = "◇ポストディレイ",
+                listeners = new[] {
+                    new PresetListener<EditTextValue>("0", 20, val => val.Set(0, true)),
+                },
+                prevListeners = new[] {
+                    new PresetListener<EditTextValue>("<<", 30, val => val.Add(-120, true)),
+                    new PresetListener<EditTextValue>("<", 20, val => val.Add(-60, true)),
+                },
+                nextListeners = new[] {
+                    new PresetListener<EditTextValue>(">", 20, val => val.Add(+60, true)),
+                    new PresetListener<EditTextValue>(">>", 30, val => val.Add(+120, true)),
                 },
             };
             colorSlider = new CustomTextSliders(this,
@@ -220,6 +267,9 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
             // イベント処理
             scaleSlider.Value.ValueChanged += ScaleChanged;
             speedSlider.Value.ValueChanged += SpeedChanged;
+            endFrameSlider.Value.ValueChanged += EndFrameChanged;
+            delaySlider.Value.ValueChanged += DelayChanged;
+            postDelaySlider.Value.ValueChanged += PostDelayChanged;
             colorSlider.Value[0].ValueChanged += ColorRChanged;
             colorSlider.Value[1].ValueChanged += ColorGChanged;
             colorSlider.Value[2].ValueChanged += ColorBChanged;
@@ -328,6 +378,10 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
             CheckItemChanged();
 
             if (_boneRenderer != null) _boneRenderer.Update();
+            if (currentEmitter != null && currentEmitter.Exists) {
+                frameSlider.Num = currentEmitter.Frame;
+            }
+
         }
 
         public void UpdateSlider() {
@@ -350,6 +404,10 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
         protected override void OnContentView() {
             scaleSlider.OnGUI();
             speedSlider.OnGUI();
+            endFrameSlider.OnGUI();
+            frameSlider.OnGUI();
+            delaySlider.OnGUI();
+            postDelaySlider.OnGUI();
             colorSlider.OnGUI();
 
             attachLabel.OnGUI();
@@ -408,6 +466,26 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
             speedSlider.TextWidth = textWidth;
             speedSlider.TextHeight = itemHeight;
 
+            endFrameSlider.AlignTop(speedSlider, ref align);
+            endFrameSlider.indent = margin*4;
+            endFrameSlider.TextWidth = textWidth;
+            endFrameSlider.TextHeight = itemHeight;
+
+            frameSlider.AlignTop(endFrameSlider, ref align);
+            frameSlider.indent = margin*4;
+            frameSlider.TextWidth = textWidth;
+            frameSlider.TextHeight = itemHeight;
+
+            delaySlider.AlignTop(frameSlider, ref align);
+            delaySlider.indent = margin*4;
+            delaySlider.TextWidth = textWidth;
+            delaySlider.TextHeight = itemHeight;
+
+            postDelaySlider.AlignTop(delaySlider, ref align);
+            postDelaySlider.indent = margin*4;
+            postDelaySlider.TextWidth = textWidth;
+            postDelaySlider.TextHeight = itemHeight;
+
             align.x = margin;
             align.y = margin;
             align.width = viewWidth - margin2;
@@ -416,7 +494,7 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
             colorSlider.subLabelWidth = indent;
             colorSlider.TextWidth  = textWidth;
             colorSlider.TextHeight = itemHeight;
-            colorSlider.AlignTop(speedSlider, ref align);
+            colorSlider.AlignTop(postDelaySlider, ref align);
 
             align.x = margin;
             align.y = margin2;
@@ -508,6 +586,14 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
             scaleSlider.FontSizeS = fontSizeS;
             speedSlider.FontSize = fontSizeN;
             speedSlider.FontSizeS = fontSizeS;
+            endFrameSlider.FontSize = fontSizeN;
+            endFrameSlider.FontSizeS = fontSizeS;
+            frameSlider.FontSize = fontSizeN;
+            frameSlider.FontSizeS = fontSizeS;
+            delaySlider.FontSize = fontSizeN;
+            delaySlider.FontSizeS = fontSizeS;
+            postDelaySlider.FontSize = fontSizeN;
+            postDelaySlider.FontSizeS = fontSizeS;
             colorSlider.FontSize = fontSizeN;
             colorSlider.FontSizeS = fontSizeS;
 
@@ -551,6 +637,10 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
         // scale slider
         public CustomTextLogSlider scaleSlider;
         public CustomTextLogSlider speedSlider;
+        public CustomTextSlider endFrameSlider;
+        public CustomTextSlider frameSlider;
+        public CustomTextSlider delaySlider;
+        public CustomTextSlider postDelaySlider;
         public CustomTextSliders colorSlider;
 
         public CustomLabel attachLabel;

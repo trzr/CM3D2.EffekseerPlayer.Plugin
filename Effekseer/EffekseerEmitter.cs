@@ -54,6 +54,35 @@ namespace EffekseerPlayerPlugin.Effekseer {
         public bool loop;
 
         /// <summary xml:lang="en">
+        /// end frame
+        /// </summary>
+        /// <summary xml:lang="ja">
+        /// エンドフレーム
+        /// </summary>
+        public float endFrame;
+
+        /// <summary xml:lang="en">
+        /// delay frame. Number of frames before starting the effect.
+        /// </summary>
+        /// <summary xml:lang="ja">
+        /// ディレイフレーム. エフェクトを開始するまでのフレーム数
+        /// </summary>
+        public float delayFrame;
+
+        /// <summary xml:lang="en">
+        /// post-delay frame for repeat.
+        /// </summary>
+        /// <summary xml:lang="ja">
+        /// エンドフレーム以降リピートするまでのフレーム数.
+        /// </summary>
+        public float postDelayFrame;
+
+        /// <summary>
+        /// フレーム
+        /// </summary>
+        public float Frame { get; private set; }
+
+        /// <summary xml:lang="en">
         /// The last played handle.
         /// </summary>
         /// <summary xml:lang="ja">
@@ -162,6 +191,7 @@ namespace EffekseerPlayerPlugin.Effekseer {
             h.SetAllColor(_color);
             h.Speed = _speed;
             _handle = h;
+            Frame = 0;
             Status = EmitterStatus.Playing;
         }
 
@@ -390,7 +420,13 @@ namespace EffekseerPlayerPlugin.Effekseer {
                 var h = _handle.Value;
                 if (h.Exists) {
                     if (_status != EmitterStatus.Playing) return;
-//                    Log.Debug("frame:", Frame);
+
+                    Frame += _speed;
+                    if (0 < endFrame && endFrame < Frame) {
+                        if (loop) Play();
+                        else Stop();
+                        return;
+                    }
 
                     if (!fixLocation) h.SetLocation(Location);
                     if (!fixRotation) h.SetRotation(Rotation);

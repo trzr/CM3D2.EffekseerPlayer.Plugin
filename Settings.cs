@@ -22,6 +22,7 @@ namespace EffekseerPlayerPlugin {
         public float maxLocation = 2f;
         public float maxScale = 10f;
         public float maxSpeed = 10f;
+        public float maxFrame = 6000f;
 
         public float sizeRate;
         public bool ssWithoutUI; 
@@ -99,6 +100,7 @@ namespace EffekseerPlayerPlugin {
             Get(getValue("SliderMaxLocation"), ref maxLocation);
             Get(getValue("SliderMaxScale"), ref maxScale);
             Get(getValue("SliderMaxSpeed"), ref maxSpeed);
+            Get(getValue("SliderMaxEndFrame"), ref maxFrame);
         }
 
         public void Save(Action<string, string> setValue) {
