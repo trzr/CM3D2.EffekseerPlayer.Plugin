@@ -11,8 +11,8 @@ namespace EffekseerPlayerPlugin.Unity.UI {
         }
 
         /// <summary>コンストラクタ.</summary>
-        /// <param name="uiParams">UIパラメータ</param>
-        protected BaseTextSlider(UIParamSet uiParams) : base(uiParams) {
+        /// <param name="uiParamSet">UIパラメータ</param>
+        protected BaseTextSlider(UIParamSet uiParamSet) : base(uiParamSet) {
             // disable once DoNotCallOverridableMethodsInConstructor
             backgroundColor = Color.white;
         }

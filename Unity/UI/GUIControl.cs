@@ -9,17 +9,19 @@ namespace EffekseerPlayerPlugin.Unity.UI {
     /// </summary>
     public abstract class GUIControl {
         #region Methods
-        protected GUIControl(UIParamSet uiParams) {
-            this.uiParams = uiParams;
+        protected GUIControl(UIParamSet uiParamSet) {
+            this.uiParamSet = uiParamSet;
             root = this;
         }
 
         protected GUIControl(GUIControl parent) {
-            uiParams = parent.uiParams;
+            uiParamSet = parent.uiParamSet;
             parent.Add(this);
         }
 
         protected virtual void AwakeChildren() {
+            if (Children == null) return;
+
             try {
                 foreach (var child in Children) {
                     child.Awake();
@@ -30,6 +32,7 @@ namespace EffekseerPlayerPlugin.Unity.UI {
         }
 
         protected virtual void OnGUIChildren() {
+            if (Children == null) return;
             try {
                 foreach (var child in Children) {
                     child.OnGUI();
@@ -58,16 +61,27 @@ namespace EffekseerPlayerPlugin.Unity.UI {
         protected virtual void DrawGUI() { }
 
         /// <summary>
-        /// レイアウト情報を更新する.
-        /// 画面サイズ等のUIパラメータが変更された後に呼び出されることとする.
-        /// (Awake後でなければ呼んではいけない)
+        /// 画面サイズ等のUIパラメータの変更に対して、レイアウト情報を更新する.
         /// </summary>
-        /// <param name="uiparams">UIパラメータ</param>
-        internal virtual void Relayout(UIParamSet uiparams) { }
+        /// <param name="uiParams">UIパラメータ</param>
+        protected virtual void Layout(UIParamSet uiParams) { }
 
-        internal virtual void RelayoutChildren() {
+        /// <summary>
+        /// レイアウト情報を更新する.
+        /// 画面サイズ等のUIパラメータが変更された後に呼び出す必要がある.
+        /// </summary>
+        /// <param name="uiParams">UIパラメータ</param>
+        internal void UpdateLayout(UIParamSet uiParams) {
+            Layout(uiParams);
+
+            LayoutChildren(uiParams);
+        }
+
+        protected virtual void LayoutChildren(UIParamSet uiParams) {
+            if (Children == null) return;
+
             foreach (var child in Children) {
-                child.Relayout(uiParams);
+                child.UpdateLayout(uiParams);
             }
         }
 
@@ -145,7 +159,6 @@ namespace EffekseerPlayerPlugin.Unity.UI {
         #endregion
 
         #region Properties
-        
         protected virtual List<GUIControl> Children { set; get; }
     
         private bool _enabled = true;
@@ -229,19 +242,18 @@ namespace EffekseerPlayerPlugin.Unity.UI {
         protected bool modal;
         protected GUIControl root;
         protected GUIControl parent;
-        protected readonly UIParamSet uiParams;
+        protected readonly UIParamSet uiParamSet;
         protected readonly GUIEnabledStore enabledStore = new GUIEnabledStore();
 
 
-        protected const float WIDTH_SCROLLBAR = 20f;
+        protected const float WIDTH_SCROLLBAR = 16f;
 
         internal static readonly Action<Rect, string> DebugLog = (r, key) => Log.DebugF("{0}, ({1}, {2}, {3}, {4})", key, r.x, r.y, r.width, r.height);
     }
 
     ///-------------------------------------------------------------------------
     /// <summary>GUI色設定</summary>
-    public class GUIColor : IDisposable
-    {
+    public class GUIColor : IDisposable {
         #region Methods
     
         /// <summary>コンストラクタ</summary>
@@ -284,8 +296,7 @@ namespace EffekseerPlayerPlugin.Unity.UI {
 
     ///-------------------------------------------------------------------------
     /// <summary>GUI色設定</summary>
-    public class GUIColorStore
-    {
+    public class GUIColorStore {
         #region Methods
         /// <summary>背景色とコンテンツを設定する</summary>
         /// <param name="contentColor">コンテンツ色</param>
@@ -371,8 +382,7 @@ namespace EffekseerPlayerPlugin.Unity.UI {
 
     ///-------------------------------------------------------------------------
     /// <summary>GUIテキスト色設定</summary>
-    public class GUITextColor : IDisposable
-    {
+    public class GUITextColor : IDisposable {
         #region Methods
     
         /// <summary>コンストラクタ.</summary>
@@ -431,8 +441,7 @@ namespace EffekseerPlayerPlugin.Unity.UI {
 
     ///-------------------------------------------------------------------------
     /// <summary>GUIテキスト色設定</summary>
-    public class GUITextColorStore 
-    {
+    public class GUITextColorStore {
         #region Methods
         /// <summary>テキスト色をスタイルに設定する.</summary>
         /// <param name="style">スタイル</param>
@@ -494,8 +503,7 @@ namespace EffekseerPlayerPlugin.Unity.UI {
 
     ///-------------------------------------------------------------------------
     /// <summary>GUI有効設定</summary>
-    public class GUIEnabledStore 
-    {
+    public class GUIEnabledStore {
         #region Methods
         /// <summary>
         /// 有効状態を設定する.

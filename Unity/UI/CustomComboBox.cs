@@ -66,14 +66,14 @@ namespace EffekseerPlayerPlugin.Unity.UI {
             }
         }
 
-        internal override void Relayout(UIParamSet uiparams) {
-            _dropDownListRect.Set(Left, Top + Height, Width, Height);
+        protected override void Layout(UIParamSet uiParams) {
+            _dropDownListRect.Set(Left, Top + Height - offset.y, Width, Height);
             _listRect.width = _dropDownListRect.width;     
             _posRect.width  = _dropDownListRect.width;
             _viewRect.width = _dropDownListRect.width - 20;
 
             //_maxHeight = root.rect.height - root.rect.y;//(float)(Screen.height - Screen.height * 0.15 - uiparams.winRect.y);
-            MaxHeight = root.Rect.height - (Top - root.Top) - margin;
+            MaxHeight = root.Rect.height - (Top - offset.y - root.Top) - margin;
             if (MaxHeight < 0) MaxHeight = 0;
         }
     
@@ -296,7 +296,14 @@ namespace EffekseerPlayerPlugin.Unity.UI {
         public Color errorColor = UIParamSet.ErrorColor;
         private readonly GUIColorStore _colorSetter = new GUIColorStore();
 
-
+        private Vector2 offset; 
+        public Vector2 Offset {
+            get { return offset;}
+            set {
+                offset = value;
+                Layout(uiParamSet);
+            }
+        }
         private Vector2 _scrollViewVector = Vector2.zero;
         private bool _mouseDowned;
         private bool _closing;

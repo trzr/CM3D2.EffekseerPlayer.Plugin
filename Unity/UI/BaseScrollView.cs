@@ -1,13 +1,14 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace EffekseerPlayerPlugin.Unity.UI {
     /// <summary>
     /// スクロールビュー抽象クラス
     /// </summary>
     public abstract class BaseScrollView : GUIControl {
-        public BaseScrollView(UIParamSet uiParamSet) : base(uiParamSet) { }
+        protected BaseScrollView(UIParamSet uiParamSet) : base(uiParamSet) { }
 
-        public BaseScrollView(GUIControl parent) : base(parent) { }
+        protected BaseScrollView(GUIControl parent) : base(parent) { }
 
         //public override void Update() {
         //    viewRect.height = GetContentHeight();
@@ -19,11 +20,17 @@ namespace EffekseerPlayerPlugin.Unity.UI {
             if (VScrollStyle == null) {
                 VScrollStyle = new GUIStyle("verticalScrollbar");
             }
+
+            AwakeChildren();
         }
 
         public override void OnGUI() {
-            scrollViewPosition = GUI.BeginScrollView(rect, scrollViewPosition, viewRect, 
+            var pos = GUI.BeginScrollView(rect, scrollViewPosition, viewRect, 
                 AlwaysHScroll, AlwaysVScroll, HScrollStyle, VScrollStyle);
+            if (scrollViewPosition != pos) {
+                scrollViewPosition = pos;
+                ScrollChanged(pos);
+            }
 
             colorStore.SetColor(ref textColor, ref backgroundColor);
             try {
@@ -39,7 +46,7 @@ namespace EffekseerPlayerPlugin.Unity.UI {
         protected abstract void OnContentView();
             //if (Children != null) base.OnGUIChildren();
 
-        internal override void Relayout(UIParamSet uiparams) {
+        protected override void Layout(UIParamSet uiParams) {
             viewRect.Set(rect.x, rect.y, GetViewWidth(), GetViewHeight());
         }
 
@@ -63,6 +70,8 @@ namespace EffekseerPlayerPlugin.Unity.UI {
         internal readonly GUIColorStore colorStore = new GUIColorStore();
 
         //public Func<float> ContentHeightFunc = () => 0;
+        public delegate void PosHandler(Vector2 pos);
+        public PosHandler ScrollChanged = delegate {  };
         #endregion
     }
 }

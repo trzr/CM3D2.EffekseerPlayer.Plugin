@@ -16,8 +16,6 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
         }
 
         public override void Awake() {
-            base.Awake();
-
             if (CheckStyle == null) {
                 CheckStyle = new GUIStyle("label") {
                     alignment = TextAnchor.MiddleCenter,
@@ -77,6 +75,7 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
             if (_delete == null) {
                 _delete = new GUIContent("削除", ResourceHolder.Instance.DeleteImage);
             }
+            base.Awake();
         }
 
         protected override void OnContentView() {
@@ -109,20 +108,20 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
                 if (GUI.Button(expandRect, expand, CheckStyle)) {
                     recipeSet.expand = !recipeSet.expand;
 
-                    Relayout(uiParams);
+                    UpdateLayout(uiParamSet);
                 }
                 labelRect.y = yPos;
                 if (GUI.Button(labelRect, recipeSet.name, LabelStyle)) {
                     clickRecipeSet(recipeSet);
                     recipeSet.expand = !recipeSet.expand;
 
-                    Relayout(uiParams);
+                    UpdateLayout(uiParamSet);
                 }
                 buttonRect.y = yPos;
                 if (GUI.Button(buttonRect, _delete, ButtonAStyle)) {
                     deleteRecipeSet(recipeSet);
 
-                    Relayout(uiParams);
+                    UpdateLayout(uiParamSet);
                     break;
                 }
 
@@ -158,7 +157,7 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
                         if (GUI.Button(buttonRect, _delete, ButtonBStyle)) {
                             deleteRecipe(recipeSet, recipe);
 
-                            Relayout(uiParams);
+                            UpdateLayout(uiParamSet);
                             break;
                         }
                     } finally {
@@ -190,11 +189,11 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
         private static readonly GUIContent Stopped  = new GUIContent("Stopped");
         private static readonly GUIContent Stopping = new GUIContent("Stopping");
 
-        internal override void Relayout(UIParamSet uiparams) {
+        protected override void Layout(UIParamSet uiParams) {
             CalcViewHeight();
 
-            base.Relayout(uiParams);
-            var unitSize = uiParams.FixPx(20);
+            base.Layout(uiParamSet);
+            var unitSize = uiParamSet.FixPx(20);
             chkRect.width = unitSize;
             chkRect.height = unitSize;
             chkRect.x = Left;
@@ -214,11 +213,11 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
             sublabelRect.height = ItemHeight;
             sublabelRect.x = iconRect.xMax + margin;
 
-            buttonRect.width = uiParams.FixPx(70f);
+            buttonRect.width = uiParamSet.FixPx(70f);
             buttonRect.height = ItemHeight;
             buttonRect.x = xMax - buttonRect.width - margin * 2 - WIDTH_SCROLLBAR;
 
-            statusRect.width = uiParams.FixPx(80f);
+            statusRect.width = uiParamSet.FixPx(80f);
             statusRect.height = ItemHeight;
             statusRect.x = buttonRect.x - margin * 2 - statusRect.width;
         }

@@ -7,7 +7,7 @@ namespace EffekseerPlayerPlugin.Unity.UI　{
     /// 
     /// </summary>
     public abstract class BaseWindow : GUIControl　{
-        protected BaseWindow(UIParamSet uiParams) : base(uiParams) { }
+        protected BaseWindow(UIParamSet uiParamSet) : base(uiParamSet) { }
 
         /// <summary>
         /// カーソル位置が描画中にウィンドウ内に入っているか判定し、
@@ -74,7 +74,6 @@ namespace EffekseerPlayerPlugin.Unity.UI　{
             MoveWin(currentPos.x - startPosition.x, currentPos.y - startPosition.y);
         }
 
-        private const int DELTA = 16;
         protected virtual void MoveWin(float deltaX, float deltaY) {
             rect.x += deltaX;
             rect.y += deltaY;
@@ -87,7 +86,7 @@ namespace EffekseerPlayerPlugin.Unity.UI　{
                 } 
             }
 
-            Relayout(uiParams);
+            UpdateLayout(uiParamSet);
             if (_followedWin != null && _followedWin.attached) {
                 _followedWin.MoveWin(deltaX, deltaY);
             }
@@ -97,15 +96,15 @@ namespace EffekseerPlayerPlugin.Unity.UI　{
         /// スクリーンサイズが変更されたときに呼びされるメソッド.
         /// ウィンドウのサイズを更新し、リレイアウトを行う
         /// </summary>
-        /// <param name="uiParamSet">UIパラメータセット</param>
-        internal virtual void WinResized(UIParamSet uiParamSet) {
+        /// <param name="uiParams">UIパラメータセット</param>
+        internal virtual void WinResized(UIParamSet uiParams) {
             InitSize();
             CheckWinPosition();
 
-            titleBarRect.Set(Left+4, Top, Width-8-20, uiParamSet.FixPx(titleBarHeight));
+            titleBarRect.Set(Left+4, Top, Width-8-20, uiParams.FixPx(titleBarHeight));
 
             UpdateUISize();
-            Relayout(uiParamSet);
+            UpdateLayout(uiParams);
         }
 
         /// <summary>
@@ -148,6 +147,7 @@ namespace EffekseerPlayerPlugin.Unity.UI　{
         protected bool dragging;
         protected Vector2 startPosition;
 
+        private const int DELTA = 16;
         public float titleBarHeight = 24f;
         protected Rect titleBarRect;
         internal bool attached;

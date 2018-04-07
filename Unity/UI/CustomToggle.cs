@@ -9,9 +9,9 @@ namespace EffekseerPlayerPlugin.Unity.UI {
     public class CustomToggle : GUIControl {
         #region Methods
         /// <summary>コンストラクタ</summary>
-        /// <param name="uiParams">UIパラメータ</param>
+        /// <param name="uiParamSet">UIパラメータ</param>
         /// <param name="value">トグル初期状態</param>
-        public CustomToggle(UIParamSet uiParams, bool value=false) : base(uiParams) {
+        public CustomToggle(UIParamSet uiParamSet, bool value=false) : base(uiParamSet) {
             _value = value;
         }
 

@@ -87,8 +87,16 @@ namespace EffekseerPlayerPlugin.Unity.Data {
         protected readonly EditRange range;
         public float Max { get { return range.Max;} }
         public float Min { get { return range.Min;} }
-        public float SoftMax { get { return range.SoftMax;} }
-        public float SoftMin { get { return range.SoftMin;} }
+
+        public float SoftMax {
+            get { return range.SoftMax; }
+            set { range.SoftMax = value; }
+        }
+
+        public float SoftMin {
+            get { return range.SoftMin;}
+            set { range.SoftMin = value; }
+        }
         #endregion
 
         #region Events

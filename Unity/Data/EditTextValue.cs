@@ -72,7 +72,7 @@ namespace EffekseerPlayerPlugin.Unity.Data {
 
         public override void ReflectToSrc(float value1) {
             base.ReflectToSrc(value1);
-            text = base.val.ToString(range.Format);
+            text = val.ToString(range.Format);
             isSynched = true;
         }
         #endregion

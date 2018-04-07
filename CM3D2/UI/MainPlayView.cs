@@ -12,16 +12,16 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
     /// ファイルからロードされたレシピリストと、プレイ管理を行うビュー.
     /// </summary>
     public class MainPlayView : BaseWindow {
-        public MainPlayView(UIParamSet uiParams, EditRecipeView editView, 
-            RecipeManager recipeMgr, PlayManager playMgr) : base(uiParams) {
-            uiParams.AddListener(WinResized);
+        public MainPlayView(UIParamSet uiParamSet, EditRecipeView editView, 
+            RecipeManager recipeMgr, PlayManager playMgr) : base(uiParamSet) {
+            uiParamSet.AddListener(WinResized);
             _editView = editView;
             _recipeMgr = recipeMgr;
             _playMgr = playMgr;
         }
 
         ~MainPlayView() {
-            uiParams.Remove(WinResized);
+            uiParamSet.Remove(WinResized);
         }
 
         /// <summary>ウィンドウを初期化する</summary>
@@ -30,7 +30,7 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
                 if (!InitControls()) return;
 
                 AwakeChildren();
-                WinResized(uiParams);
+                WinResized(uiParamSet);
 
             } catch (Exception e) {
                 Log.Error("failed to awake MainPlayView", e);
@@ -38,13 +38,13 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
             }
         }
         internal override void InitPos() {
-            Left = Screen.width - uiParams.FixPx(420);
-            Top = uiParams.FixPx(74);
+            Left = Screen.width - uiParamSet.FixPx(420);
+            Top = uiParamSet.FixPx(74);
         }
 
         internal override void InitSize() {
-            Width = uiParams.FixPx(400);
-            Height = Screen.height - uiParams.FixPx(200);
+            Width = uiParamSet.FixPx(400);
+            Height = Screen.height - uiParamSet.FixPx(200);
             if (Height > 1000) {
                 Height = 1000;
             }
@@ -176,16 +176,16 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
             }
         }
 
-        internal override void Relayout(UIParamSet uiparams) {
+        protected override void Layout(UIParamSet uiParams) {
             if (!_initialized) return;
 
             var margin2 = margin * 2;
             var margin6 = margin * 6;
 
 //            var lineTop = Top + uiParams.unitHeight;
-            var itemHeight = uiParams.itemHeight;
-            var subButtonWidth = uiParams.FixPx(20f);
-            var align = new Rect(margin, uiParams.unitHeight, subButtonWidth, itemHeight*2);
+            var itemHeight = uiParamSet.itemHeight;
+            var subButtonWidth = uiParamSet.FixPx(20f);
+            var align = new Rect(margin, uiParamSet.unitHeight, subButtonWidth, itemHeight*2);
             editViewToggle.Align(ref align);
 
             align.y = 0f;
@@ -196,7 +196,7 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
 
             var buttonWidth = (Width - margin6 - subButtonWidth) / 4f;
             align.x = margin;
-            align.y = uiParams.unitHeight;
+            align.y = uiParamSet.unitHeight;
             align.width = buttonWidth;
             align.height = itemHeight;
             playButton.AlignLeft(editViewToggle, ref align);
@@ -229,7 +229,6 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
 #if DEBUG
             DebugLog(listView.Rect,  "mainView list ");
 #endif
-            RelayoutChildren();
         }
 
         /// <inheritdoc />
@@ -243,14 +242,14 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
             DebugLog(titleBarRect, "mainView titleBar ");
 #endif
 
-            Margin = uiParams.margin;
+            Margin = uiParamSet.margin;
             foreach (var child in Children) {
                 child.Margin = margin;
             }
 
-            var fontSizeL = uiParams.fontSizeL;
-            var fontSizeN = uiParams.fontSize;
-            var fontSizeS = uiParams.fontSizeS;
+            var fontSizeL = uiParamSet.fontSizeL;
+            var fontSizeN = uiParamSet.fontSize;
+            var fontSizeS = uiParamSet.fontSizeS;
 //            var fontSizeSS = uiParams.fontSizeSS;
 
             WinStyle.fontSize = fontSizeN;
@@ -270,7 +269,7 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
             reloadButton.FontSize = fontSizeN;
 
             listView.FontSize = fontSizeN;
-            listView.ItemHeight = uiParams.itemHeight;
+            listView.ItemHeight = uiParamSet.itemHeight;
         }
 
         #region Event
@@ -287,7 +286,7 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
             foreach (var set in _recipeMgr.GetRecipeSets()) {
                 set.expand = expandToggle.Value;
             }
-            listView.Relayout(uiParams);
+            listView.UpdateLayout(uiParamSet);
         }
 
         public void DeleteItems(object obj, EventArgs args) {
@@ -312,7 +311,7 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
             }
 
             // 削除後にリストビューのレイアウトを更新
-            listView.Relayout(uiParams);
+            listView.UpdateLayout(uiParamSet);
         }
 
         public void Close(object obj, EventArgs args) {
@@ -345,7 +344,7 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
 
         public void Reload(object obj, EventArgs args) {
             _recipeMgr.Reload();
-            listView.Relayout(uiParams);
+            listView.UpdateLayout(uiParamSet);
         }
 
         /// <summary>
@@ -372,12 +371,12 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
 
         public void DeleteRecipe(RecipeSet set, PlayRecipe recipe) {
             _recipeMgr.Remove(set.name, recipe);
-            listView.Relayout(uiParams);
+            listView.UpdateLayout(uiParamSet);
         }
 
         public void DeleteRecipeSet(RecipeSet recipeSet) {
             _recipeMgr.RemoveSet(recipeSet, true);
-            listView.Relayout(uiParams);
+            listView.UpdateLayout(uiParamSet);
         }
 
         #endregion

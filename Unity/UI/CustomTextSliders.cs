@@ -130,7 +130,7 @@ namespace EffekseerPlayerPlugin.Unity.UI {
             }
         }
 
-        internal override void Relayout(UIParamSet uiparams) {
+        protected override void Layout(UIParamSet uiParams) {
 
             // 各コントロールの位置調整
             if (Text != null) {
@@ -143,7 +143,7 @@ namespace EffekseerPlayerPlugin.Unity.UI {
 
             // indent: 外から指定
             subLabelRect.x = Left + indent;
-            subLabelRect.width  = uiParams.FixPx(subLabelWidth);
+            subLabelRect.width  = uiParamSet.FixPx(subLabelWidth);
             subLabelRect.height = TextHeight;
 
             textRect.x = subLabelRect.xMax + margin;

@@ -14,14 +14,14 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
     /// レシピ編集用ウィンドウ
     /// </summary>
     public partial class EditRecipeView : BaseWindow {
-        public EditRecipeView(UIParamSet uiParams, RecipeManager recipeMgr, EfkManager efkMgr) : base(uiParams) {
-            uiParams.AddListener(WinResized);
+        public EditRecipeView(UIParamSet uiParamSet, RecipeManager recipeMgr, EfkManager efkMgr) : base(uiParamSet) {
+            uiParamSet.AddListener(WinResized);
             this.recipeMgr = recipeMgr;
             this.efkMgr = efkMgr;
         }
 
         ~EditRecipeView() {
-            uiParams.Remove(WinResized);
+            uiParamSet.Remove(WinResized);
             if (_currentEmitter == null) return;
 
             _currentEmitter.Stop();
@@ -35,7 +35,7 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
                 if (!InitControls()) return;
                 AwakeChildren();
 
-                WinResized(uiParams);
+                WinResized(uiParamSet);
 
             } catch (Exception e) {
                 Log.Error("Failed to awake EditRecipeView", e);
@@ -46,17 +46,17 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
         internal override void InitPos() {
             if (parentWin != null) {
                 Left = parentWin.Left - Width;
-                Top = parentWin.Top + uiParams.FixPx(20);
+                Top = parentWin.Top + uiParamSet.FixPx(20);
             } else {
-                Left = Screen.width - uiParams.FixPx(820);
-                Top = uiParams.FixPx(80);
+                Left = Screen.width - uiParamSet.FixPx(820);
+                Top = uiParamSet.FixPx(80);
             }
         }
 
         internal override void InitSize() {
-            Width = uiParams.FixPx(460);
-//            Height = Screen.height - uiParams.FixPx(200);
-            Height = uiParams.FixPx(840);
+            Width = uiParamSet.FixPx(460);
+//            Height = Screen.height - uiParamSet.FixPx(200);
+            Height = uiParamSet.FixPx(840);
             if (Height > 900) {
                 Height = 900;
             }
@@ -205,7 +205,7 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
                 SelectTextColor = Color.white
             };
             attachToggle.CheckChanged += (obj, args) => {
-                Relayout(uiParams);
+                UpdateLayout(uiParamSet);
                 if (attachToggle.Value) {
                     ReloadMaidCombo();
                 }
@@ -356,7 +356,7 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
                 }
                 eulerSlider.Enabled = !eulerSlider.Enabled;
                 quatSlider.Enabled = !quatSlider.Enabled;
-                Relayout(uiParams);
+                UpdateLayout(uiParamSet);
             };
 
             eulerSlider = new CustomTextSliders(this,
@@ -491,7 +491,7 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
             return efkCombo.IsShowDropDownList || maidCombo.IsShowDropDownList;
         }
 
-        internal override void Relayout(UIParamSet uiparams) {
+        protected override void Layout(UIParamSet uiParams) {
             if (!_initialized) return;
 
             var margin2 = margin * 2;
@@ -634,11 +634,9 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
             align.width = uiParams.FixPx(100);
             _rotToggle.AlignTop(posSlider, ref align);
 
-
 #if DEBUG
 //            DebugLog(scaleSlider.Rect,  "editView slider");
 #endif
-            RelayoutChildren();
         }
 
         /// <summary>
@@ -651,14 +649,14 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
             DebugLog(titleBarRect, "editView titleBar ");
 #endif
 
-            Margin = uiParams.margin;
+            Margin = uiParamSet.margin;
             foreach (var child in Children) {
                 child.Margin = margin;
             }
 
-            var fontSizeN = uiParams.fontSize;
-            var fontSizeS = uiParams.fontSizeS;
-//            var fontSizeSS = uiParams.fontSizeSS;
+            var fontSizeN = uiParamSet.fontSize;
+            var fontSizeS = uiParamSet.fontSizeS;
+//            var fontSizeSS = uiParamSet.fontSizeSS;
 
             WinStyle.fontSize = fontSizeN;
 //            VerStyle.fontSize = fontSizeN;

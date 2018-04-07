@@ -31,8 +31,8 @@ namespace EffekseerPlayerPlugin.Unity.Data {
                 Format = "F" + _decimal;
             }
         }
-        public float SoftMin     { get; private set;}
-        public float SoftMax     { get; private set;}
+        public float SoftMin { get; set;}
+        public float SoftMax { get; set;}
         public float Min     { get; private set;}
         public float Max     { get; private set;}
         public string Format { get; private set;}

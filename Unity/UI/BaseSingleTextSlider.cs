@@ -43,7 +43,7 @@ namespace EffekseerPlayerPlugin.Unity.UI {
 
 //        protected abstract T CreateInstance(string name, float value, EditRange range);
 
-        public override void OnGUI() {
+        protected override void DrawGUI() {
             if (Text != null) GUI.Label(labelRect, Text, LabelStyle);
             if (listeners != null) {
                 var xPos = xMax;
@@ -101,7 +101,7 @@ namespace EffekseerPlayerPlugin.Unity.UI {
             Value.Value = GUI.HorizontalSlider(sliderRect, Value.Value, Value.SoftMin, Value.SoftMax);
         }
 
-        internal override void Relayout(UIParamSet uiparams) {
+        protected override void Layout(UIParamSet uiParams) {
 
             // 各コントロールの位置調整
             var yPos = Top;

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace EffekseerPlayerPlugin.Unity.Util {
     ///
-    /// カーソル・ドラッグ操作など用のユーティリティクラス.
+    /// カーソル・ドラッグ操作などを対象としたユーティリティクラス.
     ///
     internal class UIHelper {
 
