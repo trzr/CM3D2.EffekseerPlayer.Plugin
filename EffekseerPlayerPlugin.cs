@@ -180,6 +180,10 @@ namespace EffekseerPlayerPlugin {
             Log.Debug("plugin on destroy");
             Dispose();
             EffekseerSystem.Destroy();
+
+#if UNITY_5_5_OR_NEWER
+            SceneManager.sceneLoaded -= SceneLoaded;
+#endif
         }
         #endregion
 

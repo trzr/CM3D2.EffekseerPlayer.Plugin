@@ -356,7 +356,7 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
             if (!_editView.Visibled) return;
 
             _editView.SetGroupName(set.name);
-            _editView.SelectRecipe(recipe);
+            _editView.ToEditView(recipe);
         }
 
         /// <summary>

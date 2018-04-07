@@ -10,9 +10,7 @@ namespace EffekseerPlayerPlugin.Util {
     public sealed class ResourceHolder {
         private static readonly ResourceHolder INSTANCE = new ResourceHolder();
         public static ResourceHolder Instance {
-            get {
-                return INSTANCE;
-            }
+            get { return INSTANCE; }
         }
         private ResourceHolder() {}
 
