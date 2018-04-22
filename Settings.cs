@@ -47,7 +47,10 @@ namespace EffekseerPlayer {
         // 歪みエフェクトを有効にする
         public bool enableDistortion = EffekseerSystem.enableDistortion;
         // 音声を多重再生
-        public bool suppressMultiplePlaySound; 
+        public bool suppressMultiplePlaySound;
+
+        public delegate void UpdateHandler(Settings settings);
+        public UpdateHandler Updated = delegate { };
 
         // 設定の読み込み
         public void Load(Func<string, string> getValue) {
@@ -101,6 +104,8 @@ namespace EffekseerPlayer {
             Get(getValue("SliderMaxScale"), ref maxScale);
             Get(getValue("SliderMaxSpeed"), ref maxSpeed);
             Get(getValue("SliderMaxEndFrame"), ref maxFrame);
+
+            Updated(this);
         }
 
         public void Save(Action<string, string> setValue) {

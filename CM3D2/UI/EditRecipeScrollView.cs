@@ -32,6 +32,7 @@ namespace EffekseerPlayer.CM3D2.UI {
             var settings = Settings.Instance;
             var scaleRange = new EditRange(5, 0.00001f, settings.maxScale);
             var speedRange = new EditRange(5, 0.0001f, settings.maxSpeed);
+            var fixFrameRange = new EditRange(0, 0f, settings.maxFrame);
             var frameRange = new EditRange(0, 0f, settings.maxFrame);
             var posRange = new EditRange(5, -settings.maxLocation, settings.maxLocation);
 
@@ -71,7 +72,7 @@ namespace EffekseerPlayer.CM3D2.UI {
                     new PresetListener<EditTextLogValue>(">>", 30, val => val.Multiply(10f, true)),
                 },
             };
-            endFrameSlider = new CustomTextSlider(this, 0f, frameRange) {
+            endFrameSlider = new CustomTextSlider(this, 0f, fixFrameRange) {
                 Text = "◆エンドフレーム",
                 listeners = new[] {
                     new PresetListener<EditTextValue>("0", 20, val => val.Set(0, true)),
@@ -89,7 +90,7 @@ namespace EffekseerPlayer.CM3D2.UI {
                 Text = "◇フレーム",
                 Enabled = false,
             };
-            delaySlider = new CustomTextSlider(this, 0f, frameRange) {
+            delaySlider = new CustomTextSlider(this, 0f, fixFrameRange) {
                 Text = "◇ディレイ",
                 listeners = new[] {
                     new PresetListener<EditTextValue>("0", 20, val => val.Set(0, true)),
@@ -103,7 +104,7 @@ namespace EffekseerPlayer.CM3D2.UI {
                     new PresetListener<EditTextValue>(">>", 30, val => val.Add(+120, true)),
                 },
             };
-            postDelaySlider = new CustomTextSlider(this, 0f, frameRange) {
+            postDelaySlider = new CustomTextSlider(this, 0f, fixFrameRange) {
                 Text = "◇ポストディレイ",
                 listeners = new[] {
                     new PresetListener<EditTextValue>("0", 20, val => val.Set(0, true)),

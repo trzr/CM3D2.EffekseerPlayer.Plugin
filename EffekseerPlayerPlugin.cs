@@ -30,8 +30,10 @@ namespace EffekseerPlayer {
 
         private readonly UIParamSet _uiParamSet = UIParamSet.Instance;
         private readonly UIHelper _uiHelper = new UIHelper();
+        private readonly CM3D2SceneChecker sceneChecker = new CM3D2SceneChecker();
 
         private bool _started;
+        private bool IsTargetScene;
         private PlayManager _playMgr;
         private EfkManager _efkMgr;
         private RecipeManager _recipeMgr;
@@ -39,6 +41,8 @@ namespace EffekseerPlayer {
         private EditRecipeView _editView;
         private MainPlayView _playView;
         //private AssetBundle effectBundle;
+
+        private Func<bool> InputVisibleKey = () => false;
 
         /// <summary>初期化状態を表す列挙型</summary>
         public enum InitState {
@@ -76,6 +80,7 @@ namespace EffekseerPlayer {
             // デフォルトのefkパスを取得（configにパスが設定されている場合は、configを優先）
             var efkDir = Path.GetFullPath(Path.Combine(confDir, @"efk"));
 
+            Settings.Updated += UpdateSetting;
             ReloadConfig();
             Settings.Load(key => Preferences["Config"][key].Value);
             _uiParamSet.SizeRate = Settings.sizeRate;
@@ -91,7 +96,6 @@ namespace EffekseerPlayer {
 
             Log.Debug("Effekseer Dir: ", Settings.efkDir);
             _efkMgr = new EfkManager(Settings.efkDir);
-
             _playMgr = new PlayManager();
 
             var recipeDir = Path.GetFullPath(Path.Combine(Settings.efkDir, @"_recipes"));
@@ -101,16 +105,25 @@ namespace EffekseerPlayer {
             }
             _recipeMgr = new RecipeManager(recipeDir);
 
-            EffekseerSystem.baseDirectory   = Settings.efkDir;
-            EffekseerSystem.effectInstances = Settings.effectInstances;
-            EffekseerSystem.maxSquares      = Settings.maxSquares;
-            EffekseerSystem.soundInstances  = Settings.soundInstances;
-            EffekseerSystem.isRightHandledCoordinateSystem = Settings.isRightHandledCoordinateSystem;
-            EffekseerSystem.enableDistortion = Settings.enableDistortion;
-            EffekseerSystem.suppressMultiplePlaySound = Settings.suppressMultiplePlaySound;
-
+            EffekseerSystem.baseDirectory    = Settings.efkDir;
             DontDestroyOnLoad(this);
             _started = true;
+        }
+
+        private void UpdateSetting(Settings settings) {
+            EffekseerSystem.effectInstances  = settings.effectInstances;
+            EffekseerSystem.maxSquares       = settings.maxSquares;
+            EffekseerSystem.soundInstances   = settings.soundInstances;
+            EffekseerSystem.isRightHandledCoordinateSystem = settings.isRightHandledCoordinateSystem;
+            EffekseerSystem.enableDistortion = settings.enableDistortion;
+            EffekseerSystem.suppressMultiplePlaySound = settings.suppressMultiplePlaySound;
+            
+            if (Settings.toggleModifiers == EventModifiers.None) {
+                // 修飾キーが押されていない事を確認(Shift/Alt/Ctrl)
+                InputVisibleKey = () => (Event.current.modifiers & MODIFIER_KEYS) == EventModifiers.None && Input.GetKeyDown(Settings.toggleKey);
+            } else {
+                InputVisibleKey = () => (Event.current.modifiers & Settings.toggleModifiers) != EventModifiers.None && Input.GetKeyDown(Settings.toggleKey);
+            }
         }
 
 #if UNITY_5_5_OR_NEWER
@@ -130,13 +143,22 @@ namespace EffekseerPlayer {
             // Effekseerの再生状態を一旦クリア
             _playMgr.Clear();
             // 必要に応じて各コンボの情報(メイド一覧など)をクリア
+
+            IsTargetScene = sceneChecker.IsTarget(sceneIdx);
+            if (IsTargetScene) {
+                if (_state == InitState.NotInitialized) {
+                    _state = InitState.Initializing;
+                    plugin.StartCoroutine(DelayFrame(60, Init));
+                }
+            }
         }
 
         public void Update() {
+            if (!IsTargetScene) return;
+
             try {
-                if (InputModifierKey() && Input.GetKeyDown(Settings.toggleKey)) {
-                    if (_state == InitState.NotInitialized) Init();
-                    else {
+                if (InputVisibleKey()) {
+                    if (_state != InitState.NotInitialized) {
                         _playView.Visibled = !_playView.Visibled;
                         Log.Debug("Visibled:", _playView.Visibled);
                         if (_playView.Visibled && _state == InitState.Initialized) _uiParamSet.Update();
@@ -156,6 +178,8 @@ namespace EffekseerPlayer {
         }
 
         public void OnGUI() {
+            if (!IsTargetScene) return;
+
             if (_state != InitState.Initialized || !_playView.Visibled) return;
             if (Settings.ssWithoutUI && !_uiHelper.IsEnabledUICamera()) return; // UI無し撮影
 
@@ -242,16 +266,6 @@ namespace EffekseerPlayer {
         private void Dispose() {
             _uiHelper.SetCameraControl(true);
             _uiHelper.InitStatus();
-        }
-
-        private bool InputModifierKey() {
-            var em = Event.current.modifiers;
-            if (Settings.toggleModifiers == EventModifiers.None) {
-                // 修飾キーが押されていない事を確認(Shift/Alt/Ctrl)
-                return (em & MODIFIER_KEYS) == EventModifiers.None;
-            }
-
-            return (em & Settings.toggleModifiers) != EventModifiers.None;
         }
 
         private string ResolveDir() {

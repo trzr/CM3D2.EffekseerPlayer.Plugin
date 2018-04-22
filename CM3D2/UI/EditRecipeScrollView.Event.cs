@@ -348,6 +348,8 @@ namespace EffekseerPlayer.CM3D2.UI {
         }
 
         private void ApplyLocation() {
+            if (currentEmitter == null) return;
+
             if (fixOffsetToggle.Value) {
                 currentEmitter.OffsetLocation = _location;
             } else {
@@ -358,11 +360,10 @@ namespace EffekseerPlayer.CM3D2.UI {
         }
 
         private void PosChanged(float val,  Action<float> setPos) {
-            if (currentEmitter == null) return;
-
             setPos(val);
             ApplyLocation();
         }
+
         private void PosXChanged(object obj, EventArgs args) {
             var val = (EditTextValue)obj;
             PosChanged(val.Value, f => _location.x = f);
@@ -490,7 +491,6 @@ namespace EffekseerPlayer.CM3D2.UI {
                 quatSlider.Value[2].Value,
                 quatSlider.Value[3].Value);
         }
-
 
         /// <summary>
         /// メイド情報のコンボボックスの内容を更新する.
