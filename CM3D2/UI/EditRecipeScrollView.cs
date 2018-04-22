@@ -1,12 +1,12 @@
 ﻿using System;
-using EffekseerPlayerPlugin.CM3D2.Render;
-using EffekseerPlayerPlugin.CM3D2.Util;
-using EffekseerPlayerPlugin.Unity.Data;
-using EffekseerPlayerPlugin.Unity.UI;
-using EffekseerPlayerPlugin.Util;
+using EffekseerPlayer.CM3D2.Render;
+using EffekseerPlayer.CM3D2.Util;
+using EffekseerPlayer.Unity.Data;
+using EffekseerPlayer.Unity.UI;
+using EffekseerPlayer.Util;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.CM3D2.UI {
+namespace EffekseerPlayer.CM3D2.UI {
     /// <summary>
     /// レシピエディットウィンドウ用のスクロールビュークラス.
     /// レシピの各種パラメータを設定するUIを定義する.
@@ -130,7 +130,7 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
                     new PresetListener<EditTextValues>(">", 20, vals => vals.Add(new[] {0.1f, 0.1f, 0.1f, 0f}, true)),
                     new PresetListener<EditTextValues>(">>", 30,
                         vals => vals.Add(new[] {0.25f, 0.25f, 0.25f, 0f}, true)),
-                    new PresetListener<EditTextValues>("reset", 50, vals => vals.SetWithNotify(1, 1, 1, 1)),
+                    new PresetListener<EditTextValues>("reset", WIDTH_RESET, vals => vals.SetWithNotify(1, 1, 1, 1)),
                 },
                 prevListeners = new[] {
                     new PresetListener<EditTextValue>("0", 20, val => val.Set(0, true)),
@@ -210,7 +210,7 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
                 new[] {"X", "Y", "Z"}, new[] {0f, 0f, 0f}, posRange) {
                 Text = "◆位置",
                 listeners = new[] {
-                    new PresetListener<EditTextValues>("reset", 50, vals => vals.SetWithNotify(0, 0, 0)),
+                    new PresetListener<EditTextValues>("reset", WIDTH_RESET, vals => vals.SetWithNotify(0, 0, 0)),
                 },
                 prevListeners = new[] {
                     new PresetListener<EditTextValue>("<", 20, val => val.Add(-0.1f, true)),
@@ -234,7 +234,7 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
                 Text = "◆回転(Euler)",
                 Enabled = false,
                 listeners = new[] {
-                    new PresetListener<EditTextValues>("reset", 50, vals => vals.SetWithNotify(0, 0, 0)),
+                    new PresetListener<EditTextValues>("reset", WIDTH_RESET, vals => vals.SetWithNotify(0, 0, 0)),
                 },
                 prevListeners = new[] {
                     new PresetListener<EditTextValue>("-90", 40, val => val.Add(-90, true)),
@@ -252,7 +252,7 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
                 Text = "◆回転(Quaternion)",
                 Enabled = true,
                 listeners = new[] {
-                    new PresetListener<EditTextValues>("reset", 50, vals => vals.SetWithNotify(0f, 0f, 0f, 1f)),
+                    new PresetListener<EditTextValues>("reset", WIDTH_RESET, vals => vals.SetWithNotify(0f, 0f, 0f, 1f)),
                 },
                 prevListeners = new[] {
                     new PresetListener<EditTextValue>("-0.5", 40, val => val.Add(-0.5f, true)),
@@ -265,6 +265,7 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
 
             //------------------------------------------
             // イベント処理
+            //------------------------------------------
             scaleSlider.Value.ValueChanged += ScaleChanged;
             speedSlider.Value.ValueChanged += SpeedChanged;
             endFrameSlider.Value.ValueChanged += EndFrameChanged;
@@ -381,7 +382,6 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
             if (currentEmitter != null && currentEmitter.Exists) {
                 frameSlider.Num = currentEmitter.Frame;
             }
-
         }
 
         public void UpdateSlider() {
@@ -630,6 +630,7 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
         }
 
         #region Fields
+        private const int WIDTH_RESET = 50;
         private readonly MaidHolder _maidHolder = new MaidHolder();
         private readonly EventHandler CheckValidate;
         protected float viewHeight;

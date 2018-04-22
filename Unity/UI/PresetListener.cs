@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.Unity.UI {
+namespace EffekseerPlayer.Unity.UI {
     ///
     /// プリセット操作用リスナー
     /// 

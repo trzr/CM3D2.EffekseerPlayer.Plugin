@@ -9,7 +9,7 @@ using UnityEngine.Rendering;
 using UnityEditor;
 #endif
 
-namespace EffekseerPlayerPlugin.Effekseer {
+namespace EffekseerPlayer.Effekseer {
 
     public class EffekseerSystem : MonoBehaviour {
 

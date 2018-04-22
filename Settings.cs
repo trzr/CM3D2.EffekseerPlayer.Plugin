@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using EffekseerPlayerPlugin.Effekseer;
+using EffekseerPlayer.Effekseer;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin {
+namespace EffekseerPlayer {
     public sealed class Settings {
 
         private static readonly Settings INSTANCE = new Settings();
@@ -41,7 +41,7 @@ namespace EffekseerPlayerPlugin {
         // 描画できる四角形の最大数
         public int maxSquares       = EffekseerSystem.maxSquares;
         // サウンドインスタンスの最大数
-        public int soundInstances = EffekseerSystem.soundInstances;
+        public int soundInstances   = EffekseerSystem.soundInstances;
         // エフェクトの座標系
         public bool isRightHandledCoordinateSystem = EffekseerSystem.isRightHandledCoordinateSystem;
         // 歪みエフェクトを有効にする

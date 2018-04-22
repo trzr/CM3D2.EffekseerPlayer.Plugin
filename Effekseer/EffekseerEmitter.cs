@@ -3,7 +3,7 @@ using System.Text;
 using UnityEngine;
 // ReSharper disable PossibleInvalidOperationException
 
-namespace EffekseerPlayerPlugin.Effekseer {
+namespace EffekseerPlayer.Effekseer {
     /// <summary xml:lang="en">
     /// A emitter of the Effekseer effect
     /// </summary>
@@ -13,11 +13,12 @@ namespace EffekseerPlayerPlugin.Effekseer {
     public class EffekseerEmitter : MonoBehaviour {
         [Flags]
         public enum EmitterStatus {
-            Empty = 0,
-            Playing = 1,
-            Paused = 2,
+            Empty    = 0,
+            Playing  = 1,
+            Paused   = 2,
             Stopping = 4,
-            Stopped = 8,
+            Stopped  = 8,
+            Waiting  = 16,
         }
         /// <summary xml:lang="en">
         /// Effect name
@@ -331,18 +332,6 @@ namespace EffekseerPlayerPlugin.Effekseer {
                 return _handle.HasValue ? _handle.Value.Speed : 0.0f;
             }
         }
-
-//        /// <summary xml:lang="en">
-//        /// Play frame
-//        /// </summary>
-//        /// <summary xml:lang="ja">
-//        /// 再生フレーム
-//        /// </summary>
-//        public float Frame { 
-//            get {
-//                return _handle.HasValue ? _handle.Value.Frame : -1f;
-//            }
-//        }
 
         /// <summary xml:lang="en">
         /// Existing state

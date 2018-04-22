@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Text;
-using EffekseerPlayerPlugin.CM3D2.Util;
-using EffekseerPlayerPlugin.Effekseer;
+using EffekseerPlayer.CM3D2.Util;
+using EffekseerPlayer.Effekseer;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.CM3D2.Data {
+namespace EffekseerPlayer.CM3D2.Data {
 
     [Serializable]
     public class PlayRecipe : ISerializationCallbackReceiver {
@@ -167,7 +167,7 @@ namespace EffekseerPlayerPlugin.CM3D2.Data {
             var slot = m.body0.goSlot[(int)attachSlot.Value];
             if (slot != null && slot.obj != null) return MaidHelper.SearchBone(slot.obj.transform, attachBone);
 
-            Log.Info("Attach target slot is empty. maid:", m.name, ", recipe:", name, ", slot:", attachSlot.Value);
+            Log.Info("Attach target slot is empty. maid:", MaidHelper.GetName(m), ", recipe:", name, ", slot:", attachSlot.Value);
             return null;
         }
 

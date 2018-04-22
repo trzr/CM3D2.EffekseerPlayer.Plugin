@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.CM3D2.Util {
+namespace EffekseerPlayer.CM3D2.Util {
     public static class MaidHelper {
         
         private static readonly Dictionary<string, Maid> GuidCache = new Dictionary<string, Maid>();

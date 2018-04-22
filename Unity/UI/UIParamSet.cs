@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.Unity.UI {
+namespace EffekseerPlayer.Unity.UI {
     /// <summary>
     /// UIパーツの共通パラメータ管理クラス.
     /// 基本となるパラメータセットのみとする

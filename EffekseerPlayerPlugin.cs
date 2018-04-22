@@ -2,19 +2,19 @@
 using System.Collections;
 using System.IO;
 using System.Reflection;
-using EffekseerPlayerPlugin.CM3D2;
-using EffekseerPlayerPlugin.CM3D2.Data;
-using EffekseerPlayerPlugin.CM3D2.UI;
-using EffekseerPlayerPlugin.Effekseer;
-using EffekseerPlayerPlugin.Unity.UI;
-using EffekseerPlayerPlugin.Unity.Util;
+using EffekseerPlayer.CM3D2;
+using EffekseerPlayer.CM3D2.Data;
+using EffekseerPlayer.CM3D2.UI;
+using EffekseerPlayer.Effekseer;
+using EffekseerPlayer.Unity.UI;
+using EffekseerPlayer.Unity.Util;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityInjector;
 using UnityInjector.Attributes;
 
 [assembly: AssemblyVersion("0.1.0")]
-namespace EffekseerPlayerPlugin {
+namespace EffekseerPlayer {
 #if COM3D2    
     [PluginFilter("COM3D2x64"),
 #else
@@ -53,7 +53,7 @@ namespace EffekseerPlayerPlugin {
 
         #endregion
         // ReSharper disable once FieldCanBeMadeReadOnly.Global
-        internal PluginBase plugin;
+        internal MonoBehaviour plugin;
         public EffekseerPlayerPlugin() {
             plugin = this;
         }
@@ -117,15 +117,15 @@ namespace EffekseerPlayerPlugin {
         public void SceneLoaded(Scene scene, LoadSceneMode sceneMode) {
             // Log.Debug(scene.name);
             
-            SceneLoaded();
+            OnSceneLoaded(scene.buildIndex);
         }
 #else
         public void OnLevelWasLoaded(int level) {
             // Log.Debug("OnLevelWasLoaded ", level);
-            SceneLoaded();
+            OnSceneLoaded(level);
         }
 #endif
-        private void SceneLoaded() {
+        private void OnSceneLoaded(int sceneIdx) {
             _uiHelper.InitStatus();
             // Effekseerの再生状態を一旦クリア
             _playMgr.Clear();
@@ -271,9 +271,7 @@ namespace EffekseerPlayerPlugin {
             return DataPath;
         }
 
-        // プラグイン名
         public static volatile string PluginName;
-        // プラグインバージョン
         public static volatile string Version;
         static EffekseerPlayerPlugin() {
             // 属性クラスからプラグイン名取得

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace EffekseerPlayerPlugin.CM3D2 {
+namespace EffekseerPlayer.CM3D2 {
 
     /// <summary>
     /// efkファイルマネージャ

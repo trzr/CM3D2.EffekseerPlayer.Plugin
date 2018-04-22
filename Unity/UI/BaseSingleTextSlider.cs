@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
-using EffekseerPlayerPlugin.Unity.Data;
+using EffekseerPlayer.Unity.Data;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.Unity.UI {
+namespace EffekseerPlayer.Unity.UI {
     /// <summary>
     /// テキストフィールドとスライダー（水平）を横に並べ、連動するコントロールの抽象クラス
     /// </summary>

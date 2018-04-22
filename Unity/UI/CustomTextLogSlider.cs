@@ -1,8 +1,8 @@
 ﻿using System;
-using EffekseerPlayerPlugin.Unity.Data;
+using EffekseerPlayer.Unity.Data;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.Unity.UI {
+namespace EffekseerPlayer.Unity.UI {
     /// <summary>
     /// CustomTextSliderを拡張し、スライダーを対数の縮尺で動作させるクラス.
     /// </summary>

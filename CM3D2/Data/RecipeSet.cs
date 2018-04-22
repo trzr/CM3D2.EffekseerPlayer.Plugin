@@ -2,24 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using EffekseerPlayerPlugin.Unity.Data;
+using EffekseerPlayer.Unity.Data;
 
-namespace EffekseerPlayerPlugin.CM3D2.Data {
+namespace EffekseerPlayer.CM3D2.Data {
     /// <summary>
     /// PlayRecipeの集合を表すデータクラス.
     /// 1つのjsonファイルに対応する.
     /// </summary>
     [Serializable]
     public class RecipeSet {
-        public string name;
-
-        public bool expand;
-        public CheckStatus check;
-        public long lastWriteTime;
-        public bool loaded;
-
-        public readonly List<PlayRecipe> recipeList = new List<PlayRecipe>();
-        private readonly Dictionary<string, PlayRecipe> _recipeDic = new Dictionary<string, PlayRecipe>();
 
         ~RecipeSet() {
             Destroy();
@@ -67,8 +58,8 @@ namespace EffekseerPlayerPlugin.CM3D2.Data {
                 if (!_recipeDic.ContainsKey(recipe.name)) {
                     _recipeDic[recipe.name] = recipe;
                 } else {
-                    Log.Debug("Recipeに重複があったため削除しました. name=", recipe.name);
                     recipeList.RemoveAt(i);
+                    Log.Debug("recipe was deleted because of duplication. name=", recipe.name);
                 }
             }
         }
@@ -93,16 +84,15 @@ namespace EffekseerPlayerPlugin.CM3D2.Data {
                 recipe.selected = old.selected;
                 if (idx != -1) {
                     recipeList[idx] = recipe;
-                    Log.Debug("overwrite recipe:", recipe.name, ", count=", recipeList.Count);
                 } else {
                     recipeList.Add(recipe);
-                    Log.Debug("add recipe1:", recipe.name, ", count=", recipeList.Count);
                 }
                 old.Destroy();
             } else {
                 recipeList.Add(recipe);
-                Log.Debug("add recipe2:", recipe.name, ", count=", recipeList.Count);
             }
+            Log.Debug("register recipe:", recipe.name, ", count=", recipeList.Count);
+
             _recipeDic[recipe.name] = recipe;
             recipe.Parent = this;
 
@@ -146,7 +136,12 @@ namespace EffekseerPlayerPlugin.CM3D2.Data {
             return _recipeDic.TryGetValue(recipeName, out recipe) ? recipe : null;
         }
 
-        private const string INDENT = "  ";
+        /// <summary>
+        /// <summary>
+        /// レシピセットの情報をJSON形式で出力する.
+        /// </summary>
+        /// <param name="writer">出力先ライター</param>
+        /// <param name="pretty">整形フラグ</param>
         public void ToJSON(StreamWriter writer, bool pretty=false) {
             var buff = new StringBuilder();
             buff.Append("{");
@@ -165,7 +160,7 @@ namespace EffekseerPlayerPlugin.CM3D2.Data {
                     buff.Append(',');
                     if (pretty) buff.Append("\n");
                 }
-                recipe.ToJSON(buff, pretty, INDENT);
+                recipe.ToJSON(buff, pretty, ConstantValues.JSON_INDENT);
                 writer.Write(buff);
                 buff.Length = 0;
             }
@@ -175,5 +170,17 @@ namespace EffekseerPlayerPlugin.CM3D2.Data {
             buff.Append("}");
             writer.Write(buff);
         }
+
+        #region Fields
+        public readonly List<PlayRecipe> recipeList = new List<PlayRecipe>();
+        private readonly Dictionary<string, PlayRecipe> _recipeDic = new Dictionary<string, PlayRecipe>();
+
+        public string name;
+
+        public bool expand;
+        public CheckStatus check;
+        public long lastWriteTime;
+        public bool loaded;
+        #endregion
     }
 }

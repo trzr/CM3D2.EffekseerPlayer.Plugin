@@ -3,7 +3,7 @@ using System.IO;
 using System.Reflection;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.Util {
+namespace EffekseerPlayer.Util {
     /// <summary>
     /// リソースのロードユーティリティ
     /// </summary>

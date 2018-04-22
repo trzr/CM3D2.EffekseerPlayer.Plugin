@@ -1,12 +1,12 @@
 ﻿using System;
-using EffekseerPlayerPlugin.CM3D2.Data;
-using EffekseerPlayerPlugin.Effekseer;
-using EffekseerPlayerPlugin.Unity.Data;
-using EffekseerPlayerPlugin.Unity.UI;
-using EffekseerPlayerPlugin.Util;
+using EffekseerPlayer.CM3D2.Data;
+using EffekseerPlayer.Effekseer;
+using EffekseerPlayer.Unity.Data;
+using EffekseerPlayer.Unity.UI;
+using EffekseerPlayer.Util;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.CM3D2.UI {
+namespace EffekseerPlayer.CM3D2.UI {
     /// <inheritdoc />
     // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
     public class RecipeListView : BaseScrollView {
@@ -263,7 +263,6 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
         protected Rect statusRect;
         protected Rect buttonRect;
         private readonly GUIColorStore _colorStore = new GUIColorStore();
-
 
         private Color? _buttonBColor;
         public Color? ButtonBColor {

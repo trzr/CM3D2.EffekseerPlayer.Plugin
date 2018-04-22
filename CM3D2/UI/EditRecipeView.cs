@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using EffekseerPlayerPlugin.CM3D2.Data;
-using EffekseerPlayerPlugin.Unity.UI;
-using EffekseerPlayerPlugin.Util;
+using EffekseerPlayer.CM3D2.Data;
+using EffekseerPlayer.Unity.UI;
+using EffekseerPlayer.Util;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.CM3D2.UI {
+namespace EffekseerPlayer.CM3D2.UI {
     /// <inheritdoc />
     /// <summary>
     /// レシピ編集用ウィンドウ
@@ -167,9 +167,7 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
                 } finally {
                     enabledStore.Restore();
                 }
-
-                    subEditView.OnGUI();
-
+                subEditView.OnGUI();
 
             } catch (Exception e) {
                 Log.Error(e);

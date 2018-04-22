@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using EffekseerPlayerPlugin.CM3D2.Data;
-using EffekseerPlayerPlugin.CM3D2.Render;
-using EffekseerPlayerPlugin.CM3D2.Util;
-using EffekseerPlayerPlugin.Effekseer;
-using EffekseerPlayerPlugin.Unity.Data;
+using EffekseerPlayer.CM3D2.Data;
+using EffekseerPlayer.CM3D2.Render;
+using EffekseerPlayer.CM3D2.Util;
+using EffekseerPlayer.Effekseer;
+using EffekseerPlayer.Unity.Data;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.CM3D2.UI {
+namespace EffekseerPlayer.CM3D2.UI {
     public partial class EditRecipeScrollView {
 
         /// <summary>

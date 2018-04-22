@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace EffekseerPlayerPlugin.Util {
+namespace EffekseerPlayer.Util {
     /// <summary>
     /// privateフィールド用のアクセサ
     /// とりあえず使う処理だけ実装版

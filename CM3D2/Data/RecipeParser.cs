@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.CM3D2.Data {
+namespace EffekseerPlayer.CM3D2.Data {
     public class RecipeParser {
         private static readonly RecipeParser INSTANCE = new RecipeParser();
         public static RecipeParser Instance {
@@ -29,7 +29,9 @@ namespace EffekseerPlayerPlugin.CM3D2.Data {
             while (!reader.EndOfStream) {
                 var quoted = false;
                 var startIdx = 0;
-                var line = reader.ReadLine().Trim();
+                var line = reader.ReadLine();
+                if (line == null) continue;
+                line = line.Trim();
                 for (var i=0; i<line.Length; i++) {
                     var chr = line[i];
                     if (quoted && chr == '"') {
@@ -55,9 +57,7 @@ namespace EffekseerPlayerPlugin.CM3D2.Data {
                         if (listValueToken && startArray && depth == 0) {
                             builder.Append(chr);
                             var recipe = JsonUtility.FromJson<PlayRecipe>(builder.ToString());
-                            Log.Debug("recipe name:", recipe.name);
-                            Log.Debug("recipe slotID:", recipe.attachSlot);
-                            Log.Debug("recipe bone:", recipe.attachBone);
+                            Log.Debug("recipe name:", recipe.name, ", slotID:", recipe.attachSlot, ", bone:", recipe.attachBone);
                             recipeSet.recipeList.Add(recipe);
                             builder.Length = 0;
                             continue;

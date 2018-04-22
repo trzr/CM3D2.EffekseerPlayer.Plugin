@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace EffekseerPlayerPlugin.Unity.Data {
+namespace EffekseerPlayer.Unity.Data {
     /// <summary>
     /// 複数のEditTextValueにアクセスするクラス.
     /// 
@@ -53,7 +53,6 @@ namespace EffekseerPlayerPlugin.Unity.Data {
             }
         }
 
-
         /// <summary>
         /// 値に強制的に上書きする.
         /// notifyに応じて変更通知を行う
@@ -62,7 +61,7 @@ namespace EffekseerPlayerPlugin.Unity.Data {
         /// <param name="values1">変更値</param>
         /// <param name="notify">通知の有無</param>
         /// <param name="withCheck">変更チェックの有無</param>
-        internal virtual void Set(float[] values1, bool notify=false, bool withCheck=false) {
+        public virtual void Set(float[] values1, bool notify=false, bool withCheck=false) {
             for (var i = 0; i < Size; i++) {
                 values[i].Set(values1[i], notify, withCheck);
             }
@@ -72,7 +71,7 @@ namespace EffekseerPlayerPlugin.Unity.Data {
         /// 変更通知なしのセット後に強制的に通知
         /// </summary>
         /// <param name="values1">変更値</param>
-        internal virtual void SetWithNotify(params float[] values1) {
+        public virtual void SetWithNotify(params float[] values1) {
             for (var i = 0; i < values1.Length; i++) {
                 if (i >= Size) break;
                 values[i].Set(values1[i]);

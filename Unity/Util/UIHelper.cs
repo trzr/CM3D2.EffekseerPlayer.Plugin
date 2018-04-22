@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using EffekseerPlayerPlugin.Unity.UI;
+using EffekseerPlayer.Unity.UI;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.Unity.Util {
+namespace EffekseerPlayer.Unity.Util {
     ///
     /// カーソル・ドラッグ操作などを対象としたユーティリティクラス.
     ///
@@ -30,8 +30,7 @@ namespace EffekseerPlayerPlugin.Unity.Util {
             var contains = false;
             foreach (var target in targets) {
                 contains |= target.CursorContains;
-                if (contains)
-                    break;
+                if (contains) break;
             }
 
             if (contains) {

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace EffekseerPlayerPlugin.Unity.UI {
+namespace EffekseerPlayer.Unity.UI {
     public abstract class BaseTextSlider<T> : GUIControl {
         #region Methods
         /// <summary>コンストラクタ.</summary>

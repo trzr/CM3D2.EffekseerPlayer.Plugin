@@ -1,4 +1,4 @@
-﻿namespace EffekseerPlayerPlugin.Unity.Data {
+﻿namespace EffekseerPlayer.Unity.Data {
     /// <summary>
     /// チェックステータスを表す列挙型.
     /// </summary>

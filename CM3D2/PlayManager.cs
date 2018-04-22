@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using EffekseerPlayerPlugin.CM3D2.Data;
-using EffekseerPlayerPlugin.Effekseer;
+using EffekseerPlayer.CM3D2.Data;
+using EffekseerPlayer.Effekseer;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.CM3D2 {
+namespace EffekseerPlayer.CM3D2 {
     public class PlayManager {
         
         ~PlayManager() {

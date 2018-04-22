@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.CM3D2.Render {
+namespace EffekseerPlayer.CM3D2.Render {
     ///
     /// ボーン描画クラス.
     ///  オリジナルのオブジェクトへのアタッチを避け、

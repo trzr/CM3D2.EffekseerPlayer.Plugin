@@ -1,6 +1,6 @@
-﻿using EffekseerPlayerPlugin.Unity.Data;
+﻿using EffekseerPlayer.Unity.Data;
 
-namespace EffekseerPlayerPlugin.Unity.UI {
+namespace EffekseerPlayer.Unity.UI {
     /// <inheritdoc />
     /// <summary>
     /// テキストフィールドとスライダー（水平）を横に並べ、連動するコントロール.

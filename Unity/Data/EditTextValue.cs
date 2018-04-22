@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EffekseerPlayerPlugin.Unity.Data {
+namespace EffekseerPlayer.Unity.Data {
     /// <inheritdoc />
     /// <summary>
     /// 編集用の文字列と浮動小数点の変数を扱うクラス.
@@ -36,7 +36,7 @@ namespace EffekseerPlayerPlugin.Unity.Data {
         /// <param name="notify">変更通知</param>
         /// <param name="withCheck">範囲チェックの有無</param>
         /// <returns>変更した場合にtrueを返す</returns>
-        internal override bool Set(float val1, bool notify=false, bool withCheck=false) {
+        public override bool Set(float val1, bool notify=false, bool withCheck=false) {
             var changed = base.Set(val1, notify, withCheck);
             text = val.ToString(range.Format);
             isSynched = true;
@@ -53,7 +53,7 @@ namespace EffekseerPlayerPlugin.Unity.Data {
         /// <param name="notify">変更通知</param>
         /// <param name="withCheck">範囲チェックの有無</param>
         /// <returns>変更した場合にtrueを返す</returns>
-        internal virtual bool Set(string val1, bool notify=false, bool withCheck=false) {
+        public virtual bool Set(string val1, bool notify=false, bool withCheck=false) {
             if (text == val1) return false;
             text = val1;
 

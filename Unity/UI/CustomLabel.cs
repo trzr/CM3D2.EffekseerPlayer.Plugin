@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace EffekseerPlayerPlugin.Unity.UI {
+namespace EffekseerPlayer.Unity.UI {
     /// <summary>
     /// ラベル コントロール
     /// </summary>

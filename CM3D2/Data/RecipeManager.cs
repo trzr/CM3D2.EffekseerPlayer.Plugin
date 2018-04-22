@@ -4,18 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace EffekseerPlayerPlugin.CM3D2.Data {
+namespace EffekseerPlayer.CM3D2.Data {
 
     /// <summary>
     /// 再生レシピのセーブ・ロードを行う管理するマネージャクラス.
     /// </summary>
+    // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
     public class RecipeManager {
-        private const string EXTENSION = ".json";
-        // 保存ディレクトリ
-        protected readonly string directory;
-
-        private readonly List<RecipeSet> _recipeSets = new List<RecipeSet>();
-        private readonly Dictionary<string, RecipeSet> _recipeSetDic = new Dictionary<string, RecipeSet>();
 
         public RecipeManager(string directory) {
             this.directory = directory;
@@ -80,9 +75,10 @@ namespace EffekseerPlayerPlugin.CM3D2.Data {
 
             _recipeSetDic.Remove(setName);
             var removed = _recipeSets.Remove(recipeSet);
+            recipeSet.Destroy();
             if (!deleteFile) return false;
 
-            var filepath = Path.Combine(directory, setName + EXTENSION);
+            var filepath = Path.Combine(directory, setName + ConstantValues.EXT_JSON);
             try {
                 File.Delete(filepath);
             } catch(Exception e) {
@@ -161,7 +157,7 @@ namespace EffekseerPlayerPlugin.CM3D2.Data {
 
         public void Load() {
             Log.Debug("Loading recipeSet.");
-            var filenames = Directory.GetFiles(directory, "*" + EXTENSION, SearchOption.TopDirectoryOnly);
+            var filenames = Directory.GetFiles(directory, "*" + ConstantValues.EXT_JSON, SearchOption.TopDirectoryOnly);
             foreach (var filename in filenames) {
                 var filepath = Path.Combine(directory, filename);
                 var file = new FileInfo(filepath);
@@ -200,13 +196,26 @@ namespace EffekseerPlayerPlugin.CM3D2.Data {
             }
         }
 
+        /// <summary>
+        /// 指定したレシピセットをファイルに保存する.
+        /// 
+        /// 一時ファイルを作成して書き出した後に、ファイルをリネームして上書きする.
+        /// </summary>
+        /// <param name="recipeSet"></param>
         public void Save(RecipeSet recipeSet) {
-            var filepath = Path.Combine(directory, recipeSet.name + EXTENSION);
+            var filepath = Path.Combine(directory, recipeSet.name + ConstantValues.EXT_JSON);
+            var tmppath = Path.Combine(directory, "tmp"+Path.GetRandomFileName());
             try {
-                SaveJson(filepath, recipeSet);
-                Log.Debug("recipe file written.", recipeSet.name, EXTENSION);
-            } catch(Exception e) {
+                SaveJson(tmppath, recipeSet);
+
+                if (File.Exists(filepath)) File.Delete(filepath);
+                File.Move(tmppath, filepath);
+                Log.Debug("recipe file written.", recipeSet.name, ConstantValues.EXT_JSON);
+                
+            } catch (Exception e) {
                 Log.Error("failed to save json. file=", filepath, e);
+            } finally {
+                if (File.Exists(tmppath)) File.Delete(tmppath);
             }
         }
 
@@ -216,5 +225,12 @@ namespace EffekseerPlayerPlugin.CM3D2.Data {
             }
         }
 
+        #region Fields
+        // 保存ディレクトリ
+        protected readonly string directory;
+
+        private readonly List<RecipeSet> _recipeSets = new List<RecipeSet>();
+        private readonly Dictionary<string, RecipeSet> _recipeSetDic = new Dictionary<string, RecipeSet>();
+        #endregion
     }
 }

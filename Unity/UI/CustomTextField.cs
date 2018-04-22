@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.Unity.UI {
+namespace EffekseerPlayer.Unity.UI {
     /// <summary>
     /// テキストフィールド コントロール.
     /// hasErrorフラグをtrueにすると背景色をerrorColorに設定する.

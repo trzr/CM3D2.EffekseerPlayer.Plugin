@@ -1,8 +1,8 @@
 ﻿using System;
-using EffekseerPlayerPlugin.CM3D2.Data;
+using EffekseerPlayer.CM3D2.Data;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.CM3D2.UI {
+namespace EffekseerPlayer.CM3D2.UI {
 
     public partial class EditRecipeView {
 

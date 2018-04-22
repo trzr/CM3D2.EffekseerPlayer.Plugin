@@ -1,7 +1,7 @@
-﻿using EffekseerPlayerPlugin.Unity.Data;
+﻿using EffekseerPlayer.Unity.Data;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.Unity.UI {
+namespace EffekseerPlayer.Unity.UI {
     /// <inheritdoc />
     /// <summary>
     /// 数値型テキストフィールド コントロール.

@@ -1,11 +1,11 @@
 ﻿using System;
-using EffekseerPlayerPlugin.CM3D2.Data;
-using EffekseerPlayerPlugin.Unity.Data;
-using EffekseerPlayerPlugin.Unity.UI;
-using EffekseerPlayerPlugin.Util;
+using EffekseerPlayer.CM3D2.Data;
+using EffekseerPlayer.Unity.Data;
+using EffekseerPlayer.Unity.UI;
+using EffekseerPlayer.Util;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.CM3D2.UI {
+namespace EffekseerPlayer.CM3D2.UI {
     /// <inheritdoc />
     /// <summary>
     /// メインビュー
@@ -37,6 +37,7 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
                 throw;
             }
         }
+
         internal override void InitPos() {
             Left = Screen.width - uiParamSet.FixPx(420);
             Top = uiParamSet.FixPx(74);
@@ -73,7 +74,6 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
                 };
             }
 
-            
             var resHolder = ResourceHolder.Instance;
             closeButton = new CustomButton(this, "×") {
                 ButtonStyle = new GUIStyle("button") {
@@ -81,16 +81,11 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
                     contentOffset = new Vector2(0, 0),
                 },
             };
-            closeButton.Click += Close;
 
             playButton = new CustomButton(this, new GUIContent(" play", resHolder.PlayImage));
             stopButton = new CustomButton(this, new GUIContent(" stop", resHolder.StopImage));
             stopRButton = new CustomButton(this, new GUIContent(" stopR", resHolder.StopRImage));
             pauseButton = new CustomButton(this, new GUIContent(" pause", resHolder.PauseImage));
-            playButton.Click += Play;
-            stopButton.Click += Stop;
-            stopRButton.Click += StopRoot;
-            pauseButton.Click += Pause;
 
             allSelectToggle = new CustomToggle(this) {
                 CheckStyle = new GUIStyle("label"),
@@ -101,7 +96,6 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
                 BackgroundColor = Color.black,
                 SelectBackgroundColor = Color.black,
             };
-            allSelectToggle.CheckChanged += SelectItems;
             expandToggle = new CustomToggle(this) {
                 Text = "展開",
                 SelectText = "折り畳む",
@@ -109,12 +103,9 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
                 SelectTextColor = Color.white,
                 SelectBackgroundColor = new Color(0.3f, 0.3f, 0.3f, 0.8f),
             };
-            expandToggle.CheckChanged += ExpandTree;
 
             deleteButton = new CustomButton(this, new GUIContent(" 削除", resHolder.DeleteImage));
-            deleteButton.Click += DeleteItems;
             reloadButton = new CustomButton(this, new GUIContent(" 再読込", resHolder.ReloadImage));
-            reloadButton.Click += Reload;
 
             editViewToggle = new CustomToggle(this) {
                 Text = "<",
@@ -123,19 +114,34 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
                 SelectTextColor = Color.white,
                 BackgroundColor = Color.green, //new Color(0.33f, 0.35f, 1f),
                 SelectBackgroundColor = Color.green,//new Color(0.5f, 0.5f, 1f),
-                CheckChanged = (obj, args) => { _editView.Visibled = ((CustomToggle) obj).Value; },
             };
 
             listView = new RecipeListView(this, _recipeMgr) {
                 TextColor = Color.white,
                 BackgroundColor = new Color(0.2f, 0.2f, 0.2f, 0.8f),
                 ButtonBColor = new Color(0.7f, 0.7f, 0.7f, 0.4f),
-                clickRecipe = ClickRecipe,
-                clickRecipeSet = ClickRecipeSet,
-                deleteRecipe = DeleteRecipe,
-                deleteRecipeSet = DeleteRecipeSet,
             };
 
+            //----------------------------------------
+            // イベント処理
+            //----------------------------------------
+            playButton.Click += Play;
+            stopButton.Click += Stop;
+            stopRButton.Click += StopRoot;
+            pauseButton.Click += Pause;
+
+            closeButton.Click += Close;
+
+            deleteButton.Click += DeleteItems;
+            reloadButton.Click += Reload;
+            allSelectToggle.CheckChanged += SelectItems;
+            expandToggle.CheckChanged += ExpandTree;
+
+            editViewToggle.CheckChanged = (obj, args) => { _editView.Visibled = ((CustomToggle) obj).Value; };
+            listView.clickRecipe     = ClickRecipe;
+            listView.clickRecipeSet  = ClickRecipeSet;
+            listView.deleteRecipe    = DeleteRecipe;
+            listView.deleteRecipeSet = DeleteRecipeSet;
 
 //            filterText = new CustomTextField(this);
 //            filterText.ValueChanged += (obj, args) => {
@@ -148,7 +154,6 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
 
         public override void Update() {
 //            if (!_initialized) return;
-
         }
 
         public override void OnGUI() {
@@ -238,9 +243,6 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
         /// </summary>
         internal override void UpdateUISize() {
             if (!_initialized) return;
-#if DEBUG
-            DebugLog(titleBarRect, "mainView titleBar ");
-#endif
 
             Margin = uiParamSet.margin;
             foreach (var child in Children) {
@@ -409,7 +411,6 @@ namespace EffekseerPlayerPlugin.CM3D2.UI {
         private readonly RecipeManager _recipeMgr;
         private readonly PlayManager _playMgr;
         private readonly EditRecipeView _editView;
-
 
 //        public CustomTextField filterText;
         protected CustomButton closeButton;

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace EffekseerPlayerPlugin {
+namespace EffekseerPlayer {
     /// <summary>
     /// ログ出力ユーティリティ
     /// </summary>

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using EffekseerPlayerPlugin.Unity.Data;
+using EffekseerPlayer.Unity.Data;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.Unity.UI {
+namespace EffekseerPlayer.Unity.UI {
     /// <summary>
     /// 連動するテキストフィールドとスライダー（水平）を並べたコントロールの複数セット.
     /// </summary>

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace EffekseerPlayerPlugin.CM3D2.Util {
+namespace EffekseerPlayer.CM3D2.Util {
     /// <summary>
     /// コンボボックスの選択、メイドアクセスを容易にするためのヘルパークラス
     /// </summary>

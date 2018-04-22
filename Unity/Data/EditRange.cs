@@ -1,5 +1,5 @@
 ﻿
-namespace EffekseerPlayerPlugin.Unity.Data {
+namespace EffekseerPlayer.Unity.Data {
     /// <summary>
     /// 値範囲を扱うクラス.
     /// Max, Min, SoftMax, SoftMinにより範囲を制御する.
@@ -33,8 +33,23 @@ namespace EffekseerPlayerPlugin.Unity.Data {
         }
         public float SoftMin { get; set;}
         public float SoftMax { get; set;}
-        public float Min     { get; private set;}
-        public float Max     { get; private set;}
+        private float min;
+        public float Min {
+            get { return min;}
+            private set {
+                min = value;
+                Delta = Max - min;
+            }
+        }
+        private float max;
+        public float Max {
+            get { return max;}
+            private set {
+                max = value;
+                Delta = max - min;
+            }
+        }
+        public float Delta   { get; private set;}
         public string Format { get; private set;}
         private int _decimal;
         private readonly bool _cyclic;
@@ -61,18 +76,16 @@ namespace EffekseerPlayerPlugin.Unity.Data {
 
         // 最小値以下の値を補正する
         private float ToCorrectMin(float val) {
-            var cycle = Max - Min;
             do {
-                val += cycle;
+                val += Delta;
             } while (val < Min);
             return val;
         }
 
         // 最大値以上の値を補正する
         private float ToCorrectMax(float val) {
-            var cycle = Max - Min;
             do {
-                val -= cycle;
+                val -= Delta;
             } while (val > Max);
             return val;
         }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EffekseerPlayerPlugin.Util {
+namespace EffekseerPlayer.Util {
     /// <summary>
     /// 数値関連のユーティリティクラス.
     /// 現在はフロート値の比較用のみ.

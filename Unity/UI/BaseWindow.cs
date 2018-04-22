@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace EffekseerPlayerPlugin.Unity.UI　{
+namespace EffekseerPlayer.Unity.UI　{
     /// <summary>
     /// ウィンドウを実現する抽象クラス.
     /// ただし、DropDownを実現するため、GUI.WindowではなくあくまでBoxとして疑似的なウィンドウを実現する.
