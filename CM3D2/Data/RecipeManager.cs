@@ -12,8 +12,9 @@ namespace EffekseerPlayer.CM3D2.Data {
     // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
     public class RecipeManager {
 
-        public RecipeManager(string directory) {
+        public RecipeManager(string directory, PlayManager playManager) {
             this.directory = directory;
+            this.playManager = playManager;
         }
 
         public bool Any() {
@@ -188,6 +189,8 @@ namespace EffekseerPlayer.CM3D2.Data {
                     Log.Error("failed to load recipeSet. file=", filename, e);
                 }
             }
+
+            InitKeyHandler();
         }
 
         protected virtual RecipeSet LoadJson(FileInfo fi) {
@@ -225,10 +228,59 @@ namespace EffekseerPlayer.CM3D2.Data {
             }
         }
 
+        public void InitKeyHandler() {
+
+            var detectHandler = InputKeyDetectHandler<RecipeSet>.Get();
+            detectHandler.handlers.Clear();
+
+            var dic = new Dictionary<InputKeyDetectHandler<RecipeSet>.KeyHolder, IList<RecipeSet>>();
+            foreach (var recipeSet in _recipeSets) {
+                // スキップ対象: 再読み込み時の削除ターゲット, キーコードが空のターゲット
+                if (!recipeSet.loaded || recipeSet.playKeyCode == null || recipeSet.playKeyCode.Trim().Length == 0) continue;
+
+                Log.Debug("recipe playKeyCode:", recipeSet.playKeyCode);
+                var keyHolder = detectHandler.Parse(recipeSet.playKeyCode);
+                Log.Debug("code:", keyHolder.codes);
+                IList<RecipeSet> old;
+                if (!dic.TryGetValue(keyHolder, out old)) {
+                    old = new List<RecipeSet>();
+                    dic[keyHolder] = old;
+                }
+                old.Add(recipeSet);
+            }
+
+            foreach (var e in dic) {
+                var detector = detectHandler.CreateKeyDetector(e.Key);
+                Log.Debug("detector:", detector);
+                if (detector == null) continue;
+
+                var keyHandler = new InputKeyDetectHandler<RecipeSet>.KeyHandler {
+                    detector = detector,
+                    keyHolder = e.Key,
+                    dataList = e.Value,
+                };
+                foreach (var rset in keyHandler.dataList) {
+                    rset.keyHandler = keyHandler;
+                }
+
+                keyHandler.handle = () => {
+                    foreach (var rset in keyHandler.dataList) {
+                        foreach (var recipe in rset.recipeList) {
+                            playManager.Play(recipe);
+                        }
+                    }
+                };
+
+                detectHandler.handlers.Add(keyHandler);
+            }
+            Log.Debug("Input-keyCode-handler initialized. count=", detectHandler.handlers.Count);
+        }
+
         #region Fields
         // 保存ディレクトリ
         protected readonly string directory;
 
+        private readonly PlayManager playManager;
         private readonly List<RecipeSet> _recipeSets = new List<RecipeSet>();
         private readonly Dictionary<string, RecipeSet> _recipeSetDic = new Dictionary<string, RecipeSet>();
         #endregion

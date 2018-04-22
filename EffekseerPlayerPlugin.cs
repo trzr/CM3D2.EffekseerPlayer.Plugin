@@ -30,6 +30,7 @@ namespace EffekseerPlayer {
 
         private readonly UIParamSet _uiParamSet = UIParamSet.Instance;
         private readonly UIHelper _uiHelper = new UIHelper();
+        private readonly InputKeyDetectHandler<RecipeSet> _detectHandler = InputKeyDetectHandler<RecipeSet>.Get();
         private readonly CM3D2SceneChecker sceneChecker = new CM3D2SceneChecker();
 
         private bool _started;
@@ -103,7 +104,7 @@ namespace EffekseerPlayer {
                 Directory.CreateDirectory(recipeDir);
                 Log.Info("Recipe directory created: ", recipeDir);
             }
-            _recipeMgr = new RecipeManager(recipeDir);
+            _recipeMgr = new RecipeManager(recipeDir, _playMgr);
 
             EffekseerSystem.baseDirectory    = Settings.efkDir;
             DontDestroyOnLoad(this);
@@ -169,6 +170,8 @@ namespace EffekseerPlayer {
                 return;
             }
             if (_state != InitState.Initialized) return;
+
+            _detectHandler.Detect();
 
             if (_playView.Visibled) _uiHelper.UpdateCursor();
             _uiHelper.UpdateCameraControl();

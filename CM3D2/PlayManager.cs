@@ -32,7 +32,7 @@ namespace EffekseerPlayer.CM3D2 {
                 var gobj = new GameObject(ConstantValues.EFK_PREFIX + recipeId);
 
                 var emitter = gobj.AddComponent<EffekseerEmitter>();
-                emtDic[recipeId] = emitter;
+                cache[recipeId] = recipe;
 
                 recipe.Load(emitter);
                 
@@ -48,12 +48,12 @@ namespace EffekseerPlayer.CM3D2 {
         /// <param name="recipeId">レシピID</param>
         /// <returns>再生に成功した場合はtrueを返す</returns>
         public bool Play(string recipeId) {
-            EffekseerEmitter emitter;
-            if (!emtDic.TryGetValue(recipeId, out emitter)) return false;
+            PlayRecipe recipe;
+            if (!cache.TryGetValue(recipeId, out recipe)) return false;
 
-            if (!emitter.enabled) return false;
-            Log.Debug("to play...", emitter);
-            emitter.Play();
+            if (!recipe.emitter.enabled) return false;
+            Log.Debug("to play...", recipe.emitter);
+            recipe.emitter.Play();
             return true;
         }
 
@@ -61,8 +61,8 @@ namespace EffekseerPlayer.CM3D2 {
         /// 登録されている有効なエミッタ―をすべて再生する.
         /// </summary>
         public void PlayAll() {
-            foreach (var emitter in emtDic.Values) {
-                if (emitter.enabled) emitter.Play();
+            foreach (var recipe in cache.Values) {
+                if (recipe.emitter.enabled) recipe.emitter.Play();
             }
         }
 
@@ -74,54 +74,63 @@ namespace EffekseerPlayer.CM3D2 {
         }
 
         public void Stop(string recipeId) {
-            EffekseerEmitter emitter;
-            if (!emtDic.TryGetValue(recipeId, out emitter)) return;
+            PlayRecipe recipe;
+            if (!cache.TryGetValue(recipeId, out recipe)) return;
+            if (recipe.emitter == null) return;
 
             Log.Debug(recipeId, " stop");
-            emitter.Stop();
+            recipe.emitter.Stop();
         }
 
         public void StopRoot(string recipeId) {
-            EffekseerEmitter emitter;
-            if (!emtDic.TryGetValue(recipeId, out emitter)) return;
+            PlayRecipe recipe;
+            if (!cache.TryGetValue(recipeId, out recipe)) return;
+            if (recipe.emitter == null) return;
 
             Log.Debug(recipeId, " stopRoot");
-            emitter.StopRoot();
+            recipe.emitter.StopRoot();
         }
 
         public void Shown(string recipeId, bool show) {
-            EffekseerEmitter emitter;
-            if (!emtDic.TryGetValue(recipeId, out emitter)) return;
+            PlayRecipe recipe;
+            if (!cache.TryGetValue(recipeId, out recipe)) return;
+            if (recipe.emitter == null) return;
 
-            emitter.Shown = show;
+            recipe.emitter.Shown = show;
         }
 
         public void ShownAll(bool show) {
-            foreach (var emitter in emtDic.Values) {
-                emitter.Shown = show;
+            foreach (var recipe in cache.Values) {
+                if (recipe.emitter != null) {
+                    recipe.emitter.Shown = show;
+                }
             }
         }
 
         public void Clear() {
-            foreach (var emitter in emtDic.Values) {
-                emitter.Stop();
-                Object.Destroy(emitter);
-            }
-            emtDic.Clear();
-        }
+            foreach (var recipe in cache.Values) {
+                if (recipe.emitter == null) continue;
 
+                recipe.emitter.Stop();
+                Object.Destroy(recipe.emitter);
+                recipe.emitter = null;
+            }
+            cache.Clear();
+        }
 
         public void StopAll() {
             //EffekseerSystem.StopAllEffects();
-            foreach (var emitter in emtDic.Values) {
-                emitter.Stop();
+            foreach (var recipe in cache.Values) {
+                if (recipe.emitter == null) continue;
+                recipe.emitter.Stop();
             }
         }
 
         public void StopRootAll() {
-            foreach (var emitter in emtDic.Values) {
-                if (emitter.Exists) {
-                    emitter.StopRoot();
+            foreach (var recipe in cache.Values) {
+                if (recipe.emitter == null) continue;
+                if (recipe.emitter.Exists) {
+                    recipe.emitter.StopRoot();
                 }
             }
         }
@@ -131,11 +140,12 @@ namespace EffekseerPlayer.CM3D2 {
         /// </summary>
         /// <param name="recipeId">レシピID</param>
         public void Pause(string recipeId) {
-            EffekseerEmitter emitter;
-            if (!emtDic.TryGetValue(recipeId, out emitter)) return;
+            PlayRecipe recipe;
+            if (!cache.TryGetValue(recipeId, out recipe)) return;
+            if (recipe.emitter == null) return;
 
             // Log.Debug(recipeId, " pausing...", emitter.Paused);
-            emitter.Paused = !emitter.Paused;
+            recipe.emitter.Paused = !recipe.emitter.Paused;
         }
 
         public void PauseAll(bool pause) {
@@ -143,7 +153,7 @@ namespace EffekseerPlayer.CM3D2 {
         }
 
         #region Fields
-        public readonly Dictionary<string, EffekseerEmitter> emtDic = new Dictionary<string, EffekseerEmitter>();
+        public readonly Dictionary<string, PlayRecipe> cache = new Dictionary<string, PlayRecipe>();
         #endregion
     }
 }

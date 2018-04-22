@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using EffekseerPlayer.Effekseer;
 using EffekseerPlayer.Unity.Data;
 
 namespace EffekseerPlayer.CM3D2.Data {
@@ -22,6 +23,8 @@ namespace EffekseerPlayer.CM3D2.Data {
             }
             recipeList.Clear();
             _recipeDic.Clear();
+
+            ClearKeyHandler();
         }
 
         public CheckStatus Check {
@@ -137,6 +140,25 @@ namespace EffekseerPlayer.CM3D2.Data {
         }
 
         /// <summary>
+        /// セット内のレシピが停止状態(未初期化)である場合にtrueを返す.
+        /// </summary>
+        /// <returns>停止状態の場合にtrue</returns>
+        public bool IsStopped() {
+            foreach (var recipe in recipeList) {
+                if (recipe.Status != EffekseerEmitter.EmitterStatus.Stopped && recipe.Status != EffekseerEmitter.EmitterStatus.Empty) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public void ClearKeyHandler() {
+            if (keyHandler == null) return;
+
+            keyHandler.dataList.Remove(this);
+            keyHandler = null;
+        }
+
         /// <summary>
         /// レシピセットの情報をJSON形式で出力する.
         /// </summary>
@@ -148,6 +170,12 @@ namespace EffekseerPlayer.CM3D2.Data {
             if (pretty) buff.Append("\n");
             buff.Append("  \"name\": ").Append('"').Append(name).Append("\",");
             if (pretty) buff.Append("\n");
+
+            if (playKeyCode != null) {
+                buff.Append("  \"playKeyCode\": ").Append('"').Append(playKeyCode).Append("\",");
+                if (pretty) buff.Append("\n");
+            }
+
             buff.Append("  \"recipeList\": [");
             if (pretty) buff.Append("\n");
             writer.Write(buff);
@@ -176,11 +204,13 @@ namespace EffekseerPlayer.CM3D2.Data {
         private readonly Dictionary<string, PlayRecipe> _recipeDic = new Dictionary<string, PlayRecipe>();
 
         public string name;
+        public string playKeyCode;
 
         public bool expand;
         public CheckStatus check;
         public long lastWriteTime;
         public bool loaded;
+        public InputKeyDetectHandler<RecipeSet>.KeyHandler keyHandler;
         #endregion
     }
 }

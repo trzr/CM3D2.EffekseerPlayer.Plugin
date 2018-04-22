@@ -90,7 +90,8 @@ namespace EffekseerPlayer.CM3D2.Data {
                             buff = null;
                             if (key == "name") {
                                 recipeSet.name = value;
-                                Log.Debug("set name:", value);
+                            } else if (key == "playKeyCode") {
+                                recipeSet.playKeyCode = value;
                             }
                             key = null;
                             listValueToken = false;
