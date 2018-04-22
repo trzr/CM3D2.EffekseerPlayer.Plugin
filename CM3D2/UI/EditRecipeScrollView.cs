@@ -19,14 +19,34 @@ namespace EffekseerPlayer.CM3D2.UI {
         }
 
         public void Dispose() {
-            if (currentEmitter == null) return;
+            if (currentEmitter != null) {
+                currentEmitter.Stop();
+                UnityEngine.Object.Destroy(currentEmitter);
+                currentEmitter = null;
+            }
 
-            currentEmitter.Stop();
-            UnityEngine.Object.Destroy(currentEmitter);
-            currentEmitter = null;
+            if (posGizmo != null) {
+                posGizmo.Visible = false;
+                UnityEngine.Object.Destroy(posGizmo);
+                posGizmo  = null;
+            }
+
+            if (rotGizmo != null) {
+                rotGizmo.Visible = false;
+                UnityEngine.Object.Destroy(rotGizmo);
+                rotGizmo  = null;
+            }
+
+            if (gobj != null) {
+                UnityEngine.Object.Destroy(gobj);
+                gobj = null;
+            }
         }
 
         public override void Awake() {
+            gobj = new GameObject("CurrentEmitter");
+            UnityEngine.Object.DontDestroyOnLoad(gobj);
+
             _boneRenderer = new CustomBoneRenderer();
 
             var settings = Settings.Instance;
@@ -175,7 +195,7 @@ namespace EffekseerPlayer.CM3D2.UI {
                 TextColor = Color.white,
                 SelectTextColor = Color.white
             };
-            
+
             // maidComboは常にEnabled
             maidCombo = new CustomComboBox(this, EMPTY_CONTS) { Enabled = true };
 
@@ -228,6 +248,18 @@ namespace EffekseerPlayer.CM3D2.UI {
                 TextColor = Color.white,
                 SelectTextColor = Color.white,
                 //SelectBackgroundColor =  Color.green,
+            };
+            posGizmoToggle = new CustomToggle(this) {
+                Text = "Gizmo off",
+                SelectText = "Gizmo on",
+                TextColor = Color.white,
+                SelectTextColor = Color.white,
+            };
+            rotGizmoToggle = new CustomToggle(this) {
+                Text = "Gizmo off",
+                SelectText = "Gizmo on",
+                TextColor = Color.white,
+                SelectTextColor = Color.white,
             };
 
             eulerSlider = new CustomTextSliders(this,
@@ -283,6 +315,9 @@ namespace EffekseerPlayer.CM3D2.UI {
                 if (attachToggle.Value) {
                     ReloadMaidCombo();
                 }
+
+                UpdateAttach(attachToggle.Value);
+
                 //var tggle = (CustomToggle)obj;
                 //blendEdit.blendCombo.IsShowDropDownList &= tggle.Value;
                 CheckValidate(obj, args);
@@ -300,7 +335,11 @@ namespace EffekseerPlayer.CM3D2.UI {
                 _currentMaid = GetMaid();
 
                 ReloadSlotCombo();
-                if (CanPlay()) MaidChanged(obj, args);
+                // スロットに対して、ボーンが選択可能かを確認する
+                if (_currentMaid != null && slotCombo.SelectedIndex != -1) {
+                    ChangeCurrentSlot(SelectedSlot(_currentMaid));
+                }
+                UpdateAttach(attachToggle.Value);
             };
             maidRefreshButton.Click += (obj, args) => { ReloadMaidCombo(); };
             prevMaidButton.Click += (obj, args) => { maidCombo.Prev(); };
@@ -332,24 +371,52 @@ namespace EffekseerPlayer.CM3D2.UI {
             posSlider.Value[1].ValueChanged += PosYChanged;
             posSlider.Value[2].ValueChanged += PosZChanged;
             posSlider.Value.ValueChanged += PosChanged;
+            posGizmoToggle.CheckChanged += (obj, args) => {
+                if (posGizmo == null) {
+                    posGizmo = CreateGizmo();
+                    posGizmo.RotChanged += (trans0, emp) => {
+                        var pos = ((Transform)trans0).localPosition;
+                        _location = pos;
+                        ToLocationSlider(ref pos);
+                        ApplyLocation();
+                    };
+                }
+                ToggleGizmo(ref posGizmo, posGizmoToggle.Value, true, false);
+                if (posGizmoToggle.Value) {
+                    posGizmo.transform.localPosition = _location;
+                }
+
+            };
+            rotGizmoToggle.CheckChanged += (obj, args) => {
+                if (rotGizmo == null) {
+                    rotGizmo = CreateGizmo();
+                    rotGizmo.RotChanged += (trans0, emp) => {
+                        var trans = (Transform) trans0;
+                        if (currentEmitter != null) {
+                            currentEmitter.transform.localRotation = trans.localRotation;
+                            currentEmitter.UpdateRotation();
+                        }
+
+                        ToRotationSlider(trans);
+                    };
+                }
+
+                ToggleGizmo(ref rotGizmo, rotGizmoToggle.Value, false, true);
+                if (rotGizmoToggle.Value) {
+                    rotGizmo.transform.localRotation = GetQuat();
+                }
+            };
             rotToggle.CheckChanged += (obj, args) => {
                 // EulerとQuaternion間の変換
                 if (eulerSlider.Enabled) {
-                    var rot = Quaternion.Euler(eulerSlider.Value[0].Value,
-                        eulerSlider.Value[1].Value,
-                        eulerSlider.Value[2].Value);
+                    var rot = Quaternion.Euler(_euler);
                     quatSlider.Value.SetWithNotify(rot.x, rot.y, rot.z, rot.w);
                 } else {
                     var rot = new Quaternion(quatSlider.Value[0].Value,
                         quatSlider.Value[1].Value,
                         quatSlider.Value[2].Value,
                         quatSlider.Value[3].Value);
-                    var euler = rot.eulerAngles;
-                    // 範囲を [0, 360]から[-180, 180]に補正
-                    if (euler.x > 180) euler.x -=360;
-                    if (euler.y > 180) euler.y -=360;
-                    if (euler.z > 180) euler.z -=360;
-                    eulerSlider.Value.SetWithNotify(euler.x, euler.y, euler.z);
+                    SetEulerSlider(ref rot, true);
                 }
                 eulerSlider.Enabled = !eulerSlider.Enabled;
                 quatSlider.Enabled = !quatSlider.Enabled;
@@ -432,6 +499,8 @@ namespace EffekseerPlayer.CM3D2.UI {
                 fixRotToggle.OnGUI();
             }
             rotToggle.OnGUI();
+            posGizmoToggle.OnGUI();
+            rotGizmoToggle.OnGUI();
             posSlider.OnGUI();
             if (eulerSlider.Enabled) {
                 eulerSlider.OnGUI();
@@ -554,7 +623,11 @@ namespace EffekseerPlayer.CM3D2.UI {
             posSlider.TextWidth  = textWidth;
             posSlider.TextHeight = itemHeight;
             posSlider.AlignTop(baseObj, ref align);
+            align.x = viewWidth - margin2 - WIDTH_RESET - buttonWidth;
+            align.width = buttonWidth;
+            posGizmoToggle.AlignTop(baseObj, ref align);
 
+            align.x = margin;
             align.y = margin2;
             align.width = viewWidth - margin2;
             eulerSlider.indent = indent;
@@ -567,6 +640,10 @@ namespace EffekseerPlayer.CM3D2.UI {
             quatSlider.TextWidth = textWidth;
             quatSlider.TextHeight = itemHeight;
             quatSlider.AlignTop(posSlider, ref align);
+
+            align.x = viewWidth - margin2 - WIDTH_RESET - buttonWidth;
+            align.width = buttonWidth;
+            rotGizmoToggle.AlignTop(posSlider, ref align);
 
             align.x = margin2 + textWidth + indent * 3;
             align.width = uiParamSet.FixPx(100);
@@ -628,6 +705,8 @@ namespace EffekseerPlayer.CM3D2.UI {
             quatSlider.FontSize = fontSizeN;
             quatSlider.FontSizeS = fontSizeS;
             rotToggle.FontSize = fontSizeN;
+            posGizmoToggle.FontSize = fontSizeN;
+            rotGizmoToggle.FontSize = fontSizeN;
         }
 
         #region Fields
@@ -676,6 +755,11 @@ namespace EffekseerPlayer.CM3D2.UI {
         public CustomTextSliders eulerSlider;
         public CustomTextSliders quatSlider;
         private CustomToggle rotToggle;
+
+        public CustomToggle posGizmoToggle;
+        public CustomToggle rotGizmoToggle;
+        public CustomGizmoRender posGizmo;
+        public CustomGizmoRender rotGizmo;
 
         #endregion
     }

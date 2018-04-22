@@ -68,14 +68,7 @@ namespace EffekseerPlayer.CM3D2.UI {
             var vals = posSlider.Value;
             //recipe.location = new Vector3(posXSlider.Num, posYSlider.Num, posZSlider.Num);
             recipe.location = new Vector3(vals[0].Value, vals[1].Value, vals[2].Value);
-
-            if (eulerSlider.Enabled) {
-                recipe.rotation = new Quaternion {
-                    eulerAngles = ToEuler()
-                };
-            } else {
-                recipe.rotation = ToQuat();
-            }
+            recipe.rotation = GetQuat();
         }
 
         /// <summary>
@@ -116,8 +109,6 @@ namespace EffekseerPlayer.CM3D2.UI {
 
         public EffekseerEmitter LoadEmitter(string effectName, bool repeat) {
             if (currentEmitter == null) {
-                // gameObjectは_currentEmitter.gameObjectに自動で割り当てられる
-                var gobj = new GameObject("CurrentEmitter");
                 currentEmitter = gobj.AddComponent<EffekseerEmitter>();
             }
 
@@ -137,29 +128,19 @@ namespace EffekseerPlayer.CM3D2.UI {
             _location.y = vals[1].Value;
             _location.z = vals[2].Value;
             if (!AttachSlot(currentEmitter, _location)) {
-                currentEmitter.transform.SetParent(null);
+                currentEmitter.transform.SetParent(null, false);
                 currentEmitter.OffsetLocation = null;
                 currentEmitter.transform.localPosition = _location;
-                if (eulerSlider.Enabled) {
-                    currentEmitter.transform.localEulerAngles = ToEuler();
-                } else {
-                    currentEmitter.transform.localRotation = ToQuat();
-                }
+                currentEmitter.transform.localRotation = GetQuat();
             }
 
             return currentEmitter;
         }
         
         internal bool AttachSlot(EffekseerEmitter emitter, Vector3 pos) {
-            if (!attachToggle.Value || slotCombo.SelectedIndex == -1 || boneCombo.SelectedIndex == -1) return false;
-            var maid0 = GetMaid();
-            if (maid0 == null) return false;
-            var slot = SelectedSlot(maid0);
-            if (slot == null || slot.obj == null) return false;
-
             var hasAttached = false;
             var boneName = boneCombo.SelectedItem;
-            var boneTrans = MaidHelper.SearchBone(slot.obj.transform, boneName);
+            var boneTrans = GetBoneTransform();
             if (boneTrans != null) {
                 emitter.fixLocation = fixPosToggle.Value;
                 emitter.fixRotation = fixRotToggle.Value;
@@ -171,7 +152,7 @@ namespace EffekseerPlayer.CM3D2.UI {
                     emitter.OffsetLocation = null;
                     emitter.transform.localPosition = pos;
                 }
-                SetRotation(emitter, eulerSlider.Enabled);
+                emitter.transform.localRotation = GetQuat();
                 emitter.UpdateRotation();
 
                 //emitter.offset = pos;
@@ -181,14 +162,6 @@ namespace EffekseerPlayer.CM3D2.UI {
                 Log.Debug("bone not found:", boneName);
             }
             return hasAttached;
-        }
-
-        private void SetRotation(Component emitter, bool useEuler) {
-            if (useEuler) {
-                emitter.transform.localEulerAngles = ToEuler();
-            } else {
-                emitter.transform.localRotation = ToQuat();
-            }
         }
 
         private void ChangeCurrentSlot(TBodySkin slot) {
@@ -212,22 +185,6 @@ namespace EffekseerPlayer.CM3D2.UI {
         private void SlotChanged(object obj=null, EventArgs args=null) {
             var slot = _currentMaid != null ? SelectedSlot(_currentMaid) : null;
             ChangeCurrentSlot(slot);
-        }
-
-        // ReSharper disable once UnusedParameter.Local
-        private void MaidChanged(object obj=null, EventArgs args=null) {
-            if (_currentMaid == null || currentEmitter == null) return;
-            // アタッチが有効であり、再生中の場合に、アタッチ対象のメイドを変更
-            if (!attachToggle.Value || currentEmitter.Status != EffekseerEmitter.EmitterStatus.Playing) return;
-
-            var slot = SelectedSlot(_currentMaid);
-            if (slot == null) return;
-
-            var boneTrans = MaidHelper.SearchBone(bone: slot.obj.transform, boneName: boneCombo.SelectedItem);
-            if (boneTrans == null) return;
-
-            currentEmitter.transform.SetParent(boneTrans);
-            currentEmitter.UpdateRotation();
         }
 
         private void OffsetPosChanged(object obj, EventArgs args) {
@@ -257,7 +214,7 @@ namespace EffekseerPlayer.CM3D2.UI {
             if (currentEmitter == null) return;
 
             currentEmitter.useLocalRotation = rotScopeToggle.Value;
-            SetRotation(currentEmitter, eulerSlider.Enabled);
+            currentEmitter.transform.localRotation = GetQuat();
             currentEmitter.UpdateRotation();
         }
 
@@ -369,6 +326,10 @@ namespace EffekseerPlayer.CM3D2.UI {
         private void PosChanged(float val,  Action<float> setPos) {
             setPos(val);
             ApplyLocation();
+
+            if (posGizmo != null && posGizmo.Visible) {
+                posGizmo.transform.localPosition = _location;
+            }
         }
 
         private void PosXChanged(object obj, EventArgs args) {
@@ -398,52 +359,64 @@ namespace EffekseerPlayer.CM3D2.UI {
         // 基本的に回転はEmitterのlocalRotationに設定する.
         // フラグにより、localRotationをそのまま使うかrotationを使うかをハンドリング.
         //
+        delegate void SetTransformAction(ref Transform trans, float val);
+        private void RotChanged(float val, SetTransformAction setTransform) {
+            if (currentEmitter != null) {
+                var trans = currentEmitter.transform;
+                setTransform(ref trans, val);
+                currentEmitter.UpdateRotation();
+                // ApplyLocation();
+            }
 
+            if (rotGizmo != null && rotGizmo.Visible) {
+                rotGizmo.transform.localRotation = GetQuat();
+            }
+        }
         delegate void SetRotAction(ref Quaternion rot, float val);
-        private void RotChanged(float val, SetRotAction setRot) {
-            if (currentEmitter == null) return;
+        private void RotChanged(float val, SetRotAction setRotate) {
+            if (currentEmitter != null) {
+                var rot = currentEmitter.transform.localRotation;
+                setRotate(ref rot, val);
+                currentEmitter.transform.localRotation = rot;
+                currentEmitter.UpdateRotation();
+                // ApplyLocation();
+            }
 
-            var rot = currentEmitter.transform.localRotation;
-            setRot(ref rot, val);
-            currentEmitter.transform.localRotation = rot;
-            currentEmitter.UpdateRotation();
-            // ApplyLocation();
+            if (rotGizmo != null && rotGizmo.Visible) {
+                rotGizmo.transform.localRotation = GetQuat();
+            }
         }
         private void EulerXChanged(object obj, EventArgs args) {
             var etv = (EditTextValue)obj;
-            RotChanged(etv.Value, (ref Quaternion rot, float val) => {
-                var angles = rot.eulerAngles;
-                angles.x = val;
-                rot.eulerAngles = angles;
+            RotChanged(etv.Value, (ref Transform trans, float val) => {
+                _euler.x = val;
+                trans.localRotation = Quaternion.Euler(_euler);
             });
         }
 
         private void EulerYChanged(object obj, EventArgs args) {
             var etv = (EditTextValue)obj;
-            RotChanged(etv.Value, (ref Quaternion rot, float val) => {
-                var angles = rot.eulerAngles;
-                angles.y = val;
-                rot.eulerAngles = angles;
+            RotChanged(etv.Value, (ref Transform trans, float val) => {
+                _euler.y = val;
+                trans.localRotation = Quaternion.Euler(_euler);
             });
         }
 
         private void EulerZChanged(object obj, EventArgs args) {
             var etv = (EditTextValue)obj;
-            RotChanged(etv.Value, (ref Quaternion rot, float val) => {
-                var angles = rot.eulerAngles;
-                angles.z = val;
-                rot.eulerAngles = angles;
+            RotChanged(etv.Value, (ref Transform trans, float val) => {
+                _euler.z = val;
+                trans.localRotation = Quaternion.Euler(_euler);
             });
         }
 
         private void EulerChanged(object obj, EventArgs args) {
             var etv = (EditTextValues)obj;
-            RotChanged(0, (ref Quaternion rot, float val) => {
-                var angles = rot.eulerAngles;
-                angles.x = etv[0].Value;
-                angles.y = etv[1].Value;
-                angles.z = etv[2].Value;
-                rot.eulerAngles = angles;
+            RotChanged(0, (ref Transform trans, float val) => {
+                _euler.x = etv[0].Value;
+                _euler.y = etv[1].Value;
+                _euler.z = etv[2].Value;
+                trans.localRotation = Quaternion.Euler(_euler);
             });
         }
 
@@ -484,13 +457,36 @@ namespace EffekseerPlayer.CM3D2.UI {
             });
         }
 
-        internal Vector3 ToEuler() {
-            return new Vector3(eulerSlider.Value[0].Value,
-                eulerSlider.Value[1].Value,
-                eulerSlider.Value[2].Value);
+        private void ToLocationSlider( ref Vector3 location) {
+            posSlider.Value.Set(new[]{location.x, location.y, location.z}, false, false );
         }
 
-        internal Quaternion ToQuat() {
+        private void ToRotationSlider(Transform trans) {
+            var rot = trans.localRotation;
+            if (eulerSlider.Enabled) {
+                SetEulerSlider(ref rot, false);
+            } else {
+                quatSlider.Value.Set(new[] {rot.x, rot.y, rot.z, rot.w}, false, false);
+            }
+        }
+
+        private void SetEulerSlider(ref Quaternion rot, bool notify) {
+            _euler = rot.eulerAngles;
+            // 範囲を [0, 360]から[-180, 180]に補正
+            if (_euler.x > EULER_RANGE.Max) _euler.x -= EULER_RANGE.Delta;
+            if (_euler.y > EULER_RANGE.Max) _euler.y -= EULER_RANGE.Delta;
+            if (_euler.z > EULER_RANGE.Max) _euler.z -= EULER_RANGE.Delta;
+
+            eulerSlider.Value.Set(new[] {_euler.x, _euler.y, _euler.z}, notify);
+        }
+
+        internal Quaternion GetQuat() {
+            if (eulerSlider.Enabled) {
+                _euler.x = eulerSlider.Value[0].Value;
+                _euler.y = eulerSlider.Value[1].Value;
+                _euler.z = eulerSlider.Value[2].Value;
+                return Quaternion.Euler(_euler);
+            } 
             return new Quaternion(quatSlider.Value[0].Value,
                 quatSlider.Value[1].Value,
                 quatSlider.Value[2].Value,
@@ -668,12 +664,82 @@ namespace EffekseerPlayer.CM3D2.UI {
             return !attachToggle.Value || (slotCombo.SelectedIndex != -1 && boneCombo.SelectedIndex != -1);
         }
 
+        private CustomGizmoRender CreateGizmo() {
+            var gizmo = gobj.AddComponent<CustomGizmoRender>();
+            gizmo.name = "___gizmo";
+            gizmo.offsetScale = 0.5f;
+            gizmo.lineSelectedThick = 0.1f;  // [0.04f]
+            gizmo.lineRSelectedThick = 0.2f; // [0.1f]
+            return gizmo;
+        }
+
+        public void ToggleGizmo(ref CustomGizmoRender gizmo, bool visible, bool eAxis, bool eRotate) {
+            if (visible) {
+                var boneTrans = GetBoneTransform();
+                gizmo.transform.SetParent(boneTrans, false);
+                gizmo.transform.localPosition = _location;
+                gizmo.transform.localRotation = GetQuat();
+
+                gizmo.eAxis = eAxis;
+                gizmo.eRotate = eRotate;
+                gizmo.InitStatus();
+            }
+            gizmo.Visible = visible;
+        }
+
+        /// <summary>
+        /// アタッチ状態を更新する.
+        /// アタッチフラグのほかに、メイド、スロット、ボーンの選択が行えていないとアタッチから外される.
+        /// </summary>
+        /// <param name="attach">アタッチの有無</param>
+        private void UpdateAttach(bool attach) {
+            Transform boneTrans = null;
+            if (attach) {
+                boneTrans = GetBoneTransform();
+            }
+
+            var rot = GetQuat();
+            if (posGizmo != null && posGizmo.Visible) {
+                var pos0 = posGizmo.transform.localPosition;
+                Log.Debug("pos.b:", pos0.x, ",", pos0.y, ",", pos0.z);
+                posGizmo.transform.SetParent(boneTrans, false);
+                var pos = posGizmo.transform.localPosition;
+                Log.Debug("pos.a:", pos.x, ",", pos.y, ",", pos.z);
+                posGizmo.transform.SetParent(boneTrans, false);
+                posGizmo.transform.localPosition = _location;
+                posGizmo.transform.localRotation = rot;
+            }
+            if (rotGizmo != null && rotGizmo.Visible) {
+                rotGizmo.transform.SetParent(boneTrans, false);
+                rotGizmo.transform.localPosition = _location;
+                rotGizmo.transform.localRotation = rot;
+            }
+            if (currentEmitter != null) {
+                currentEmitter.transform.SetParent(boneTrans, false);
+                currentEmitter.transform.localPosition = _location;
+                currentEmitter.transform.localRotation = rot;
+            }
+        }
+
+        private Transform GetBoneTransform() {
+            if (!attachToggle.Value || slotCombo.SelectedIndex == -1 || boneCombo.SelectedIndex == -1) return null;
+            var maid0 = GetMaid();
+            if (maid0 == null) return null;
+            var slot = SelectedSlot(maid0);
+            if (slot == null || slot.obj == null) return null;
+
+            var boneName = boneCombo.SelectedItem;
+            return MaidHelper.SearchBone(slot.obj.transform, boneName);
+        }
+
         #region Fields
+        private GameObject gobj; 
         internal EffekseerEmitter currentEmitter;
         private CustomBoneRenderer _boneRenderer;
 
         private Color _color = Color.white;
         private Vector3 _location;
+        private Vector3 _euler;
 
         private GUIContent[] _allSlotContents;
         private List<GUIContent> _slotContents;
