@@ -60,7 +60,18 @@ namespace EffekseerPlayer.Effekseer {
         /// <summary xml:lang="ja">
         /// エンドフレーム
         /// </summary>
-        public float endFrame;
+        private float endFrame;
+        public float EndFrame {
+            get { return endFrame; }
+            set {
+                endFrame = value;
+                if (endFrame > 0) {
+                    checkFrame = CheckFrame;
+                } else {
+                    checkFrame = () => true;
+                }
+            }
+        }
 
         /// <summary xml:lang="en">
         /// delay frame. Number of frames before starting the effect.
@@ -78,8 +89,11 @@ namespace EffekseerPlayer.Effekseer {
         /// </summary>
         public float postDelayFrame;
 
-        /// <summary>
-        /// フレーム
+        /// <summary xml:lang="en">
+        /// Play frame
+        /// </summary>
+        /// <summary xml:lang="ja">
+        /// 再生フレーム
         /// </summary>
         public float Frame { get; private set; }
 
@@ -180,9 +194,18 @@ namespace EffekseerPlayer.Effekseer {
         /// 設定されているエフェクトを再生
         /// </summary>
         public void Play() {
+            if (delayFrame <= 0) {
+                _delayExecutor.Stop();
+                PlayImmediate();
+            } else {
+                Status = EmitterStatus.Waiting;
+                _delayExecutor.Delay(delayFrame, PlayImmediate);
+            }
+        }
+
+        private void PlayImmediate() {
             if (_handle.HasValue) {// 古いものがあれば停止
                 _handle.Value.Stop();
-                _handle = null;
             }
 
             var h = EffekseerSystem.PlayEffect(_effectName, Location);
@@ -205,11 +228,16 @@ namespace EffekseerPlayer.Effekseer {
         /// 全てのノードが即座に消える
         /// </summary>
         public void Stop() {
+            Stop(EmitterStatus.Stopped);
+        }
+
+        private void Stop(EmitterStatus status) {
+            _delayExecutor.Stop();
             if (!_handle.HasValue) return;
 
             _handle.Value.Stop();
             _handle = null;
-            Status = EmitterStatus.Stopped;
+            Status = status;
         }
 
         /// <summary xml:lang="en">
@@ -221,6 +249,7 @@ namespace EffekseerPlayer.Effekseer {
         /// ルートノードを削除したことで子ノード生成が停止され寿命で徐々に消える
         /// </summary>
         public void StopRoot() {
+            _delayExecutor.Stop();
             if ((_status & (EmitterStatus.Playing | EmitterStatus.Paused)) == EmitterStatus.Empty) return;
             if (!Exists) return;
 
@@ -237,9 +266,9 @@ namespace EffekseerPlayer.Effekseer {
         /// </summary>
         /// <param name="color">Color</param>
         public void SetAllColor(Color color) {
-            if (!_handle.HasValue) return;
             if (_color == color) return;
             _color = color;
+            if (!_handle.HasValue) return;
 
             // 色自体の変更はしても再生中/一時停止中でなければ、handlerには反映しない
             //  StopRoot後のPauseだとアクセス違反が発生するため、Playingか、Pausedで且つ直前がPlayingの場合に限る
@@ -275,12 +304,10 @@ namespace EffekseerPlayer.Effekseer {
         /// </summary>
         public bool Paused {
             set {
+                _delayExecutor.Pause(value);
                 if (_status == EmitterStatus.Stopped || !Exists) return;
 
                 var h = _handle.Value;
-//                if (!h.Paused) {
-//                    prevStatus = status;
-//                }
                 h.Paused = value;
                 Status = h.Paused ? EmitterStatus.Paused : _prevStatus;
             }
@@ -353,22 +380,26 @@ namespace EffekseerPlayer.Effekseer {
             if (!Exists) return;
 
             //  StopRoot後のPauseだとアクセス違反が発生するためPlayingで条件を絞る
-            if (_status != EmitterStatus.Playing &&
-                (_status != EmitterStatus.Paused || _prevStatus != EmitterStatus.Playing)) return;
+            // ReSharper disable once InvertIf
+            if (_status == EmitterStatus.Playing ||
+                _status == EmitterStatus.Paused && _prevStatus == EmitterStatus.Playing) {
 
-            var h = _handle.Value;
-            h.SetLocation(Location);
+                var h = _handle.Value;
+                h.SetLocation(Location);
+            }
         }
 
         public void UpdateRotation() {
             if (!Exists) return;
 
             //  StopRoot後のPauseだとアクセス違反が発生するためPlayingで条件を絞る
-            if (_status != EmitterStatus.Playing &&
-                (_status != EmitterStatus.Paused || _prevStatus != EmitterStatus.Playing)) return;
+            // ReSharper disable once InvertIf
+            if (_status == EmitterStatus.Playing ||
+                _status == EmitterStatus.Paused && _prevStatus == EmitterStatus.Playing) {
 
-            var h = _handle.Value;
-            h.SetRotation(Rotation);
+                var h = _handle.Value;
+                h.SetRotation(Rotation);
+            }
         }
 
         public override string ToString() {
@@ -385,6 +416,9 @@ namespace EffekseerPlayer.Effekseer {
                 .Append(", scale=").Append(transform.localScale)
                 .Append(", speed=").Append(_speed)
                 .Append(", color=").Append(_color);
+            if (endFrame > 0) builder.Append(", endFrame=").Append(endFrame);
+            if (delayFrame > 0) builder.Append(", delay=").Append(delayFrame);
+            if (postDelayFrame > 0) builder.Append(", postDelay=").Append(postDelayFrame);
             builder.Append(']');
             return builder.ToString();
         }
@@ -402,30 +436,49 @@ namespace EffekseerPlayer.Effekseer {
             Stop();
         }
 
-        void Update() {
-            if (!_handle.HasValue) return;
+        private readonly DelayExecutor _delayExecutor = new DelayExecutor();
+        private Func<bool> checkFrame = () => true;
 
+        private bool CheckFrame() {
+            Frame += _speed;
+            if (Frame <= endFrame) return true;
+
+            PostPlay();
+            return false;
+        }
+
+        /// <summary>
+        /// プレイ後、リピート判定により再生や停止を行う.
+        /// </summary>
+        private void PostPlay() {
+            if (loop) {
+                if (postDelayFrame <= 0) PlayImmediate();
+                else {
+                    Stop(EmitterStatus.Waiting);
+                    _delayExecutor.Delay(postDelayFrame, PlayImmediate);
+                }
+            } else Stop(EmitterStatus.Stopped);
+        }
+
+        void Update() {
+            if (_delayExecutor.enabled) _delayExecutor.Update(_speed);
+            if (!_handle.HasValue) return;
+            
             try {
                 var h = _handle.Value;
                 if (h.Exists) {
                     if (_status != EmitterStatus.Playing) return;
 
-                    Frame += _speed;
-                    if (0 < endFrame && endFrame < Frame) {
-                        if (loop) Play();
-                        else Stop();
-                        return;
-                    }
+                    if (!checkFrame()) return;
 
                     if (!fixLocation) h.SetLocation(Location);
                     if (!fixRotation) h.SetRotation(Rotation);
 
                     h.SetScale(transform.localScale);
-                } else if (loop) {
-                    Play();
                 } else {
-                    Stop();
+                    PostPlay();
                 }
+
             } catch(Exception e) {
                 Debug.LogError("update error:"+ e.Message);
             }
@@ -433,5 +486,42 @@ namespace EffekseerPlayer.Effekseer {
 
         #endregion
 
+        private class DelayExecutor {
+            private float frame;
+            private float delayFrame;
+            private Action act;
+            internal bool enabled;
+
+            internal void Stop() {
+                enabled = false;
+                act = null;
+            }
+
+            internal void Pause(bool pause) {
+                if (pause) {
+                    enabled = false;
+                } else if (!enabled && act != null) {
+                    enabled = true;
+                }
+            }
+
+            internal void Delay(float delay, Action act_) {
+                act = act_;
+                delayFrame = delay;
+                frame = 0;
+                enabled = act != null && delay > 0;
+                Log.Debug("set delay:", delay, ", enabled:", enabled);
+            }
+
+            internal void Update(float speed) {
+                frame += speed;
+                if (frame < delayFrame) return;
+
+                Log.Debug("frame:", frame, ", delay:", delayFrame);
+                act();
+                act = null;
+                enabled = false;
+            }
+        } 
    }
 }

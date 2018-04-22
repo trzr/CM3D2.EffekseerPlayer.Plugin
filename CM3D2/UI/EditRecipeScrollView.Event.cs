@@ -44,6 +44,9 @@ namespace EffekseerPlayer.CM3D2.UI {
         public void SetupRecipe(PlayRecipe recipe) {
             recipe.scale = scaleSlider.Num;
             recipe.speed = speedSlider.Num;
+            recipe.endFrame = endFrameSlider.Num;
+            recipe.delayFrame = delaySlider.Num;
+            recipe.postDelayFrame = postDelaySlider.Num;
             recipe.color = _color;
             if (attachToggle.Value) {
                 recipe.attach = true;
@@ -121,6 +124,9 @@ namespace EffekseerPlayer.CM3D2.UI {
             currentEmitter.EffectName = effectName;
             currentEmitter.loop = repeat;
             currentEmitter.Speed = speedSlider.Num;
+            currentEmitter.EndFrame = endFrameSlider.Num;
+            currentEmitter.delayFrame = delaySlider.Num;
+            currentEmitter.postDelayFrame = postDelaySlider.Num;
             currentEmitter.SetAllColor(_color);
             currentEmitter.fixLocation = true;
             currentEmitter.fixRotation = true;
@@ -288,11 +294,12 @@ namespace EffekseerPlayer.CM3D2.UI {
             if (currentEmitter == null) return;
 
             var val = (EditTextValue)obj;
-            currentEmitter.endFrame = val.Value;
-            frameSlider.Value.SoftMax =
-                (int)currentEmitter.endFrame == 0
-                    ? frameSlider.Value.Max 
-                    : currentEmitter.endFrame;
+            currentEmitter.EndFrame = val.Value;
+            if ((int) currentEmitter.EndFrame <= 0) {
+                frameSlider.Value.SoftMax = frameSlider.Value.Max;
+            } else {
+                frameSlider.Value.SoftMax = currentEmitter.EndFrame;
+            }
         }
 
         private void DelayChanged(object obj, EventArgs args) {
@@ -380,8 +387,6 @@ namespace EffekseerPlayer.CM3D2.UI {
         }
 
         private void PosChanged(object obj, EventArgs args) {
-            if (currentEmitter == null) return;
-
             var val = (EditTextValues)obj;
             _location.x = val[0].Value;
             _location.y = val[1].Value;
@@ -667,7 +672,7 @@ namespace EffekseerPlayer.CM3D2.UI {
         internal EffekseerEmitter currentEmitter;
         private CustomBoneRenderer _boneRenderer;
 
-        private Color _color;
+        private Color _color = Color.white;
         private Vector3 _location;
 
         private GUIContent[] _allSlotContents;

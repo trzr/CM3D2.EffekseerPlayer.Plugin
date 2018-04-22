@@ -103,7 +103,7 @@ namespace EffekseerPlayer.CM3D2.Data {
             emitter.EffectName = effectName;
             emitter.loop = repeat;
             emitter.Speed = speed;
-            emitter.endFrame = endFrame;
+            emitter.EndFrame = endFrame;
             emitter.delayFrame = delayFrame;
             emitter.postDelayFrame = postDelayFrame;
             emitter.SetAllColor(color);
