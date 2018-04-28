@@ -228,7 +228,7 @@ namespace EffekseerPlayer.CM3D2.Data {
             if (pretty) subIndent += "  ";
             WriteField(builder, "name", name, pretty, subIndent);
             WriteField(builder, "effectName", effectName, pretty, subIndent);
-            WriteField(builder, "autoStart", autoStart, pretty, subIndent);
+            // WriteField(builder, "autoStart", autoStart, pretty, subIndent);
             WriteField(builder, "repeat", repeat, pretty, subIndent);
             WriteField(builder, "attach", attach, pretty, subIndent);
 
@@ -240,8 +240,12 @@ namespace EffekseerPlayer.CM3D2.Data {
             WriteField(builder, "fixRotation", fixRotation, pretty, subIndent);
             WriteField(builder, "useLocalRotation", useLocalRotation, pretty, subIndent);
             WriteField(builder, "maid", maid, pretty, subIndent);
-            WriteField(builder, "scale", scale, pretty, subIndent);
-            WriteField(builder, "speed", speed, pretty, subIndent);
+            if (Math.Abs(scale - 1f) > ConstantValues.EPSILON) {
+                WriteField(builder, "scale", scale, pretty, subIndent);
+            }
+            if (Math.Abs(speed - 1f) > ConstantValues.EPSILON) {
+                WriteField(builder, "speed", speed, pretty, subIndent);
+            }
             if (endFrame > 0) {
                 WriteField(builder, "endFrame", endFrame, pretty, subIndent);
             }
@@ -251,7 +255,9 @@ namespace EffekseerPlayer.CM3D2.Data {
             if (postDelayFrame > 0) {
                 WriteField(builder, "postDelayFrame", postDelayFrame, pretty, subIndent);
             }
-            WriteField(builder, "color", color, pretty, subIndent);
+            if (color != Color.white) {
+                WriteField(builder, "color", color, pretty, subIndent);
+            }
             WriteField(builder, "location", location, pretty, subIndent);
             WriteField(builder, "rotation", rotation, pretty, subIndent, false);
             builder.Append(indent).Append("}");
