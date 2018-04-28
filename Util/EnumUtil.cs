@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace EffekseerPlayer.Util {
-    public static partial class Enum {
+    public static class EnumUtil {
         /// <summary>
         /// Enum型をパースする.
         /// </summary>
