@@ -11,7 +11,7 @@
         internal const string JSON_INDENT = "  ";
         internal const string EXT_JSON = ".json";
 
-        internal const float EPSILON       = 0.00000001f;
+        internal const float EPSILON       = 1E-06f;
         internal const float EPSILON_SPEED = 0.00001f;
         internal const float EPSILON_RGB   = 0.0001f;
     }
