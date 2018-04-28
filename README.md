@@ -10,7 +10,7 @@ Effekseerの再生部分は[EffekseerForUnity][]のサンプルコードを元�
 UnityInjectorが導入済みであること。
 
 #### ◇動作確認環境
-  - バージョン：**1.57** (CM3D2), **1.07** (COM3D2)    
+  - バージョン：**1.57** (CM3D2), **1.11** (COM3D2)    
   - 前提プラグイン：UnityInjector/Sybaris  
   ※ COM3D2ではSybaris 2系を想定
   - Effekseerバージョン: **1.32**
@@ -42,18 +42,21 @@ Effekseerで作成したエフェクトをCM3D2上で再生するためには、
    また、efk/bytesに設定された画像や音ファイルは、  
    efk/bytesファイルの位置を基準とした相対パスで配置してください。  
 
-* プリセットファイル(レシピファイル)  
+* プリセットファイル(レシピファイル)のパス  
 CM3D2/COM3D2上で設定した再生レシピはJSON形式で以下に保存されます。
 ~~~
 {CM3D2インストールフォルダ}\Sybaris\Plugins\UnityInjector\Config\efk\_recipes\  CM3D2の場合
 {COM3D2インストールフォルダ}\Sybaris\UnityInjector\Config\efk\_recipes\         COM3D2の場合
 ~~~
 
-* iniファイル  
+* [iniファイル][] の配置パス  
 ~~~
 {CM3D2インストールフォルダ}\Sybaris\Plugins\UnityInjector\Config\EffekseerPlayerPlugin.ini
 {COM3D2インストールフォルダ}\Sybaris\UnityInjector\Config\EffekseerPlayerPlugin.ini
 ~~~
+
+[iniファイル][]の各設定項目や [画面][]については、[wiki][]を参照してください。
+
 
 #### ◇補足
 * Effect音の再生  
@@ -84,4 +87,7 @@ https://github.com/effekseer/Effekseer/blob/master/LICENSE
 [Releases]:https://github.com/trzr/CM3D2.EffekseerPlayer.Plugin/releases
 [Effekseer]:https://github.com/effekseer/Effekseer
 [EffekseerForUnity]:https://github.com/effekseer/EffekseerForUnity
+[wiki]:https://github.com/trzr/CM3D2.EffekseerPlayer.Plugin/wiki
 [memo]:https://github.com/trzr/CM3D2.EffekseerPlayer.Plugin/wiki/memo
+[iniファイル]:https://github.com/trzr/CM3D2.EffekseerPlayer.Plugin/wiki/ini
+[画面]:https://github.com/trzr/CM3D2.EffekseerPlayer.Plugin/wiki/画面説明
