@@ -374,7 +374,7 @@ namespace EffekseerPlayer.CM3D2.UI {
             posGizmoToggle.CheckChanged += (obj, args) => {
                 if (posGizmo == null) {
                     posGizmo = CreateGizmo();
-                    posGizmo.RotChanged += (trans0, emp) => {
+                    posGizmo.PosChanged += (trans0, emp) => {
                         var pos = ((Transform)trans0).localPosition;
                         _location = pos;
                         ToLocationSlider(ref pos);
