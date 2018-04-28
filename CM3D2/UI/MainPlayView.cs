@@ -295,7 +295,7 @@ namespace EffekseerPlayer.CM3D2.UI {
             // TODO 削除確認 ファイル()が削除されます。よろしいですか？
 //            var selectButton = (CustomToggle)obj;
             foreach (var set in _recipeMgr.GetRecipeSets()) {
-                if (set.check == CheckStatus.Checked) {
+                if (set.Check == CheckStatus.Checked) {
                     _recipeMgr.RemoveSet(set.name, true);
                     
                 } else {

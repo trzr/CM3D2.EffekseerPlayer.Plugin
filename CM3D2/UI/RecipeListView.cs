@@ -89,9 +89,9 @@ namespace EffekseerPlayer.CM3D2.UI {
             var space = (ItemHeight - chkRect.height) / 2;
             foreach (var recipeSet in _recipeMgr.GetRecipeSets()) {
                 chkRect.y = yPos + space;
-                var chk = _checks[(int) recipeSet.check];
+                var chk = _checks[(int) recipeSet.Check];
                 if (GUI.Button(chkRect, chk, CheckStyle)) {
-                    switch (recipeSet.check) {
+                    switch (recipeSet.Check) {
                     case CheckStatus.NoChecked:
                         recipeSet.Check = CheckStatus.Checked;
                         break;
@@ -99,7 +99,7 @@ namespace EffekseerPlayer.CM3D2.UI {
                         recipeSet.Check = CheckStatus.NoChecked;
                         break;
                     case CheckStatus.PartChecked:
-                        recipeSet.check = CheckStatus.NoChecked;
+                        recipeSet.Check = CheckStatus.NoChecked;
                         break;
                     }
                 }
@@ -287,16 +287,16 @@ namespace EffekseerPlayer.CM3D2.UI {
 
         private void CheckChanged(RecipeSet set, PlayRecipe recipe) {
             recipe.selected = !recipe.selected;
-            switch (set.check) {
+            switch (set.Check) {
             case CheckStatus.NoChecked:
-                if (recipe.selected) set.check = CheckStatus.PartChecked;
+                if (recipe.selected) set.Check = CheckStatus.PartChecked;
                 break;
             case CheckStatus.Checked:
-                if (!recipe.selected) set.check = CheckStatus.PartChecked;
+                if (!recipe.selected) set.Check = CheckStatus.PartChecked;
                 break;
             case CheckStatus.PartChecked:
                 if (set.recipeList.FindIndex(rcp => rcp.selected != recipe.selected) == -1) {
-                    set.check = recipe.selected ? CheckStatus.Checked : CheckStatus.NoChecked;
+                    set.Check = recipe.selected ? CheckStatus.Checked : CheckStatus.NoChecked;
                 }
                 break;
             }

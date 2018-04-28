@@ -28,6 +28,7 @@ namespace EffekseerPlayer.CM3D2.Data {
         }
 
         public CheckStatus Check {
+            get { return check; }
             set {
                 check = value;
                 switch (check) {
@@ -207,7 +208,7 @@ namespace EffekseerPlayer.CM3D2.Data {
         public string playKeyCode;
 
         public bool expand;
-        public CheckStatus check;
+        private CheckStatus check;
         public long lastWriteTime;
         public bool loaded;
         public InputKeyDetectHandler<RecipeSet>.KeyHandler keyHandler;

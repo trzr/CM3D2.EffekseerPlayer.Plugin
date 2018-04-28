@@ -238,7 +238,7 @@ namespace EffekseerPlayer.CM3D2.Data {
             WriteField(builder, "name", name, pretty, subIndent);
             WriteField(builder, "effectName", effectName, pretty, subIndent);
             // WriteField(builder, "autoStart", autoStart, pretty, subIndent);
-            WriteField(builder, "repeat", repeat, pretty, subIndent);
+            if (repeat) WriteField(builder, "repeat", repeat, pretty, subIndent);
             WriteField(builder, "attach", attach, pretty, subIndent);
 
             if (attachSlot.HasValue) {
