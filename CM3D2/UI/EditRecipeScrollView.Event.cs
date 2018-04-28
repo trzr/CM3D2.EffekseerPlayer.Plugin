@@ -700,11 +700,6 @@ namespace EffekseerPlayer.CM3D2.UI {
 
             var rot = GetQuat();
             if (posGizmo != null && posGizmo.Visible) {
-                var pos0 = posGizmo.transform.localPosition;
-                Log.Debug("pos.b:", pos0.x, ",", pos0.y, ",", pos0.z);
-                posGizmo.transform.SetParent(boneTrans, false);
-                var pos = posGizmo.transform.localPosition;
-                Log.Debug("pos.a:", pos.x, ",", pos.y, ",", pos.z);
                 posGizmo.transform.SetParent(boneTrans, false);
                 posGizmo.transform.localPosition = _location;
                 posGizmo.transform.localRotation = rot;
