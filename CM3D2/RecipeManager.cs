@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using EffekseerPlayer.CM3D2.Data;
 
-namespace EffekseerPlayer.CM3D2.Data {
+namespace EffekseerPlayer.CM3D2 {
 
     /// <summary>
     /// 再生レシピのセーブ・ロードを行う管理するマネージャクラス.

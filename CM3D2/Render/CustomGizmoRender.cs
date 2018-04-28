@@ -2,7 +2,7 @@
 using System.Reflection;
 using UnityEngine;
 
-namespace EffekseerPlayer.CM3D2.UI {
+namespace EffekseerPlayer.CM3D2.Render {
     public class CustomGizmoRender : GizmoRender {
         // ドラッグ前後の情報を保持するフィールド
         private Vector3? prevAxis;
