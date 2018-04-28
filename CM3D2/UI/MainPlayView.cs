@@ -372,7 +372,7 @@ namespace EffekseerPlayer.CM3D2.UI {
         }
 
         public void DeleteRecipe(RecipeSet set, PlayRecipe recipe) {
-            _recipeMgr.Remove(set.name, recipe);
+            _recipeMgr.Remove(set.name, recipe, true);
             listView.UpdateLayout(uiParamSet);
         }
 

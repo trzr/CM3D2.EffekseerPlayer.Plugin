@@ -101,14 +101,19 @@ namespace EffekseerPlayer.CM3D2.Data {
 
         /// <summary>
         /// 指定セットからレシピ名でレシピを削除する.
+        /// updateFile=true指定の場合、レシピ削除が成功したらファイルを更新する.
         /// </summary>
         /// <param name="setName">セット名</param>
         /// <param name="name">レシピ名</param>
+        /// <param name="updateFile">ファイルを更新するか</param>
         /// <returns>削除に成功した場合trueを返す</returns>
-        public bool Remove(string setName, string name) {
+        public bool Remove(string setName, string name, bool updateFile=false) {
             RecipeSet recipeSet;
             if (_recipeSetDic.TryGetValue(setName, out recipeSet)) {
-                return recipeSet.Remove(name);
+                if (recipeSet.Remove(name)) {
+                    if (updateFile) Save(recipeSet);
+                    return true;
+                }
             }
             return false;
         }
@@ -119,9 +124,10 @@ namespace EffekseerPlayer.CM3D2.Data {
         /// </summary>
         /// <param name="setName">セット名</param>
         /// <param name="recipe">レシピ</param>
+        /// <param name="updateFile">ファイルを更新するか</param>
         /// <returns>削除に成功した場合trueを返す</returns>
-        public bool Remove(string setName, PlayRecipe recipe) {
-            return Remove(setName, recipe.name);
+        public bool Remove(string setName, PlayRecipe recipe, bool updateFile=false) {
+            return Remove(setName, recipe.name, updateFile);
         }
 
         /// <summary>
@@ -204,7 +210,7 @@ namespace EffekseerPlayer.CM3D2.Data {
         /// 
         /// 一時ファイルを作成して書き出した後に、ファイルをリネームして上書きする.
         /// </summary>
-        /// <param name="recipeSet"></param>
+        /// <param name="recipeSet">レシピセット</param>
         public void Save(RecipeSet recipeSet) {
             var filepath = Path.Combine(directory, recipeSet.name + ConstantValues.EXT_JSON);
             var tmppath = Path.Combine(directory, "tmp"+Path.GetRandomFileName());
@@ -214,7 +220,10 @@ namespace EffekseerPlayer.CM3D2.Data {
                 if (File.Exists(filepath)) File.Delete(filepath);
                 File.Move(tmppath, filepath);
                 Log.Debug("recipe file written.", recipeSet.name, ConstantValues.EXT_JSON);
-                
+
+                // オブジェクトで保持している更新日時を更新
+                recipeSet.lastWriteTime = new FileInfo(filepath).LastWriteTime.Ticks;
+
             } catch (Exception e) {
                 Log.Error("failed to save json. file=", filepath, e);
             } finally {
@@ -229,9 +238,9 @@ namespace EffekseerPlayer.CM3D2.Data {
         }
 
         public void InitKeyHandler() {
-
             var detectHandler = InputKeyDetectHandler<RecipeSet>.Get();
             detectHandler.handlers.Clear();
+            if (StopHandler != null) detectHandler.handlers.Add(StopHandler);
 
             var dic = new Dictionary<InputKeyDetectHandler<RecipeSet>.KeyHolder, IList<RecipeSet>>();
             foreach (var recipeSet in _recipeSets) {
@@ -240,7 +249,8 @@ namespace EffekseerPlayer.CM3D2.Data {
 
                 Log.Debug("recipe playKeyCode:", recipeSet.playKeyCode);
                 var keyHolder = detectHandler.Parse(recipeSet.playKeyCode);
-                Log.Debug("code:", keyHolder.codes);
+                if (keyHolder.IsEmpty()) continue;
+
                 IList<RecipeSet> old;
                 if (!dic.TryGetValue(keyHolder, out old)) {
                     old = new List<RecipeSet>();
@@ -273,12 +283,34 @@ namespace EffekseerPlayer.CM3D2.Data {
 
                 detectHandler.handlers.Add(keyHandler);
             }
+
             Log.Debug("Input-keyCode-handler initialized. count=", detectHandler.handlers.Count);
+        }
+
+        public void SetupStopKey(string stopKey) {
+            if (stopKey == null || stopKey.Trim().Length == 0) return;
+            Log.Debug("Setup StopKey:", stopKey);
+
+            var detectHandler = InputKeyDetectHandler<RecipeSet>.Get();
+
+            var keyHolder = detectHandler.Parse(stopKey);
+            if (keyHolder.IsEmpty()) return;
+
+            var detector = detectHandler.CreateKeyDetector(keyHolder);
+
+            var keyHandler = new InputKeyDetectHandler<RecipeSet>.KeyHandler {
+                detector = detector,
+                keyHolder = keyHolder,
+                handle = playManager.StopAll,
+            };
+            StopHandler = keyHandler;
+            detectHandler.handlers.Add(StopHandler);
         }
 
         #region Fields
         // 保存ディレクトリ
         protected readonly string directory;
+        private InputKeyDetectHandler<RecipeSet>.KeyHandler StopHandler;
 
         private readonly PlayManager playManager;
         private readonly List<RecipeSet> _recipeSets = new List<RecipeSet>();
