@@ -44,7 +44,7 @@ namespace EffekseerPlayer.CM3D2.UI {
         }
 
         public override void Awake() {
-            gobj = new GameObject("CurrentEmitter");
+            gobj = new GameObject(EMITTER_NAME);
             UnityEngine.Object.DontDestroyOnLoad(gobj);
 
             _boneRenderer = new CustomBoneRenderer();
@@ -710,6 +710,7 @@ namespace EffekseerPlayer.CM3D2.UI {
         }
 
         #region Fields
+        private const string EMITTER_NAME = "___CurrentEmitter";
         private const int WIDTH_RESET = 50;
         private readonly MaidHolder _maidHolder = new MaidHolder();
         private readonly EventHandler CheckValidate;

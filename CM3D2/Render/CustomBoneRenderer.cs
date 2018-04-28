@@ -205,7 +205,7 @@ namespace EffekseerPlayer.CM3D2.Render {
             _lineDict.Clear();
             ClearCache();
             _rootBone = null;
-			_targetId = -1;
+            _targetId = -1;
         }
 
         private void ClearCache() {

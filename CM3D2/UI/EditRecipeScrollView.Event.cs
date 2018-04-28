@@ -109,7 +109,8 @@ namespace EffekseerPlayer.CM3D2.UI {
 
         public EffekseerEmitter LoadEmitter(string effectName, bool repeat) {
             if (currentEmitter == null) {
-                currentEmitter = gobj.AddComponent<EffekseerEmitter>();
+                var go = GetGameObject();
+                currentEmitter = go.AddComponent<EffekseerEmitter>();
             }
 
             currentEmitter.EffectName = effectName;
@@ -664,8 +665,18 @@ namespace EffekseerPlayer.CM3D2.UI {
             return !attachToggle.Value || (slotCombo.SelectedIndex != -1 && boneCombo.SelectedIndex != -1);
         }
 
+        private GameObject GetGameObject() {
+            var go = GameObject.Find(EMITTER_NAME);
+            if (go == null) {
+                Log.Debug("GameObject recreated.");
+                gobj = new GameObject(EMITTER_NAME);
+            }
+            return gobj;
+        }
+
         private CustomGizmoRender CreateGizmo() {
-            var gizmo = gobj.AddComponent<CustomGizmoRender>();
+            var go = GetGameObject();
+            var gizmo = go.AddComponent<CustomGizmoRender>();
             gizmo.name = "___gizmo";
             gizmo.offsetScale = 0.5f;
             gizmo.lineSelectedThick = 0.1f;  // [0.04f]
