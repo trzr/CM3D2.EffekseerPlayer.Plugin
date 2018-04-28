@@ -34,6 +34,7 @@ namespace EffekseerPlayer.CM3D2.Data {
         public string name;
         public string effectName;
         public bool autoStart;
+        [SerializeField]
         private bool repeat;
         public bool Repeat {
             get { return repeat; }
