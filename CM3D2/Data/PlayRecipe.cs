@@ -34,7 +34,16 @@ namespace EffekseerPlayer.CM3D2.Data {
         public string name;
         public string effectName;
         public bool autoStart;
-        public bool repeat;
+        private bool repeat;
+        public bool Repeat {
+            get { return repeat; }
+            set {
+                repeat = value;
+                if (emitter != null) {
+                    emitter.loop = repeat;
+                }
+            }
+        }
 
         //public bool ignoreAttachRot;
 

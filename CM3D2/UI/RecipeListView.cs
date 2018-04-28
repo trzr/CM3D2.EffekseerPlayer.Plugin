@@ -140,9 +140,9 @@ namespace EffekseerPlayer.CM3D2.UI {
                         CheckChanged(recipeSet, recipe);
                     }
 
-                    var repeat = (recipe.repeat) ? _repeat : _repeatOff;
-                    if (GUI.Button(iconRect, repeat, CheckStyle)) {
-                        recipe.repeat = !recipe.repeat;
+                    var repeatCont = (recipe.Repeat) ? _repeat : _repeatOff;
+                    if (GUI.Button(iconRect, repeatCont, CheckStyle)) {
+                        recipe.Repeat = !recipe.Repeat;
                         // Set.dirty = true;
                         _recipeMgr.Save(recipeSet);
                     }

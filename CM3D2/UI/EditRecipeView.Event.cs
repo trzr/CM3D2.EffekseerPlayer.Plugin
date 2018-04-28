@@ -19,7 +19,7 @@ namespace EffekseerPlayer.CM3D2.UI {
             var recipe = new PlayRecipe {
                 name = nameText.Text,
                 effectName = efkCombo.SelectedItem,
-                repeat = repeatToggle.Value,
+                Repeat = repeatToggle.Value,
             };
             subEditView.SetupRecipe(recipe);
 
@@ -38,7 +38,7 @@ namespace EffekseerPlayer.CM3D2.UI {
             nameText.Text = recipe.name;
             efkCombo.Index = -1; // 見つからない場合を未選択とするため-1をセット
             efkCombo.SelectedItem = recipe.effectName;
-            repeatToggle.Value = recipe.repeat;
+            repeatToggle.Value = recipe.Repeat;
 
             subEditView.ToEditView(recipe);
         }

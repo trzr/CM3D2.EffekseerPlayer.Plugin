@@ -510,14 +510,14 @@ namespace EffekseerPlayer.Effekseer {
                 delayFrame = delay;
                 frame = 0;
                 enabled = act != null && delay > 0;
-                Log.Debug("set delay:", delay, ", enabled:", enabled);
+                // Log.Debug("set delay:", delay, ", enabled:", enabled);
             }
 
             internal void Update(float speed) {
                 frame += speed;
                 if (frame < delayFrame) return;
 
-                Log.Debug("frame:", frame, ", delay:", delayFrame);
+                // Log.Debug("frame:", frame, ", delay:", delayFrame);
                 act();
                 act = null;
                 enabled = false;
