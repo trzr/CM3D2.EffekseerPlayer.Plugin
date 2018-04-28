@@ -105,6 +105,10 @@ namespace EffekseerPlayer {
                 Log.Info("Recipe directory created: ", recipeDir);
             }
             _recipeMgr = new RecipeManager(recipeDir, _playMgr);
+            _recipeMgr.SetupStopKey(Settings.playStopKeyCode);
+            if (GameMain.Instance.VRMode) {
+                _recipeMgr.SetupStopKey(Settings.playStopKeyCodeVR);
+            }
 
             EffekseerSystem.baseDirectory    = Settings.efkDir;
             DontDestroyOnLoad(this);
@@ -140,6 +144,7 @@ namespace EffekseerPlayer {
         }
 #endif
         private void OnSceneLoaded(int sceneIdx) {
+            if (!_started) return;
             _uiHelper.InitStatus();
             // Effekseerの再生状態を一旦クリア
             _playMgr.Clear();

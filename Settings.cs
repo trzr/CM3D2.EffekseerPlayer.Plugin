@@ -15,6 +15,8 @@ namespace EffekseerPlayer {
 
         public KeyCode  toggleKey = KeyCode.F12;
         public EventModifiers toggleModifiers = EventModifiers.None;
+        public string playStopKeyCode;
+        public string playStopKeyCodeVR;
 
         public string efkDir;
         //internal string currentDir;
@@ -66,6 +68,8 @@ namespace EffekseerPlayer {
             //namePostfixWithExt = namePostfix + ".tex";
 
             Get(getValue("ToggleWindow"), ref toggleKey);
+            Get(getValue("PlayStopKeyCode"), ref playStopKeyCode);
+            Get(getValue("PlayStopKeyCodeVR"), ref playStopKeyCodeVR);
             string keylist = null;
             if (Get(getValue("ToggleWindowModifier"), ref keylist) && keylist != null) {
                 toggleModifiers = EventModifiers.None;
