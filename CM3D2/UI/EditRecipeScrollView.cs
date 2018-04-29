@@ -379,30 +379,36 @@ namespace EffekseerPlayer.CM3D2.UI {
                         _location = pos;
                         ToLocationSlider(ref pos);
                         ApplyLocation();
+                        if (rotGizmo != null && rotGizmo.Visible) {
+                            rotGizmo.transform.localPosition = pos;
+                        }
                     };
                 }
                 ToggleGizmo(ref posGizmo, posGizmoToggle.Value, true, false);
                 if (posGizmoToggle.Value) {
                     posGizmo.transform.localPosition = _location;
+                    posGizmo.transform.localRotation = GetQuat();
                 }
-
             };
             rotGizmoToggle.CheckChanged += (obj, args) => {
                 if (rotGizmo == null) {
                     rotGizmo = CreateGizmo();
                     rotGizmo.RotChanged += (trans0, emp) => {
                         var trans = (Transform) trans0;
+                        ToRotationSlider(trans.localRotation);
                         if (currentEmitter != null) {
                             currentEmitter.transform.localRotation = trans.localRotation;
                             currentEmitter.UpdateRotation();
                         }
-
-                        ToRotationSlider(trans);
+                        if (posGizmo != null && posGizmo.Visible) {
+                            posGizmo.transform.localRotation = trans.localRotation;
+                        }
                     };
                 }
 
                 ToggleGizmo(ref rotGizmo, rotGizmoToggle.Value, false, true);
                 if (rotGizmoToggle.Value) {
+                    rotGizmo.transform.localPosition = _location;
                     rotGizmo.transform.localRotation = GetQuat();
                 }
             };

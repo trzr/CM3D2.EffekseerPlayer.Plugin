@@ -103,8 +103,13 @@ namespace EffekseerPlayer.CM3D2.UI {
             var vals = new[]{vec3[0], vec3[1], vec3[2] };
             posSlider.Value.Set(vals, true);
             var rot = recipe.rotation;
-            var rotVals = new[]{rot[0], rot[1], rot[2], rot[3] };
-            quatSlider.Value.Set(rotVals, true);
+
+            if (rotToggle.Value) {
+                SetEulerSlider(ref rot, true);
+            } else {
+                var rotVals = new[] {rot[0], rot[1], rot[2], rot[3]};
+                quatSlider.Value.Set(rotVals, true);
+            }
         }
 
         public EffekseerEmitter LoadEmitter(string effectName, bool repeat) {
@@ -221,17 +226,7 @@ namespace EffekseerPlayer.CM3D2.UI {
 
         // ReSharper disable UnusedParameter.Local
         private void BoneChanged(object obj, EventArgs args) {
-            // ReSharper restore UnusedParameter.Local
-            if (currentEmitter == null) return;
-
-            // 呼び出し元でチェック
-//            var combo = (CustomComboBox)obj;
-//            var idx = combo.SelectedIndex;
-//            if (idx == -1) return;
-
-            //var pos = new Vector3(posXSlider.Num, posYSlider.Num, posZSlider.Num);
-            var pos = new Vector3(posSlider.Value[0].Value, posSlider.Value[1].Value, posSlider.Value[2].Value);
-            AttachSlot(currentEmitter, pos);
+            UpdateAttach(attachToggle.Value);
         }
 
         private void ScaleChanged(object obj, EventArgs args) {
@@ -328,9 +323,7 @@ namespace EffekseerPlayer.CM3D2.UI {
             setPos(val);
             ApplyLocation();
 
-            if (posGizmo != null && posGizmo.Visible) {
-                posGizmo.transform.localPosition = _location;
-            }
+            UpdateGizmoPosition();
         }
 
         private void PosXChanged(object obj, EventArgs args) {
@@ -354,6 +347,8 @@ namespace EffekseerPlayer.CM3D2.UI {
             _location.y = val[1].Value;
             _location.z = val[2].Value;
             ApplyLocation();
+
+            UpdateGizmoPosition();
         }
 
         //
@@ -369,9 +364,7 @@ namespace EffekseerPlayer.CM3D2.UI {
                 // ApplyLocation();
             }
 
-            if (rotGizmo != null && rotGizmo.Visible) {
-                rotGizmo.transform.localRotation = GetQuat();
-            }
+            UpdateGizmoRotation(GetQuat());
         }
         delegate void SetRotAction(ref Quaternion rot, float val);
         private void RotChanged(float val, SetRotAction setRotate) {
@@ -383,9 +376,7 @@ namespace EffekseerPlayer.CM3D2.UI {
                 // ApplyLocation();
             }
 
-            if (rotGizmo != null && rotGizmo.Visible) {
-                rotGizmo.transform.localRotation = GetQuat();
-            }
+            UpdateGizmoRotation(GetQuat());
         }
         private void EulerXChanged(object obj, EventArgs args) {
             var etv = (EditTextValue)obj;
@@ -458,12 +449,29 @@ namespace EffekseerPlayer.CM3D2.UI {
             });
         }
 
-        private void ToLocationSlider( ref Vector3 location) {
+        private void UpdateGizmoPosition() {
+            if (posGizmo != null && posGizmo.Visible) {
+                posGizmo.transform.localPosition = _location;
+            }
+            if (rotGizmo != null && rotGizmo.Visible) {
+                rotGizmo.transform.localPosition = _location;
+            }
+        }
+
+        private void UpdateGizmoRotation(Quaternion rot) {
+            if (posGizmo != null && posGizmo.Visible) {
+                posGizmo.transform.localRotation = rot;
+            }
+            if (rotGizmo != null && rotGizmo.Visible) {
+                rotGizmo.transform.localRotation = rot;
+            }
+        }
+
+        private void ToLocationSlider(ref Vector3 location) {
             posSlider.Value.Set(new[]{location.x, location.y, location.z}, false, false );
         }
 
-        private void ToRotationSlider(Transform trans) {
-            var rot = trans.localRotation;
+        private void ToRotationSlider(Quaternion rot) {
             if (eulerSlider.Enabled) {
                 SetEulerSlider(ref rot, false);
             } else {

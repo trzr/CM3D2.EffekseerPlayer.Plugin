@@ -262,7 +262,6 @@ namespace EffekseerPlayer.CM3D2 {
 
             foreach (var e in dic) {
                 var detector = detectHandler.CreateKeyDetector(e.Key);
-                Log.Debug("detector:", detector);
                 if (detector == null) continue;
 
                 var keyHandler = new InputKeyDetectHandler<RecipeSet>.KeyHandler {
