@@ -103,14 +103,13 @@ namespace EffekseerPlayer.CM3D2.Data {
              //               if (line[i+1] == 'u') {
              //                   int utf32;
              //                   if (Int32.TryParse(line.Substring(i+2, 4),
-									    //NumberStyles.AllowHexSpecifier,
-									    //NumberFormatInfo.InvariantInfo,
+             //                         NumberStyles.AllowHexSpecifier,
+             //                         NumberFormatInfo.InvariantInfo,
              //                           out utf32)) {
              //                       builder.Append(Char.ConvertFromUtf32(utf32));
              //                       i += 5;
              //                       continue;
              //                   }
-
              //               }
              //           }
              //           break;

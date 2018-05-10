@@ -26,15 +26,15 @@ namespace EffekseerPlayer {
     public class EffekseerPlayerPlugin : PluginBase {
         #region Variables
         private const EventModifiers MODIFIER_KEYS = EventModifiers.Shift | EventModifiers.Control | EventModifiers.Alt;
-        private static readonly Settings Settings = Settings.Instance;
+        private readonly Settings settings = Settings.Instance;
 
-        private readonly UIParamSet _uiParamSet = UIParamSet.Instance;
-        private readonly UIHelper _uiHelper = new UIHelper();
-        private readonly InputKeyDetectHandler<RecipeSet> _detectHandler = InputKeyDetectHandler<RecipeSet>.Get();
+        private readonly UIParamSet uiParamSet = UIParamSet.Instance;
+        private readonly UIHelper uiHelper = new UIHelper();
+        private readonly InputKeyDetectHandler<RecipeSet> keyDetector = InputKeyDetectHandler<RecipeSet>.Get();
         private readonly CM3D2SceneChecker sceneChecker = new CM3D2SceneChecker();
 
         private bool _started;
-        private bool IsTargetScene;
+        private bool _isTargetScene;
         private PlayManager _playMgr;
         private EfkManager _efkMgr;
         private RecipeManager _recipeMgr;
@@ -81,53 +81,53 @@ namespace EffekseerPlayer {
             // デフォルトのefkパスを取得（configにパスが設定されている場合は、configを優先）
             var efkDir = Path.GetFullPath(Path.Combine(confDir, @"efk"));
 
-            Settings.Updated += UpdateSetting;
+            settings.Updated += UpdateSetting;
             ReloadConfig();
-            Settings.Load(key => Preferences["Config"][key].Value);
-            _uiParamSet.SizeRate = Settings.sizeRate;
+            settings.Load(key => Preferences["Config"][key].Value);
+            uiParamSet.SizeRate = settings.sizeRate;
 
             // 設定の反映
-            if (!Directory.Exists(Settings.efkDir)) {
+            if (!Directory.Exists(settings.efkDir)) {
                 if (!Directory.Exists(efkDir)) {
                     Directory.CreateDirectory(efkDir);
                     Log.Info("directory created: ", efkDir);
                 }
-                Settings.efkDir = efkDir;
+                settings.efkDir = efkDir;
             }
 
-            Log.Debug("Effekseer Dir: ", Settings.efkDir);
-            _efkMgr = new EfkManager(Settings.efkDir);
+            Log.Debug("Effekseer Dir: ", settings.efkDir);
+            _efkMgr = new EfkManager(settings.efkDir);
             _playMgr = new PlayManager();
 
-            var recipeDir = Path.GetFullPath(Path.Combine(Settings.efkDir, @"_recipes"));
+            var recipeDir = Path.GetFullPath(Path.Combine(settings.efkDir, @"_recipes"));
             if (!Directory.Exists(recipeDir)) {
                 Directory.CreateDirectory(recipeDir);
                 Log.Info("Recipe directory created: ", recipeDir);
             }
             _recipeMgr = new RecipeManager(recipeDir, _playMgr);
-            _recipeMgr.SetupStopKey(Settings.playStopKeyCode);
+            _recipeMgr.SetupStopKey(settings.playStopKeyCode);
             if (GameMain.Instance.VRMode) {
-                _recipeMgr.SetupStopKey(Settings.playStopKeyCodeVR);
+                _recipeMgr.SetupStopKey(settings.playStopKeyCodeVR);
             }
 
-            EffekseerSystem.baseDirectory    = Settings.efkDir;
+            EffekseerSystem.baseDirectory = settings.efkDir;
             DontDestroyOnLoad(this);
             _started = true;
         }
 
-        private void UpdateSetting(Settings settings) {
-            EffekseerSystem.effectInstances  = settings.effectInstances;
-            EffekseerSystem.maxSquares       = settings.maxSquares;
-            EffekseerSystem.soundInstances   = settings.soundInstances;
-            EffekseerSystem.isRightHandledCoordinateSystem = settings.isRightHandledCoordinateSystem;
-            EffekseerSystem.enableDistortion = settings.enableDistortion;
-            EffekseerSystem.suppressMultiplePlaySound = settings.suppressMultiplePlaySound;
+        private void UpdateSetting(Settings settings1) {
+            EffekseerSystem.effectInstances  = settings1.effectInstances;
+            EffekseerSystem.maxSquares       = settings1.maxSquares;
+            EffekseerSystem.soundInstances   = settings1.soundInstances;
+            EffekseerSystem.isRightHandledCoordinateSystem = settings1.isRightHandledCoordinateSystem;
+            EffekseerSystem.enableDistortion = settings1.enableDistortion;
+            EffekseerSystem.suppressMultiplePlaySound = settings1.suppressMultiplePlaySound;
             
-            if (Settings.toggleModifiers == EventModifiers.None) {
+            if (settings1.toggleModifiers == EventModifiers.None) {
                 // 修飾キーが押されていない事を確認(Shift/Alt/Ctrl)
-                InputVisibleKey = () => (Event.current.modifiers & MODIFIER_KEYS) == EventModifiers.None && Input.GetKeyDown(Settings.toggleKey);
+                InputVisibleKey = () => (Event.current.modifiers & MODIFIER_KEYS) == EventModifiers.None && Input.GetKeyDown(settings1.toggleKey);
             } else {
-                InputVisibleKey = () => (Event.current.modifiers & Settings.toggleModifiers) != EventModifiers.None && Input.GetKeyDown(Settings.toggleKey);
+                InputVisibleKey = () => (Event.current.modifiers & settings1.toggleModifiers) != EventModifiers.None && Input.GetKeyDown(settings1.toggleKey);
             }
         }
 
@@ -145,13 +145,13 @@ namespace EffekseerPlayer {
 #endif
         private void OnSceneLoaded(int sceneIdx) {
             if (!_started) return;
-            _uiHelper.InitStatus();
+            uiHelper.InitStatus();
             // Effekseerの再生状態を一旦クリア
             _playMgr.Clear();
             // 必要に応じて各コンボの情報(メイド一覧など)をクリア
 
-            IsTargetScene = sceneChecker.IsTarget(sceneIdx);
-            if (IsTargetScene) {
+            _isTargetScene = sceneChecker.IsTarget(sceneIdx);
+            if (_isTargetScene) {
                 if (_state == InitState.NotInitialized) {
                     _state = InitState.Initializing;
                     plugin.StartCoroutine(DelayFrame(60, Init));
@@ -160,14 +160,14 @@ namespace EffekseerPlayer {
         }
 
         public void Update() {
-            if (!IsTargetScene) return;
+            if (!_isTargetScene) return;
 
             try {
                 if (InputVisibleKey()) {
                     if (_state != InitState.NotInitialized) {
                         _playView.Visibled = !_playView.Visibled;
                         Log.Debug("Visibled:", _playView.Visibled);
-                        if (_playView.Visibled && _state == InitState.Initialized) _uiParamSet.Update();
+                        if (_playView.Visibled && _state == InitState.Initialized) uiParamSet.Update();
                     }
                 }
             } catch (Exception e) {
@@ -176,24 +176,24 @@ namespace EffekseerPlayer {
             }
             if (_state != InitState.Initialized) return;
 
-            _detectHandler.Detect();
+            keyDetector.Detect();
 
-            if (_playView.Visibled) _uiHelper.UpdateCursor();
-            _uiHelper.UpdateCameraControl();
+            if (_playView.Visibled) uiHelper.UpdateCursor();
+            uiHelper.UpdateCameraControl();
 
             _playView.Update();
             _editView.Update();
         }
 
         public void OnGUI() {
-            if (!IsTargetScene) return;
+            if (!_isTargetScene) return;
 
             if (_state != InitState.Initialized || !_playView.Visibled) return;
-            if (Settings.ssWithoutUI && !_uiHelper.IsEnabledUICamera()) return; // UI無し撮影
+            if (settings.ssWithoutUI && !uiHelper.IsEnabledUICamera()) return; // UI無し撮影
 
             _playView.OnGUI();
             _editView.OnGUI();
-            _uiHelper.UpdateDrag();
+            uiHelper.UpdateDrag();
         }
 
         public void OnEnable() {
@@ -203,7 +203,7 @@ namespace EffekseerPlayer {
 
         public void OnDisable() {
             Log.Debug("plugin on disable");
-            _uiHelper.InitStatus();
+            uiHelper.InitStatus();
             EffekseerSystem.SetActive(false);
         }
 
@@ -234,18 +234,18 @@ namespace EffekseerPlayer {
         }
 
         public IEnumerator InitAsync() {
-            _uiParamSet.Update();
-            _editView = new EditRecipeView(_uiParamSet, _recipeMgr, _efkMgr) {
+            uiParamSet.Update();
+            _editView = new EditRecipeView(uiParamSet, _recipeMgr, _efkMgr) {
                 Text = "Playエディット"
             };
 
-            _playView = new MainPlayView(_uiParamSet, _editView, _recipeMgr, _playMgr) {
+            _playView = new MainPlayView(uiParamSet, _editView, _recipeMgr, _playMgr) {
                 Text = "EffekseerPlayer",
                 Version = Version,
                 FollowedWin = _editView
             };
-            _uiHelper.targets.Add(_playView);
-            _uiHelper.targets.Add(_editView);
+            uiHelper.targets.Add(_playView);
+            uiHelper.targets.Add(_editView);
             yield return null;
 
             _efkMgr.ScanDir();
@@ -272,8 +272,8 @@ namespace EffekseerPlayer {
         }
 
         private void Dispose() {
-            _uiHelper.SetCameraControl(true);
-            _uiHelper.InitStatus();
+            uiHelper.SetCameraControl(true);
+            uiHelper.InitStatus();
         }
 
         private string ResolveDir() {
@@ -293,17 +293,17 @@ namespace EffekseerPlayer {
             return DataPath;
         }
 
+        #region Static Fields
         public static volatile string PluginName;
         public static volatile string Version;
         static EffekseerPlayerPlugin() {
-            // 属性クラスからプラグイン名取得
+            // 属性クラスからプラグイン名とプラグインバージョンを取得
             try {
                 var attr = Attribute.GetCustomAttribute(typeof(EffekseerPlayerPlugin), typeof(PluginNameAttribute)) as PluginNameAttribute;
                 if (attr != null) PluginName = attr.Name;
             } catch (Exception e) {
                 Log.Error(e);
             }
-            // プラグインバージョン取得
             try {
                 var attr = Attribute.GetCustomAttribute(typeof(EffekseerPlayerPlugin), typeof(PluginVersionAttribute)) as PluginVersionAttribute;
                 if (attr != null) Version = attr.Version;
@@ -311,5 +311,6 @@ namespace EffekseerPlayer {
                 Log.Error(e);
             }
         }
+        #endregion
     }
 }

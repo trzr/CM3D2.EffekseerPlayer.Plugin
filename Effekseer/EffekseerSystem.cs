@@ -100,6 +100,8 @@ namespace EffekseerPlayer.Effekseer {
 
         /// <summary xml:lang="ja">
         /// 全エフェクトの再生停止
+        ///
+        /// FIXME Emitter側の状態管理と整合が取れなくなるため注意
         /// </summary>
         public static void StopAllEffects() {
             Plugin.EffekseerStopAllEffects();
@@ -107,6 +109,8 @@ namespace EffekseerPlayer.Effekseer {
 
         /// <summary xml:lang="ja">
         /// 全エフェクトの一時停止、もしくは再開
+        ///
+        /// FIXME Emitter側の状態管理と整合が取れなくなるため注意
         /// </summary>
         public static void SetPausedToAllEffects(bool paused) {
             Plugin.EffekseerSetPausedToAllEffects(paused);
@@ -184,7 +188,6 @@ namespace EffekseerPlayer.Effekseer {
         // Loaded effect resources
         private List<TextureResource> _textureList;
         private List<ModelResource> _modelList;
-//        private Dictionary<string, SoundResource> _soundDict;
         private List<SoundResource> _soundList;
         private List<SoundInstance> _soundInstanceList;
 
@@ -319,9 +322,7 @@ namespace EffekseerPlayer.Effekseer {
                     fileLoaded = true;
                 }
 
-                // 本来不要だが、念のため 他から利用されても安全なように…
                 // efkファイルのロードディレクトリを基準として、他のファイルを参照できるようにworkDirを設定
-//                lock (_lockObj) {
                 {
                     if (fileLoaded) workDir = Path.GetDirectoryName(filepath);
                     else if (workDir == null) workDir = baseDirectory;
@@ -390,7 +391,6 @@ namespace EffekseerPlayer.Effekseer {
             _effectList = new Dictionary<string, IntPtr>();
             _textureList = new List<TextureResource>();
             _modelList = new List<ModelResource>();
-//            _soundDict = new Dictionary<string, SoundResource>();
             _soundList = new List<SoundResource>();
             _soundInstanceList = new List<SoundInstance>();
 
