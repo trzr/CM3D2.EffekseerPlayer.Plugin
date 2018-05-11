@@ -592,13 +592,23 @@ namespace EffekseerPlayer.CM3D2.UI {
         private List<string> GetBoneNames(TBodySkin slot) {
             var boneNames = new List<string>();
 
-            foreach (Transform child in slot.obj.transform) {
-                //Log.Debug("bone:", child.name);
-                // 子なしはスキップ
-                if (child.childCount == 0) continue;
-                // アタッチされたEffekseerオブジェクトをスキップ
-                if (child.name.StartsWith(ConstantValues.EFK_PREFIX)) continue;
-                ParseBones(boneNames, child);
+            var meshRenderer = slot.obj.gameObject.GetComponentInChildren<SkinnedMeshRenderer>(false);
+            if (meshRenderer != null) {
+                var bones = meshRenderer.bones;
+                foreach (var bone in bones) {
+                    boneNames.Add(bone.name);
+                }
+            } else {
+                Log.Debug("SkinnedMeshRenderer not found");
+                // SkinnedMeshRendererが無い場合の保険 (ただし、余計なボーンが含まれる場合あり _SCL_無しボーンなど)
+                foreach (Transform child in slot.obj.transform) {
+                    // SM_ボーン直下の子なしボーンはスキップ
+                    if (child.childCount == 0) continue;
+
+                    // アタッチされたEffekseerオブジェクトをスキップ
+                    if (child.name.StartsWith(ConstantValues.EFK_PREFIX)) continue;
+                    ParseBones(boneNames, child);
+                }
             }
             return boneNames;
         }
@@ -654,7 +664,6 @@ namespace EffekseerPlayer.CM3D2.UI {
         }
 
         private static void ParseBones(ICollection<string> boneNames, Transform bone) {
-            //Log.Debug("child:", bone.name);
             boneNames.Add(bone.name);
 
             foreach (Transform child in bone) {
