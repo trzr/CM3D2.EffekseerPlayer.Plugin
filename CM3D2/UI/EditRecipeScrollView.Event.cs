@@ -610,6 +610,7 @@ namespace EffekseerPlayer.CM3D2.UI {
                     ParseBones(boneNames, child);
                 }
             }
+            boneNames.Sort();
             return boneNames;
         }
 
