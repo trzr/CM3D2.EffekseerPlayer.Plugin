@@ -315,7 +315,6 @@ namespace EffekseerPlayer.CM3D2.UI {
                 if (attachToggle.Value) {
                     ReloadMaidCombo();
                 }
-
                 UpdateAttach(attachToggle.Value);
 
                 //var tggle = (CustomToggle)obj;

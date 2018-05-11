@@ -620,13 +620,14 @@ namespace EffekseerPlayer.CM3D2.UI {
             if (filter.Length == 0) {
                 boneCombo.Items = _boneItems;
             } else {
-                _includedBones.Clear();
+                // boneCombo.Items = _boneItems.Where(item => item.text.Contains(filter)).ToArray();
+                var includedBones = new List<GUIContent>();
                 foreach (var item in _boneItems) {
                     if (item.text.Contains(filter)) {
-                        _includedBones.Add(item);
+                        includedBones.Add(item);
                     }
                 }
-                boneCombo.Items = _includedBones.ToArray();
+                boneCombo.Items = includedBones.ToArray();
             }
         }
 
@@ -774,7 +775,6 @@ namespace EffekseerPlayer.CM3D2.UI {
         private GUIContent[] _slotItems;
         private readonly List<GUIContent> _includedSlots = new List<GUIContent>();
         private GUIContent[] _boneItems;
-        private readonly List<GUIContent> _includedBones = new List<GUIContent>();
 
         #endregion
 

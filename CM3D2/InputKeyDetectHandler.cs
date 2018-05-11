@@ -26,7 +26,7 @@ namespace EffekseerPlayer.CM3D2 {
         }
 
         public void Detect() {
-            foreach (var handler in handlers) {
+            foreach (var handler in keyHandlers) {
                 if (handler.detector()) handler.handle();
             }
         }
@@ -148,6 +148,8 @@ namespace EffekseerPlayer.CM3D2 {
 
         private void Init() {
             // rawButtonのフラグを入力とし、指定されたキーすべてが押されたか判断するクロージャを生成する
+            // OVRInput.GetDownは単一キーの判断しかできないため、複数キー同時押下を判定するためのクロージャを用意する必要がある.
+            // ただし、non-publicのフィールドやクラスがあるため、reflectionを駆使して無理やり呼び出しを実現している. (可視性を変えてしまった方が早い)
             var type = typeof(OVRInput);
             var ctrollerField =  type.GetField("controllers", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
             if (ctrollerField == null) return;
@@ -206,7 +208,7 @@ namespace EffekseerPlayer.CM3D2 {
         public PlayManager playManager;
         private Func<OVRInput.RawButton, bool> GetDown;
 
-        public readonly IList<KeyHandler> handlers = new List<KeyHandler>();
+        public readonly IList<KeyHandler> keyHandlers = new List<KeyHandler>();
         private const string PREFIX_BUTTON = "ovr_";
         private const string PREFIX_TOUCH  = "ovrt_";
     }

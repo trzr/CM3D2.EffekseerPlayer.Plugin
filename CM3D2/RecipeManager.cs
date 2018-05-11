@@ -240,8 +240,8 @@ namespace EffekseerPlayer.CM3D2 {
 
         public void InitKeyHandler() {
             var detectHandler = InputKeyDetectHandler<RecipeSet>.Get();
-            detectHandler.handlers.Clear();
-            if (StopHandler != null) detectHandler.handlers.Add(StopHandler);
+            detectHandler.keyHandlers.Clear();
+            if (StopHandler != null) detectHandler.keyHandlers.Add(StopHandler);
 
             var dic = new Dictionary<InputKeyDetectHandler<RecipeSet>.KeyHolder, IList<RecipeSet>>();
             foreach (var recipeSet in _recipeSets) {
@@ -281,30 +281,36 @@ namespace EffekseerPlayer.CM3D2 {
                     }
                 };
 
-                detectHandler.handlers.Add(keyHandler);
+                detectHandler.keyHandlers.Add(keyHandler);
             }
 
-            Log.Debug("Input-keyCode-handler initialized. count=", detectHandler.handlers.Count);
+            Log.Debug("Input-keyCode-handler initialized. count=", detectHandler.keyHandlers.Count);
         }
 
         public void SetupStopKey(string stopKey) {
-            if (stopKey == null || stopKey.Trim().Length == 0) return;
             Log.Debug("Setup StopKey:", stopKey);
+            var handler = SetupKey(stopKey);
+            if (handler == null) return;
+            StopHandler = handler;
+            StopHandler.handle =  playManager.StopAll;
+        }
+
+
+        private InputKeyDetectHandler<RecipeSet>.KeyHandler SetupKey(string key) {
+            if (key == null || key.Trim().Length == 0) return null;
 
             var detectHandler = InputKeyDetectHandler<RecipeSet>.Get();
-
-            var keyHolder = detectHandler.Parse(stopKey);
-            if (keyHolder.IsEmpty()) return;
+            var keyHolder = detectHandler.Parse(key);
+            if (keyHolder.IsEmpty()) return null;
 
             var detector = detectHandler.CreateKeyDetector(keyHolder);
 
-            var keyHandler = new InputKeyDetectHandler<RecipeSet>.KeyHandler {
+            var handler = new InputKeyDetectHandler<RecipeSet>.KeyHandler {
                 detector = detector,
                 keyHolder = keyHolder,
-                handle = playManager.StopAll,
             };
-            StopHandler = keyHandler;
-            detectHandler.handlers.Add(StopHandler);
+            detectHandler.keyHandlers.Add(handler);
+            return handler;
         }
 
         #region Fields
