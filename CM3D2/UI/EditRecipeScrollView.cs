@@ -342,7 +342,9 @@ namespace EffekseerPlayer.CM3D2.UI {
             };
             maidRefreshButton.Click += (obj, args) => {
                 if (!ReloadMaidCombo()) {
-                    CheckItemChanged();
+                    if (_currentMaid == null || _currentSlot == null) return;
+
+                    ReloadSlotCombo();
                 }
             };
             prevMaidButton.Click += (obj, args) => { maidCombo.Prev(); };

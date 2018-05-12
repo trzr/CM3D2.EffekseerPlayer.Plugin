@@ -33,12 +33,6 @@ namespace EffekseerPlayer.CM3D2.UI {
             // スロット情報が変更された可能性があるため、スロットコンボを更新
             var slotObj = _currentSlot.obj;
             ReloadSlotCombo();
-
-            // 対象スロットが無効になった場合：コンボの選択状態が変わりイベント通知にて伝わる
-            // スロットアイテム変更の場合　　：イベント通知されないため、手動で更新
-            if (slotObj != null) {
-                ChangeCurrentSlot(_currentSlot);
-            }
         }
 
         public void SetupRecipe(PlayRecipe recipe) {
@@ -189,7 +183,7 @@ namespace EffekseerPlayer.CM3D2.UI {
         }
 
         private void SlotChanged(object obj=null, EventArgs args=null) {
-            var slot = _currentMaid != null ? SelectedSlot(_currentMaid) : null;
+            var slot = SelectedSlot(_currentMaid);
             ChangeCurrentSlot(slot);
         }
 
@@ -531,15 +525,23 @@ namespace EffekseerPlayer.CM3D2.UI {
             }
 
             _slotContents.Clear();
-            if (_currentMaid == null) return;
-            for (var i=0; i<_allSlotContents.Length; i++) {
-                var slotItem = _currentMaid.body0.goSlot[i];
-                if (slotItem.obj != null && slotItem.morph != null) {
-                    _slotContents.Add(_allSlotContents[i]);
+            if (_currentMaid != null) {
+                for (var i = 0; i < _allSlotContents.Length; i++) {
+                    var slotItem = _currentMaid.body0.goSlot[i];
+                    if (slotItem.obj != null && slotItem.morph != null) {
+                        _slotContents.Add(_allSlotContents[i]);
+                    }
                 }
             }
             _slotItems = _slotContents.ToArray();
-            FilterSlotCombo();
+            FilterSlotCombo(); // フィルター時にComboの変更通知発生
+
+            // 対象スロットが無効になった場合：コンボの選択状態が変わりイベント通知
+            // スロットアイテム変更の場合　　：イベント通知されないため、手動で更新
+            if (slotCombo.SelectedIndex != -1) {
+                var slot = _currentMaid != null ? SelectedSlot(_currentMaid) : null;
+                ChangeCurrentSlot(slot);
+            }
         }
 
         private static GUIContent[] CreateSlotContents() {
@@ -555,7 +557,7 @@ namespace EffekseerPlayer.CM3D2.UI {
         }
 
         private void FilterSlotCombo() {
-            if (_slotItems == null) return;
+            // if (_slotItems == null) return;
 
             var filter = slotFilterText.Text.Trim();
             if (filter.Length == 0) {
@@ -641,7 +643,6 @@ namespace EffekseerPlayer.CM3D2.UI {
             return idx == -1 ? null : _maidHolder.Get(idx);
         }
 
-        // _currentMaid != null
         private TBodySkin SelectedSlot() {
             var slot = SelectedSlot(_currentMaid);
             if (slot == null || slot.obj == null) return null;
@@ -658,10 +659,11 @@ namespace EffekseerPlayer.CM3D2.UI {
         }
 
         private TBodySkin SelectedSlot(Maid maid0) {
-            var slotNo = SelectedSlotIndex();
-            if (slotNo == -1) return null;
+            if (maid0 == null) return null;
 
-            Log.Debug("slotNo:", slotNo);
+            var slotNo = SelectedSlotIndex();
+            if (slotNo < 0 && maid0.body0.goSlot.Count <= slotNo) return null;
+
             return maid0.body0.goSlot[slotNo];
         }
 
