@@ -104,23 +104,31 @@ namespace EffekseerPlayer.CM3D2 {
                         // EventModifiers is None && keyCodes
                         return () => {
                             if (Event.current.modifiers != EventModifiers.None) return false;
-                            return keyHolder.codes.All(Input.GetKeyDown);
+                            foreach (var code in keyHolder.codes) {
+                                if (!Input.GetKeyDown(code)) return false;
+                            }
+                            return true;
                         };
                     }
                     // EventModifiers is None && keyCodes && ovrButton
                     return () => {
                         if (Event.current.modifiers != EventModifiers.None) return false;
                         if (!GetDown(keyHolder.ovrButton)) return false;
-                        return keyHolder.codes.All(Input.GetKeyDown);
+                        foreach (var code in keyHolder.codes) {
+                            if (!Input.GetKeyDown(code)) return false;
+                        }
+                        return true;
                     };
-
                 }
 
                 if (keyHolder.ovrButton == OVRInput.RawButton.None) {
                     // EventModifiers && keyCodes
                     return () => {
                         if ((Event.current.modifiers & keyHolder.modifierKeys) != keyHolder.modifierKeys) return false;
-                        return keyHolder.codes.All(Input.GetKeyDown);
+                        foreach (var code in keyHolder.codes) {
+                            if (!Input.GetKeyDown(code)) return false;
+                        }
+                        return true;
                     };
                 }
 
@@ -128,7 +136,10 @@ namespace EffekseerPlayer.CM3D2 {
                 return () => {
                     if ((Event.current.modifiers & keyHolder.modifierKeys) != keyHolder.modifierKeys) return false;
                     if (!GetDown(keyHolder.ovrButton)) return false;
-                    return keyHolder.codes.All(Input.GetKeyDown);
+                    foreach (var code in keyHolder.codes) {
+                        if (!Input.GetKeyDown(code)) return false;
+                    }
+                    return true;
                 };
             }
 
