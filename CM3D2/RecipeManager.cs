@@ -18,6 +18,10 @@ namespace EffekseerPlayer.CM3D2 {
             this.playManager = playManager;
         }
 
+        public void InitState() {
+            paused = false;
+        }
+
         public bool Any() {
             return _recipeSets.Any();
         }
@@ -242,6 +246,7 @@ namespace EffekseerPlayer.CM3D2 {
             var detectHandler = InputKeyDetectHandler<RecipeSet>.Get();
             detectHandler.keyHandlers.Clear();
             if (StopHandler != null) detectHandler.keyHandlers.Add(StopHandler);
+            if (PauseHandler != null) detectHandler.keyHandlers.Add(PauseHandler);
 
             var dic = new Dictionary<InputKeyDetectHandler<RecipeSet>.KeyHolder, IList<RecipeSet>>();
             foreach (var recipeSet in _recipeSets) {
@@ -295,6 +300,16 @@ namespace EffekseerPlayer.CM3D2 {
             StopHandler.handle =  playManager.StopAll;
         }
 
+        public void SetupPauseKey(string key) {
+            Log.Debug("Setup Pausekey:", key);
+            var handler = SetupKey(key);
+            if (handler == null) return;
+            PauseHandler = handler;
+            PauseHandler.handle =  () => {
+                playManager.PauseAll(!paused);
+                paused = !paused;
+            };
+        }
 
         private InputKeyDetectHandler<RecipeSet>.KeyHandler SetupKey(string key) {
             if (key == null || key.Trim().Length == 0) return null;
@@ -317,6 +332,8 @@ namespace EffekseerPlayer.CM3D2 {
         // 保存ディレクトリ
         protected readonly string directory;
         private InputKeyDetectHandler<RecipeSet>.KeyHandler StopHandler;
+        private InputKeyDetectHandler<RecipeSet>.KeyHandler PauseHandler;
+        public bool paused;
 
         private readonly PlayManager playManager;
         private readonly List<RecipeSet> _recipeSets = new List<RecipeSet>();

@@ -17,6 +17,8 @@ namespace EffekseerPlayer {
         public EventModifiers toggleModifiers = EventModifiers.None;
         public string playStopKeyCode;
         public string playStopKeyCodeVR;
+        public string playPauseKeyCode;
+        public string playPauseKeyCodeVR;
 
         public string efkDir;
         //internal string currentDir;
@@ -70,6 +72,8 @@ namespace EffekseerPlayer {
             Get(getValue("ToggleWindow"), ref toggleKey);
             Get(getValue("PlayStopKeyCode"), ref playStopKeyCode);
             Get(getValue("PlayStopKeyCodeVR"), ref playStopKeyCodeVR);
+            Get(getValue("PlayPauseKeyCode"), ref playPauseKeyCode);
+            Get(getValue("PlayPauseKeyCodeVR"), ref playPauseKeyCodeVR);
             string keylist = null;
             if (Get(getValue("ToggleWindowModifier"), ref keylist) && keylist != null) {
                 toggleModifiers = EventModifiers.None;

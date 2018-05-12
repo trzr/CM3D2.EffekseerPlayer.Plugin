@@ -148,8 +148,23 @@ namespace EffekseerPlayer.CM3D2 {
             recipe.emitter.Paused = !recipe.emitter.Paused;
         }
 
+        public void PauseAll() {
+            foreach (var recipe in cache.Values) {
+                if (recipe.emitter == null) continue;
+                if (recipe.emitter.Exists) {
+                    recipe.emitter.Paused = !recipe.emitter.Paused;
+                }
+            }
+        }
+
         public void PauseAll(bool pause) {
-            EffekseerSystem.SetPausedToAllEffects(pause);
+            foreach (var recipe in cache.Values) {
+                if (recipe.emitter == null) continue;
+                if (recipe.emitter.Exists) {
+                    recipe.emitter.Paused = pause;
+                }
+            }
+            // EffekseerSystem.SetPausedToAllEffects(pause);
         }
 
         #region Fields
