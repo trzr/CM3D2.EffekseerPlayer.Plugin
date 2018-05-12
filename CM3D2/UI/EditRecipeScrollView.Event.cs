@@ -506,15 +506,19 @@ namespace EffekseerPlayer.CM3D2.UI {
         /// メイド情報のコンボボックスの内容を更新する.
         /// 選択情報が変更されたらイベント通知により、スロットコンボも更新される.
         /// </summary>
-        private void ReloadMaidCombo() {
+        /// <returns>選択アイテムが変更された場合にtrueを返す</returns>
+        private bool ReloadMaidCombo() {
             var maidContents = _maidHolder.CreateActiveMaidContents();
             Log.Debug("maid combo updated.", maidContents.Count);
             maidCombo.Items = maidContents.ToArray();
 
             // 要素が一つの場合自動選択
-            if (maidCombo.Count == 1) {
+            if (maidCombo.Count == 1 && maidCombo.SelectedIndex == -1) {
                 maidCombo.SelectedIndex = 0;
+                return true;
             }
+
+            return false;
         }
 
         /// <summary>

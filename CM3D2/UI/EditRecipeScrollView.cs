@@ -340,7 +340,11 @@ namespace EffekseerPlayer.CM3D2.UI {
                 }
                 UpdateAttach(attachToggle.Value);
             };
-            maidRefreshButton.Click += (obj, args) => { ReloadMaidCombo(); };
+            maidRefreshButton.Click += (obj, args) => {
+                if (!ReloadMaidCombo()) {
+                    CheckItemChanged();
+                }
+            };
             prevMaidButton.Click += (obj, args) => { maidCombo.Prev(); };
             nextMaidButton.Click += (obj, args) => { maidCombo.Next(); };
             boneToggle.CheckChanged += (obj, args) => {
