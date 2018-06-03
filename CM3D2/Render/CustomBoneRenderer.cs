@@ -19,7 +19,9 @@ namespace EffekseerPlayer.CM3D2.Render {
         private readonly float _lineWidth = 0.006f;
         private readonly Color _color = Color.white;
 
+        private SkinnedMeshRenderer _meshRenderer;
         private Transform _rootBone;
+        private readonly HashSet<string> _boneNames = new HashSet<string>();
         private bool _isVisible;
         private bool _skipVisble;
 
@@ -39,7 +41,7 @@ namespace EffekseerPlayer.CM3D2.Render {
         }
 
         public bool IsEnabled() {
-            return _rootBone != null;
+            return _meshRenderer != null;
         }
 
         public void SetVisible(bool visible) {
@@ -55,16 +57,48 @@ namespace EffekseerPlayer.CM3D2.Render {
             }
         }
 
-        public void Setup(Transform bone) {
-            // Log.Debug("setup bone render:", bone.name);
-            if (_rootBone == bone) return;
+        public void Setup(GameObject go) {
+            var meshRenderer = go.GetComponentInChildren<SkinnedMeshRenderer>(false);
+            if (meshRenderer == null || meshRenderer == _meshRenderer) return;
+            _meshRenderer = meshRenderer;
 
             Clear();
-            _rootBone = bone;
+            foreach (var bone in meshRenderer.bones) {
+                var lineRenderer = CreateComponent();
+                lineRenderer.gameObject.name = NAME_LINE_PREFIX + bone.name;
+                _lineDict.Add(bone.name, lineRenderer);
+            }
 
-            foreach (Transform child in bone) {
-                if (child.childCount == 0) continue;
-                SetupBone(child);
+            foreach (var obj in _cache) {
+                obj.SetActive(_isVisible);
+            }
+        }
+
+        public void SetupByParse(GameObject go) {
+            _meshRenderer = go.GetComponentInChildren<SkinnedMeshRenderer>(false);
+            if (_meshRenderer == null) return;
+
+            Clear();
+            _boneNames.Clear();
+            foreach (var bone in _meshRenderer.bones) {
+                if (bone.name.EndsWith(NAME_SCL)) {
+                    _boneNames.Add(bone.name.Substring(0, bone.name.Length-NAME_SCL.Length));
+                } else {
+                    _boneNames.Add(bone.name);
+                }
+            }
+            var parentBone = _meshRenderer.rootBone;
+            if (parentBone != null) {
+                Log.Debug("rootBone:", parentBone);
+                _rootBone = parentBone;
+                SetupBone(parentBone);
+            } else {
+                parentBone = go.transform;
+                foreach (Transform child in parentBone) {
+                    if (child.childCount == 0) continue;
+                    _rootBone = child;
+                    SetupBone(child);
+                }
             }
 
             foreach (var obj in _cache) {
@@ -78,6 +112,12 @@ namespace EffekseerPlayer.CM3D2.Render {
             var lineRenderer = CreateComponent();
             lineRenderer.gameObject.name = NAME_LINE_PREFIX + bone.name;
             _lineDict.Add(bone.name, lineRenderer);
+            // meshRender.bonesに含まれないボーンを色替え
+            if (!_boneNames.Contains(bone.name)) {
+                var mate = lineRenderer.material;
+                mate.color = new Color(0.6f, 0.6f, 0.6f);
+            }
+            // lineRenderer.transform.SetParent(bone, false);
 
             foreach (Transform child in bone) {
                 if (child.childCount == 0) continue;
@@ -99,7 +139,8 @@ namespace EffekseerPlayer.CM3D2.Render {
                 if (_isVisible) SetVisible(false);
                 return;
             }
-            if (!_rootBone.gameObject.activeSelf) {
+
+            if (!_meshRenderer.gameObject.activeSelf) {
                 // 一時非表示
                 UpdateVisible(false);
                 return;
@@ -107,11 +148,15 @@ namespace EffekseerPlayer.CM3D2.Render {
             // 一時非表示からの復帰
             UpdateVisible(true);
 
+            if (_rootBone.gameObject.activeSelf) {
+                UpdatePosition(_rootBone, true, false);
+            }
+
             foreach (Transform child in _rootBone) {
                 if (child.childCount == 0) continue;
 
                 if (child.gameObject.activeSelf) {
-                    UpdatePosition(child, true);
+                    UpdatePosition(child, false, true);
                 }
             }
             // _isFirst = false;
@@ -127,7 +172,7 @@ namespace EffekseerPlayer.CM3D2.Render {
             // if (_isFirst) Log.Debug(renderer.name, " is leaf");
         }
 
-        public void UpdatePosition(Transform bone, bool isRoot=false) {
+        public void UpdatePosition(Transform bone, bool isRoot=false, bool isRecursive=false) {
             LineRenderer boneLine;
             if (!_lineDict.TryGetValue(bone.name, out boneLine)) return;
 
@@ -190,9 +235,10 @@ namespace EffekseerPlayer.CM3D2.Render {
             boneLine.SetPosition(1, pos.Value);
 
             // if (_isFirst) OutputLog(bone.position, pos.Value, bone.name);
-
-            foreach (Transform childBone in bone) {
-                UpdatePosition(childBone);
+            if (isRecursive) {
+                foreach (Transform childBone in bone) {
+                    UpdatePosition(childBone, false, true);
+                }
             }
         }
 

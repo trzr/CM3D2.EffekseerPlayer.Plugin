@@ -578,7 +578,7 @@ namespace EffekseerPlayer.CM3D2.UI {
             var boneNames = CreateBoneContents(validSlot);
             if (boneNames.Length == 0) return false;
 
-            if (boneToggle.Value) _boneRenderer.Setup(validSlot.obj.transform);
+            if (boneToggle.Value) _boneRenderer.SetupByParse(validSlot.obj);
 
             _boneItems = boneNames;
             FilterBoneCombo();
@@ -598,7 +598,7 @@ namespace EffekseerPlayer.CM3D2.UI {
         private List<string> GetBoneNames(TBodySkin slot) {
             var boneNames = new List<string>();
 
-            var meshRenderer = slot.obj.gameObject.GetComponentInChildren<SkinnedMeshRenderer>(false);
+            var meshRenderer = slot.obj.GetComponentInChildren<SkinnedMeshRenderer>(false);
             if (meshRenderer != null) {
                 var bones = meshRenderer.bones;
                 foreach (var bone in bones) {
