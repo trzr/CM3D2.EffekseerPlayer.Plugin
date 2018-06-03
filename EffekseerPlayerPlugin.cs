@@ -113,6 +113,7 @@ namespace EffekseerPlayer {
             }
 
             EffekseerSystem.baseDirectory = settings.efkDir;
+            keyDetector.Init();
             DontDestroyOnLoad(this);
             _started = true;
         }
