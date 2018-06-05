@@ -10,7 +10,7 @@ Effekseerの再生部分は[EffekseerForUnity][]のサンプルコードを元�
 UnityInjectorが導入済みであること。
 
 #### ◇動作確認環境
-  - バージョン：**1.57** (CM3D2), **1.11** (COM3D2)    
+  - バージョン：**1.57** (CM3D2), **1.14** (COM3D2)    
   - 前提プラグイン：UnityInjector/Sybaris  
   ※ COM3D2ではSybaris 2系を想定
   - Effekseerバージョン: **1.32**
