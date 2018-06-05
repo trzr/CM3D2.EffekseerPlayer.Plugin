@@ -40,7 +40,8 @@ namespace EffekseerPlayer.CM3D2 {
             public bool IsEmpty() {
                 return (codes == null || codes.Length == 0) &&
                        modifierKeys == EventModifiers.None &&
-                       ovrButton == OVRInput.RawButton.None ;
+                       ovrButton == OVRInput.RawButton.None &&
+                       lMask == 0 && rMask == 0;
             }
         }
 
