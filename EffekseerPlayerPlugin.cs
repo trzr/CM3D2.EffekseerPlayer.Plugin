@@ -22,7 +22,7 @@ namespace EffekseerPlayer {
      PluginFilter("CM3D2OHx64"),
 #endif
      PluginName("EffekseerPlayerPlugin"),
-     PluginVersion("0.2.3")]
+     PluginVersion("0.2.4")]
     public class EffekseerPlayerPlugin : PluginBase {
         #region Variables
         private const EventModifiers MODIFIER_KEYS = EventModifiers.Shift | EventModifiers.Control | EventModifiers.Alt;
