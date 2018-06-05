@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Windows.Forms;
 using EffekseerPlayer.CM3D2.Data;
 using EffekseerPlayer.CM3D2.VR;
@@ -42,6 +43,28 @@ namespace EffekseerPlayer.CM3D2 {
                        modifierKeys == EventModifiers.None &&
                        ovrButton == OVRInput.RawButton.None &&
                        lMask == 0 && rMask == 0;
+            }
+
+            public override string ToString() {
+                var sb = new StringBuilder("KeyHolder[");
+                if (codes != null && codes.Length > 0) {
+                    sb.Append("codes=");
+                    foreach (var code in codes) sb.Append(code).Append(',');
+                }
+                if (modifierKeys != EventModifiers.None) {
+                    sb.Append("modifiers=").Append(modifierKeys).Append(',');
+                }
+                if (ovrButton != OVRInput.RawButton.None) {
+                    sb.Append("ovrButton=").Append(ovrButton).Append(',');;
+                }
+                if (lMask != 0) {
+                    sb.Append("lMask=").Append(lMask).Append(',');;
+                }
+                if (rMask != 0) {
+                    sb.Append("rMask=").Append(rMask).Append(',');;
+                }
+                sb.Append(']');
+                return sb.ToString();
             }
         }
 
@@ -121,13 +144,11 @@ namespace EffekseerPlayer.CM3D2 {
             }
 
             keyHolder.codes = keyCodes.ToArray();
-
             return keyHolder;
         }
 
         public Func<bool> CreateKeyDetector(KeyHolder keyHolder) {
-            // 条件に応じて、細かく判定関数を作成する
-
+            // 条件に応じて、判定関数を作成
             if (keyHolder.codes.Length > 0) {
                 if (keyHolder.modifierKeys == EventModifiers.None) {
                     // EventModifiers is None && keyCodes
@@ -164,7 +185,6 @@ namespace EffekseerPlayer.CM3D2 {
                 }
             }
             return null;
-
         }
 
         public void Init() {

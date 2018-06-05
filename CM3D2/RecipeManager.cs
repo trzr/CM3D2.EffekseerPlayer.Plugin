@@ -248,7 +248,8 @@ namespace EffekseerPlayer.CM3D2 {
             if (StopHandler != null) detectHandler.keyHandlers.Add(StopHandler);
             if (PauseHandler != null) detectHandler.keyHandlers.Add(PauseHandler);
 
-            var dic = new Dictionary<InputKeyDetectHandler<RecipeSet>.KeyHolder, IList<RecipeSet>>();
+            // 指定されたキー情報が同じレシピセットをまとめる
+            var workDic = new Dictionary<InputKeyDetectHandler<RecipeSet>.KeyHolder, IList<RecipeSet>>();
             foreach (var recipeSet in _recipeSets) {
                 // スキップ対象: 再読み込み時の削除ターゲット, キーコードが空のターゲット
                 if (!recipeSet.loaded || recipeSet.playKeyCode == null || recipeSet.playKeyCode.Trim().Length == 0) continue;
@@ -258,21 +259,25 @@ namespace EffekseerPlayer.CM3D2 {
                 if (keyHolder.IsEmpty()) continue;
 
                 IList<RecipeSet> old;
-                if (!dic.TryGetValue(keyHolder, out old)) {
+                if (!workDic.TryGetValue(keyHolder, out old)) {
                     old = new List<RecipeSet>();
-                    dic[keyHolder] = old;
+                    workDic[keyHolder] = old;
                 }
                 old.Add(recipeSet);
             }
 
-            foreach (var e in dic) {
-                var detector = detectHandler.CreateKeyDetector(e.Key);
-                if (detector == null) continue;
+            // 
+            foreach (var entry in workDic) {
+                var detector = detectHandler.CreateKeyDetector(entry.Key);
+                if (detector == null) {
+                    Log.Debug("failed to create KeyDetector:", entry.Key);
+                    continue;
+                }
 
                 var keyHandler = new InputKeyDetectHandler<RecipeSet>.KeyHandler {
                     detector = detector,
-                    keyHolder = e.Key,
-                    dataList = e.Value,
+                    keyHolder = entry.Key,
+                    dataList = entry.Value,
                 };
                 foreach (var rset in keyHandler.dataList) {
                     rset.keyHandler = keyHandler;

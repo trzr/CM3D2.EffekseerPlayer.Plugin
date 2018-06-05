@@ -31,7 +31,7 @@ namespace EffekseerPlayer.CM3D2.UI {
             // 衣装アイテムが変更された場合
             Log.Debug("item changed.", _currentSlot.Category);
             // スロット情報が変更された可能性があるため、スロットコンボを更新
-            var slotObj = _currentSlot.obj;
+            // var slotObj = _currentSlot.obj;
             ReloadSlotCombo();
         }
 
