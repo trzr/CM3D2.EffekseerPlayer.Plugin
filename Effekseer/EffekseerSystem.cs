@@ -454,14 +454,14 @@ namespace EffekseerPlayer.Effekseer {
 
         void OnEnable() {
 #if UNITY_EDITOR
-	        Resume();
+            Resume();
 #endif
             CleanUp();
         }
 
         void OnDisable() {
 #if UNITY_EDITOR
-	        Suspend();
+            Suspend();
 #endif
             CleanUp();
         }
