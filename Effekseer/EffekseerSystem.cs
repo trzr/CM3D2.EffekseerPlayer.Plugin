@@ -545,11 +545,22 @@ namespace EffekseerPlayer.Effekseer {
                 Plugin.EffekseerSetBackGroundTexture(path.renderId, path.renderTexture.GetNativeTexturePtr());
             }
 
-            // ビュー関連の行列を更新
-            Plugin.EffekseerSetProjectionMatrix(path.renderId, Utility.Matrix2Array(
-                GL.GetGPUProjectionMatrix(camera.projectionMatrix, false)));
-            Plugin.EffekseerSetCameraMatrix(path.renderId, Utility.Matrix2Array(
-                camera.worldToCameraMatrix));
+#if UNITY_5_4_OR_NEWER
+            // ステレオレンダリング(VR)用に左右目の行列を設定
+            if (camera.stereoEnabled) {
+                var projMatL = Utility.Matrix2Array(GL.GetGPUProjectionMatrix(camera.GetStereoProjectionMatrix(Camera.StereoscopicEye.Left), false));
+                var projMatR = Utility.Matrix2Array(GL.GetGPUProjectionMatrix(camera.GetStereoProjectionMatrix(Camera.StereoscopicEye.Right), false));
+                var camMatL = Utility.Matrix2Array(camera.GetStereoViewMatrix(Camera.StereoscopicEye.Left));
+                var camMatR = Utility.Matrix2Array(camera.GetStereoViewMatrix(Camera.StereoscopicEye.Right));
+                Plugin.EffekseerSetStereoRenderingMatrix(path.renderId, projMatL, projMatR, camMatL, camMatR);
+            } else
+#endif
+            {
+                // ビュー関連の行列を更新
+                Plugin.EffekseerSetProjectionMatrix(path.renderId, Utility.Matrix2Array(
+                    GL.GetGPUProjectionMatrix(camera.projectionMatrix, false)));
+                Plugin.EffekseerSetCameraMatrix(path.renderId, Utility.Matrix2Array(camera.worldToCameraMatrix));
+            }
         }
 
         void OnRenderObject() {
