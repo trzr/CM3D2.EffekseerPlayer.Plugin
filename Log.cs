@@ -8,6 +8,11 @@ namespace EffekseerPlayer {
     /// ログ出力ユーティリティ
     /// </summary>
     public static class Log {
+        public static void Debug(Func<string> func) {
+#if DEBUG
+            Debug(func());
+#endif
+        }
 
         public static void DebugF(string format, params object[] message) {
 #if DEBUG

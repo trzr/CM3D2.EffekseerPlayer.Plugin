@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Windows.Forms;
-using EffekseerPlayer.CM3D2.Data;
 using EffekseerPlayer.CM3D2.VR;
 using EffekseerPlayer.Util;
 using UnityEngine;
@@ -55,13 +53,13 @@ namespace EffekseerPlayer.CM3D2 {
                     sb.Append("modifiers=").Append(modifierKeys).Append(',');
                 }
                 if (ovrButton != OVRInput.RawButton.None) {
-                    sb.Append("ovrButton=").Append(ovrButton).Append(',');;
+                    sb.Append("ovrButton=").Append(ovrButton).Append(',');
                 }
                 if (lMask != 0) {
-                    sb.Append("lMask=").Append(lMask).Append(',');;
+                    sb.Append("lMask=").Append(lMask).Append(',');
                 }
                 if (rMask != 0) {
-                    sb.Append("rMask=").Append(rMask).Append(',');;
+                    sb.Append("rMask=").Append(rMask).Append(',');
                 }
                 sb.Append(']');
                 return sb.ToString();
@@ -258,9 +256,9 @@ namespace EffekseerPlayer.CM3D2 {
         private VIVEControllerManager viveCtrlMgr;
         private bool initialized;
 
-        public readonly IList<KeyHandler> keyHandlers = new List<KeyHandler>();
+        public readonly List<KeyHandler> keyHandlers = new List<KeyHandler>();
         private const string PREFIX_OVR_BUTTON = "ovr_";
-        private const string PREFIX_TOUCH  = "ovrt_";
+        // private const string PREFIX_TOUCH  = "ovrt_";
         private const string PREFIX_VIVE_BUTTON = "vive_";
     }
 }

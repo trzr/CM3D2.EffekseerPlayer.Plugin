@@ -7,11 +7,7 @@ namespace EffekseerPlayer.Util {
     /// とりあえず使う処理だけ実装版
     /// </summary>
     public sealed class PrivateAccessor {
-        private static readonly PrivateAccessor INSTANCE = new PrivateAccessor();
-        
-        public static PrivateAccessor Instance {
-            get { return INSTANCE; }
-        }
+        public static readonly PrivateAccessor Instance = new PrivateAccessor();
 
         private PrivateAccessor() { }
         public static T Get<T>(object instance, string fieldName) {

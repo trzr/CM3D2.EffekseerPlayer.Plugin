@@ -40,61 +40,61 @@ namespace EffekseerPlayer.Util {
 
         private Texture2D _frameImage;
         public Texture2D PictImage {
-            get { return _pictImage ?? (_pictImage = LoadTex("picture")); }
+            get { return _pictImage ? _pictImage : (_pictImage = LoadTex("picture")); }
         }
         public Texture2D FileImage {
-            get { return _fileImage ?? (_fileImage = LoadTex("file")); }
+            get { return _fileImage ? _fileImage : (_fileImage = LoadTex("file")); }
         }
         public Texture2D DirImage {
-            get { return _dirImage ?? (_dirImage = LoadTex("folder")); }
+            get { return _dirImage ? _dirImage : (_dirImage = LoadTex("folder")); }
         }
         public Texture2D CopyImage {
-            get { return _copyImage ?? (_copyImage = LoadTex("copy")); }
+            get { return _copyImage ? _copyImage : (_copyImage = LoadTex("copy")); }
         }
         public Texture2D PasteImage {
-            get { return _pasteImage ?? (_pasteImage = LoadTex("paste")); }
+            get { return _pasteImage ? _pasteImage : (_pasteImage = LoadTex("paste")); }
         }
         public Texture2D PlusImage {
-            get { return _plusImage ?? (_plusImage = LoadTex("node_plus")); }
+            get { return _plusImage ? _plusImage : (_plusImage = LoadTex("node_plus")); }
         }
         public Texture2D MinusImage {
-            get { return _minusImage ?? (_minusImage = LoadTex("node_minus")); }
+            get { return _minusImage ? _minusImage : (_minusImage = LoadTex("node_minus")); }
         }
         public Texture2D CheckoffImage {
-            get { return _checkoffImage ?? (_checkoffImage = LoadTex("check_off")); }
+            get { return _checkoffImage ? _checkoffImage : (_checkoffImage = LoadTex("check_off")); }
         }
         public Texture2D CheckonImage {
-            get { return _checkonImage ?? (_checkonImage = LoadTex("check_on")); }
+            get { return _checkonImage ? _checkonImage : (_checkonImage = LoadTex("check_on")); }
         }
         public Texture2D CheckpartImage {
-            get { return _checkpartImage ?? (_checkpartImage = LoadTex("check_part")); }
+            get { return _checkpartImage ? _checkpartImage : (_checkpartImage = LoadTex("check_part")); }
         }
         public Texture2D FrameImage {
-            get { return _frameImage ?? (_frameImage = LoadTex("frame")); }
+            get { return _frameImage ? _frameImage : (_frameImage = LoadTex("frame")); }
         }
         public Texture2D ReloadImage {
-            get { return _reloadImage ?? (_reloadImage = LoadTex("reload")); }
+            get { return _reloadImage ? _reloadImage : (_reloadImage = LoadTex("reload")); }
         }
         public Texture2D RepeatImage {
-            get { return _repeatImage ?? (_repeatImage = LoadTex("repeat")); }
+            get { return _repeatImage ? _repeatImage : (_repeatImage = LoadTex("repeat")); }
         }
         public Texture2D RepeatOffImage {
-            get { return _repeatoffImage ?? (_repeatoffImage = LoadTex("repeat_off")); }
+            get { return _repeatoffImage ? _repeatoffImage : (_repeatoffImage = LoadTex("repeat_off")); }
         }
         public Texture2D PlayImage {
-            get { return _playImage ?? (_playImage = LoadTex("play")); }
+            get { return _playImage ? _playImage : (_playImage = LoadTex("play")); }
         }
         public Texture2D StopImage {
-            get { return _stopImage ?? (_stopImage = LoadTex("stop")); }
+            get { return _stopImage ? _stopImage : (_stopImage = LoadTex("stop")); }
         }
         public Texture2D StopRImage {
-            get { return _stopRImage ?? (_stopRImage = LoadTex("stopr")); }
+            get { return _stopRImage ? _stopRImage : (_stopRImage = LoadTex("stopr")); }
         }
         public Texture2D PauseImage {
-            get { return _pauseImage ?? (_pauseImage = LoadTex("pause")); }
+            get { return _pauseImage ? _pauseImage : (_pauseImage = LoadTex("pause")); }
         }
         public Texture2D DeleteImage {
-            get { return _deleteImage ?? (_deleteImage = LoadTex("delete")); }
+            get { return _deleteImage ? _deleteImage : (_deleteImage = LoadTex("delete")); }
         }
 
         private Texture2D LoadTex(string name) {
@@ -110,6 +110,7 @@ namespace EffekseerPlayer.Util {
                 return new Texture2D(2, 2);
             }
         }
+
         public static Texture2D LoadTexture(Stream stream) {
             var bytes = new byte[stream.Length];
             stream.Read(bytes, 0, bytes.Length);
