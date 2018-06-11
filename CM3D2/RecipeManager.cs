@@ -245,8 +245,7 @@ namespace EffekseerPlayer.CM3D2 {
         public void InitKeyHandler() {
             var detectHandler = InputKeyDetectHandler<RecipeSet>.Get();
             detectHandler.keyHandlers.Clear();
-            if (StopHandler != null) detectHandler.keyHandlers.Add(StopHandler);
-            if (PauseHandler != null) detectHandler.keyHandlers.Add(PauseHandler);
+            detectHandler.keyHandlers.AddRange(Handlers);
 
             // 指定されたキー情報が同じレシピセットをまとめる
             var workDic = new Dictionary<InputKeyDetectHandler<RecipeSet>.KeyHolder, IList<RecipeSet>>();
@@ -270,7 +269,7 @@ namespace EffekseerPlayer.CM3D2 {
             foreach (var entry in workDic) {
                 var detector = detectHandler.CreateKeyDetector(entry.Key);
                 if (detector == null) {
-                    Log.Debug("failed to create KeyDetector:", entry.Key);
+                    Log.Info("failed to create KeyDetector:", entry.Key);
                     continue;
                 }
 
@@ -301,19 +300,19 @@ namespace EffekseerPlayer.CM3D2 {
             Log.Debug("Setup StopKey:", stopKey);
             var handler = SetupKey(stopKey);
             if (handler == null) return;
-            StopHandler = handler;
-            StopHandler.handle =  playManager.StopAll;
+            handler.handle = playManager.StopAll;
+            Handlers.Add(handler);
         }
 
         public void SetupPauseKey(string key) {
             Log.Debug("Setup Pausekey:", key);
             var handler = SetupKey(key);
             if (handler == null) return;
-            PauseHandler = handler;
-            PauseHandler.handle =  () => {
+            handler.handle =  () => {
                 playManager.PauseAll(!paused);
                 paused = !paused;
             };
+            Handlers.Add(handler);
         }
 
         private InputKeyDetectHandler<RecipeSet>.KeyHandler SetupKey(string key) {
@@ -336,8 +335,7 @@ namespace EffekseerPlayer.CM3D2 {
         #region Fields
         // 保存ディレクトリ
         protected readonly string directory;
-        private InputKeyDetectHandler<RecipeSet>.KeyHandler StopHandler;
-        private InputKeyDetectHandler<RecipeSet>.KeyHandler PauseHandler;
+        private readonly List<InputKeyDetectHandler<RecipeSet>.KeyHandler> Handlers = new List<InputKeyDetectHandler<RecipeSet>.KeyHandler>();
         public bool paused;
 
         private readonly PlayManager playManager;
