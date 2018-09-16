@@ -22,8 +22,14 @@ namespace EffekseerPlayer.Effekseer {
             Path = path;
             Bundle = assetBundle;
             if (assetBundle != null) {
-                return assetBundle.LoadAsset<T>(
-                    Utility.ResourcePath(path, removeExtension));
+                var assetPath = path;
+                if (!removeExtension) assetPath += ".bytes";
+                assetPath = "Assets/Bundles/effects/Effekseer/" + assetPath;
+                var ret = assetBundle.LoadAsset<T>(assetPath);
+                if (ret != null) return ret;
+
+                var pathNoExt = System.IO.Path.GetFileNameWithoutExtension(path);
+                return assetBundle.LoadAsset<T>(pathNoExt);
             }
 
             return Resources.Load<T>(
@@ -119,7 +125,7 @@ namespace EffekseerPlayer.Effekseer {
 
         public bool Copy(IntPtr buffer, int bufferSize) {
             var bytes = (modelData != null) ? modelData.bytes : _bytes;
-            if (bytes == null || bytes.Length >= bufferSize) return false;
+            if (bytes == null || bytes.Length > bufferSize) return false;
 
             Marshal.Copy(bytes, 0, buffer, bytes.Length);
             return true;
@@ -214,13 +220,16 @@ namespace EffekseerPlayer.Effekseer {
         public static extern IntPtr EffekseerGetRenderFunc(int renderId = 0);
 
         [DllImport(PLUGIN_NAME)]
+        public static extern IntPtr EffekseerGetRenderFrontFunc(int renderId = 0);
+
+        [DllImport(PLUGIN_NAME)]
+        public static extern IntPtr EffekseerGetRenderBackFunc(int renderId = 0);
+
+        [DllImport(PLUGIN_NAME)]
         public static extern void EffekseerSetProjectionMatrix(int renderId, float[] matrix);
 
         [DllImport(PLUGIN_NAME)]
         public static extern void EffekseerSetCameraMatrix(int renderId, float[] matrix);
-
-        [DllImport(PLUGIN_NAME)]
-        public static extern void EffekseerSetStereoRenderingMatrix(int renderId, float[] projMatL, float[] projMatR, float[] camMatL, float[] camMatR);
         
         [DllImport(PLUGIN_NAME)]
         public static extern void EffekseerSetBackGroundTexture(int renderId, IntPtr background);

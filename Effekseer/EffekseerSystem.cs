@@ -80,7 +80,7 @@ namespace EffekseerPlayer.Effekseer {
         /// エフェクトの描画するタイミング
         /// </summary>
         // ReSharper disable once InconsistentNaming
-        private const CameraEvent cameraEvent = CameraEvent.BeforeImageEffects;
+        private const CameraEvent cameraEvent = CameraEvent.AfterForwardAlpha;
 
         public static string baseDirectory;
         public static AssetBundle defaultBundle;
@@ -204,7 +204,7 @@ namespace EffekseerPlayer.Effekseer {
             private readonly Camera _camera;
             private CommandBuffer _commandBuffer;
             private readonly CameraEvent _cameraEvent;
-            public readonly int renderId;
+            public int renderId;
             public RenderTexture renderTexture;
 
             public RenderPath(Camera camera, CameraEvent cameraEvent, int renderId) {
@@ -214,10 +214,13 @@ namespace EffekseerPlayer.Effekseer {
             }
 
             public void Init(bool enableDistortion) {
-                // プラグイン描画するコマンドバッファを作成
+                // Create a command buffer that is effekseer renderer
                 _commandBuffer = new CommandBuffer {
                     name = "Effekseer Rendering"
                 };
+
+                // add a command to render effects.
+                _commandBuffer.IssuePluginEvent(Plugin.EffekseerGetRenderBackFunc(), renderId);
 
 #if UNITY_5_6_OR_NEWER
                 if (enableDistortion) {
@@ -226,17 +229,16 @@ namespace EffekseerPlayer.Effekseer {
                 if (enableDistortion && _camera.cameraType == CameraType.Game) {
                     var format = (_camera.hdr) ? RenderTextureFormat.ARGBHalf : RenderTextureFormat.ARGB32;
 #endif
-                    // 歪みテクスチャを作成
+                    // Create a distortion texture
                     renderTexture = new RenderTexture(_camera.pixelWidth, _camera.pixelHeight, 0, format);
                     renderTexture.Create();
-                    // 歪みテクスチャへのコピーコマンドを追加
+                    // Add a blit command that copy to the distortion texture
                     _commandBuffer.Blit(BuiltinRenderTextureType.CameraTarget, renderTexture);
                     _commandBuffer.SetRenderTarget(BuiltinRenderTextureType.CameraTarget);
                 }
 
-                // プラグイン描画コマンドを追加
-                _commandBuffer.IssuePluginEvent(Plugin.EffekseerGetRenderFunc(), renderId);
-                // コマンドバッファをカメラに登録
+                _commandBuffer.IssuePluginEvent(Plugin.EffekseerGetRenderFrontFunc(), renderId);
+                // register the command to a camera
                 _camera.AddCommandBuffer(_cameraEvent, _commandBuffer);
             }
 
@@ -545,22 +547,11 @@ namespace EffekseerPlayer.Effekseer {
                 Plugin.EffekseerSetBackGroundTexture(path.renderId, path.renderTexture.GetNativeTexturePtr());
             }
 
-#if UNITY_5_4_OR_NEWER
-            // ステレオレンダリング(VR)用に左右目の行列を設定
-            if (camera.stereoEnabled) {
-                var projMatL = Utility.Matrix2Array(GL.GetGPUProjectionMatrix(camera.GetStereoProjectionMatrix(Camera.StereoscopicEye.Left), false));
-                var projMatR = Utility.Matrix2Array(GL.GetGPUProjectionMatrix(camera.GetStereoProjectionMatrix(Camera.StereoscopicEye.Right), false));
-                var camMatL = Utility.Matrix2Array(camera.GetStereoViewMatrix(Camera.StereoscopicEye.Left));
-                var camMatR = Utility.Matrix2Array(camera.GetStereoViewMatrix(Camera.StereoscopicEye.Right));
-                Plugin.EffekseerSetStereoRenderingMatrix(path.renderId, projMatL, projMatR, camMatL, camMatR);
-            } else
-#endif
-            {
-                // ビュー関連の行列を更新
-                Plugin.EffekseerSetProjectionMatrix(path.renderId, Utility.Matrix2Array(
-                    GL.GetGPUProjectionMatrix(camera.projectionMatrix, false)));
-                Plugin.EffekseerSetCameraMatrix(path.renderId, Utility.Matrix2Array(camera.worldToCameraMatrix));
-            }
+            // ビュー関連の行列を更新
+            Plugin.EffekseerSetProjectionMatrix(path.renderId, 
+                Utility.Matrix2Array(GL.GetGPUProjectionMatrix(camera.projectionMatrix, false)));
+            Plugin.EffekseerSetCameraMatrix(path.renderId, 
+                Utility.Matrix2Array(camera.worldToCameraMatrix));
         }
 
         void OnRenderObject() {
@@ -616,10 +607,12 @@ namespace EffekseerPlayer.Effekseer {
             var path = Marshal.PtrToStringUni(pathPtr);
             var res = new ModelResource(workDir);
             Log.Debug("modelLoader load:", path);
-            if (!res.Load(path, Instance._assetBundle) || !res.Copy(buffer, bufferSize)) return 0;
-
-            Instance._modelList.Add(res);
-            return res.Length;
+            if (!res.Load(path, Instance._assetBundle)) return 0;
+            if (res.Copy(buffer, bufferSize)) {
+                Instance._modelList.Add(res);
+                return res.Length;
+            }
+            return -res.Length;
         }
 
         [AOT.MonoPInvokeCallbackAttribute(typeof(Plugin.EffekseerModelLoaderUnload))]
