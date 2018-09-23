@@ -28,7 +28,16 @@ namespace EffekseerPlayer.CM3D2.UI {
                 if (fontSize > 0) {
                     LabelStyle.fontSize = fontSize;
                 }
-                LabelStyle.hover.background = new Texture2D(2, 2);
+
+                var tex = new Texture2D(2, 2);
+                var pixels = tex.GetPixels(0);
+                var col = new Color(0.3f, 0.3f, 0.3f, 0.2f);
+                for (var i = 0; i < pixels.Length; i++) {
+                    pixels[i] = col;
+                }
+                tex.SetPixels(pixels, 0);
+                tex.Apply();
+                LabelStyle.hover.background = tex;
             }
             if (ButtonAStyle == null) {
                 ButtonAStyle = new GUIStyle("button") {
