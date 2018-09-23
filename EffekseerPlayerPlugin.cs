@@ -6,6 +6,7 @@ using EffekseerPlayer.CM3D2;
 using EffekseerPlayer.CM3D2.Data;
 using EffekseerPlayer.CM3D2.UI;
 using EffekseerPlayer.Effekseer;
+using EffekseerPlayer.Unity.Data;
 using EffekseerPlayer.Unity.UI;
 using EffekseerPlayer.Unity.Util;
 using UnityEngine;
