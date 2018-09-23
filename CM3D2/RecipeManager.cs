@@ -269,7 +269,7 @@ namespace EffekseerPlayer.CM3D2 {
             foreach (var entry in workDic) {
                 var detector = detectHandler.CreateKeyDetector(entry.Key);
                 if (detector == null) {
-                    Log.Info("failed to create KeyDetector:", entry.Key);
+                    Log.Debug("failed to create KeyDetector:", entry.Key);
                     continue;
                 }
 

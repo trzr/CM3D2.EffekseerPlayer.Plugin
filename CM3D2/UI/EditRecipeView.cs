@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using EffekseerPlayer.CM3D2.Data;
 using EffekseerPlayer.Unity.UI;
 using EffekseerPlayer.Util;
 using UnityEngine;
@@ -42,7 +41,7 @@ namespace EffekseerPlayer.CM3D2.UI {
         internal override void InitPos() {
             if (parentWin != null) {
                 Left = parentWin.Left - Width;
-                Top  = parentWin.Top + uiParamSet.FixPx(POS_OFFSETY);
+                Top  = parentWin.Top + uiParamSet.FixPx(POS_OFFSET_Y);
             } else {
                 Left = Screen.width - uiParamSet.FixPx(820);
                 Top  = uiParamSet.FixPx(80);
@@ -53,7 +52,7 @@ namespace EffekseerPlayer.CM3D2.UI {
             Width  = uiParamSet.FixPx(460);
             Height = uiParamSet.FixPx(860);
             if (parentWin != null) {
-                var deltaY = uiParamSet.FixPx(POS_OFFSETY);
+                var deltaY = uiParamSet.FixPx(POS_OFFSET_Y);
                 if (Height > parentWin.Height - deltaY) {
                     Height = parentWin.Height - deltaY;
                 }  
@@ -82,8 +81,8 @@ namespace EffekseerPlayer.CM3D2.UI {
                 WinStyle.border = new RectOffset(5, 5, 5, 5);
             }
 
-            groupnameLabel = new CustomLabel(this, "グループ名:");
-            groupnameText = new CustomTextField(this);
+            groupNameLabel = new CustomLabel(this, "グループ名:");
+            groupNameText = new CustomTextField(this);
 
             nameLabel = new CustomLabel(this, "名前:");
             nameText = new CustomTextField(this);
@@ -102,7 +101,7 @@ namespace EffekseerPlayer.CM3D2.UI {
                 SelectTextColor = Color.white
             };
 
-            registButton = new CustomButton(this, "regist") {Enabled = false};
+            registButton = new CustomButton(this, "register") {Enabled = false};
             playButton = new CustomButton(this, new GUIContent(" play", resHolder.PlayImage));
             stopButton = new CustomButton(this, new GUIContent(" stop", resHolder.StopImage));
             stopRButton = new CustomButton(this, new GUIContent(" stopRoot", resHolder.StopRImage));
@@ -111,11 +110,11 @@ namespace EffekseerPlayer.CM3D2.UI {
 
             //------------------------------------------
             // イベント処理
-            groupnameText.ValueChanged += (obj, args) => {
-                var hasError = groupnameText.Text.IndexOfAny(INVALID_PATHCHARS) != -1;
-                groupnameText.hasError = hasError;
+            groupNameText.ValueChanged += (obj, args) => {
+                var hasError = groupNameText.Text.IndexOfAny(INVALID_PATH_CHARS) != -1;
+                groupNameText.hasError = hasError;
             };
-            groupnameText.ValueChanged += CheckValidate;
+            groupNameText.ValueChanged += CheckValidate;
 
             nameText.ValueChanged += CheckValidate;
             efkCombo.SelectedIndexChanged += CheckValidate;
@@ -136,19 +135,19 @@ namespace EffekseerPlayer.CM3D2.UI {
 
             subEditView.Update();
 
-            if (!Visibled) return;
+            if (!Visible) return;
 
             subEditView.UpdateSlider();
         }
 
         public override void OnGUI() {
-            if (!Visibled) return;
+            if (!Visible) return;
 
             try {
                 GUI.Box(Rect, Text, WinStyle);
                 //GUI.Label(titleBarRect, _version, VerStyle);
-                groupnameLabel.OnGUI();
-                groupnameText.OnGUI();
+                groupNameLabel.OnGUI();
+                groupNameText.OnGUI();
                 nameLabel.OnGUI();
                 nameText.OnGUI();
 
@@ -186,46 +185,64 @@ namespace EffekseerPlayer.CM3D2.UI {
 
             var itemHeight = uiParamSet.itemHeight;
             var labelWidth = uiParamSet.FixPx(100);
-            var align = new Rect(margin2, uiParamSet.unitHeight, labelWidth, itemHeight);
 
-            groupnameLabel.Align(ref align);
+            var formData = new FormData(margin2, uiParamSet.unitHeight) {
+                Width = labelWidth, Height = itemHeight
+            };
+            groupNameLabel.Align(formData);
 
-            align.x = margin2;
-            align.width = - margin2;
-            groupnameText.AlignLeft(groupnameLabel, ref align);
+            formData.Left.obj = groupNameLabel;// margin2, labelWidth
+            var rightLayout = new AttachData(margin2);
+            formData.Right = rightLayout;
+            groupNameText.Align(formData);
 
-            align.y = margin2;
-            align.width = labelWidth;
-            nameLabel.AlignTop(groupnameLabel, ref align);
+            formData.Left.obj = null;  // margin2, labelWidth
+            formData.Right = null;
+            formData.Top.Set(groupNameLabel, margin2, itemHeight);
+            nameLabel.Align(formData);
 
-            align.width = - margin2;
-            nameText.AlignLeftTop(nameLabel, groupnameLabel, ref align);
+            formData.Left.obj = nameLabel;
+            formData.Right = rightLayout;
+            nameText.Align(formData);
 
-            align.x = margin2;
-            align.width = labelWidth;
-            efkLabel.AlignTop(nameLabel, ref align);
+            formData.Left.obj = null; // margin2, labelWidth
+            formData.Top.obj = nameLabel;
+            formData.Right = null;
+            efkLabel.Align(formData);
 
-            align.width = - margin2;
-            efkCombo.AlignLeftTop(efkLabel, nameLabel, ref align);
+            formData.Left.obj = efkLabel;
+            formData.Top.obj = nameLabel;
+            formData.Right = rightLayout;
+            efkCombo.Align(formData);
 
             var buttonWidth = (Width - margin6) / 4f;
-            align.x = margin;
-            align.width = buttonWidth;
-            repeatToggle.AlignTop(efkLabel, ref align);
+            formData.Left.Set(null, margin, buttonWidth);
+            formData.Right = null;
+            formData.Top.obj = efkLabel;
+            repeatToggle.Align(formData);
 
-            align.width = buttonWidth;
-            align.x = Width - buttonWidth - margin2;
-            registButton.AlignTop(efkLabel, ref align);
+            var leftLayout = formData.Left;
+            formData.Left = null;
+            formData.Right = rightLayout;
+            formData.Right.length = buttonWidth;
+            formData.Top.obj = efkLabel;
+            registButton.Align(formData);
 
-            align.x = margin;
-            playButton.AlignTop(repeatToggle, ref align);
-            stopButton.AlignLeftTop(playButton, repeatToggle, ref align);
-            stopRButton.AlignLeftTop(stopButton, repeatToggle, ref align);
-            pauseButton.AlignLeftTop(stopRButton, repeatToggle, ref align);
+            formData.Left = leftLayout;
+            formData.Right = null;
+            formData.Top.obj = repeatToggle;
+            playButton.Align(formData);
+            stopButton.AlignLeft(playButton, formData);
+            stopRButton.AlignLeft(stopButton, formData);
+            pauseButton.AlignLeft(stopRButton, formData);
 
             // スクロールビュー
-            align.Set(0, 0, 0, 0);
-            subEditView.AlignTop(playButton, ref align);
+            formData.Left.Set(null, 0);
+            formData.Right = rightLayout;
+            formData.Right.Set(null, 0);
+            formData.Top.Set(playButton, margin, 0);
+            formData.Bottom = new AttachData(0);
+            subEditView.Align(formData);
 
 #if DEBUG
 //            DebugLog(scaleSlider.Rect,  "editView slider");
@@ -259,8 +276,8 @@ namespace EffekseerPlayer.CM3D2.UI {
             pauseButton.FontSize = fontSizeN;
             registButton.FontSize = fontSizeN;
 
-            groupnameLabel.FontSize = fontSizeN;
-            groupnameText.FontSize = fontSizeN;
+            groupNameLabel.FontSize = fontSizeN;
+            groupNameText.FontSize = fontSizeN;
             nameLabel.FontSize = fontSizeN;
             nameText.FontSize = fontSizeN;
 
@@ -272,8 +289,8 @@ namespace EffekseerPlayer.CM3D2.UI {
         }
 
         #region Fields
-        private static readonly char[] INVALID_PATHCHARS = Path.GetInvalidFileNameChars();
-        private const int POS_OFFSETY = 10;
+        private static readonly char[] INVALID_PATH_CHARS = Path.GetInvalidFileNameChars();
+        private const int POS_OFFSET_Y = 10;
 
 //        private int _frameCount;
         internal readonly RecipeManager recipeMgr;
@@ -281,8 +298,8 @@ namespace EffekseerPlayer.CM3D2.UI {
 
         private bool _initialized;
 
-        public CustomLabel groupnameLabel;
-        public CustomTextField groupnameText;
+        public CustomLabel groupNameLabel;
+        public CustomTextField groupNameText;
         public CustomLabel nameLabel;
         public CustomTextField nameText;
 

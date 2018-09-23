@@ -18,7 +18,7 @@ namespace EffekseerPlayer.Unity.UI　{
             cursorContains = false;
             cursorTitleContains = false;
 
-            if (!Visibled) return;
+            if (!Visible) return;
 
             titleBarRect.x = Rect.x;
             titleBarRect.y = Rect.y;
@@ -33,7 +33,7 @@ namespace EffekseerPlayer.Unity.UI　{
         /// ドラッグ操作で位置を更新する
         /// </summary>
         public void UpdateDrag() {
-            if (!Visibled) return;
+            if (!Visible) return;
 
             // Drag動作
             // http://answers.unity3d.com/questions/258048/editor-gui-drag-selection-box.html
@@ -135,7 +135,7 @@ namespace EffekseerPlayer.Unity.UI　{
         public void InitStatus() {
             cursorContains = false;
             cursorTitleContains = false;
-            visibled = false;
+            visible = false;
             dragging = false;
         }
 
@@ -167,7 +167,7 @@ namespace EffekseerPlayer.Unity.UI　{
         }
 
         protected void CloseAction() {
-            if (_followedWin != null) _followedWin.Visibled = false;
+            if (_followedWin != null) _followedWin.Visible = false;
             cursorContains = false;
             cursorTitleContains = false;
         }
@@ -177,16 +177,16 @@ namespace EffekseerPlayer.Unity.UI　{
         protected bool cursorContains;
         public bool CursorContains {
             get {
-                return Visibled && cursorContains;
+                return Visible && cursorContains;
             }
         }
 
-        protected bool visibled;
-        public virtual bool Visibled {
-            get { return visibled; }
+        protected bool visible;
+        public virtual bool Visible {
+            get { return visible; }
             set {
-                visibled = value;
-                if (visibled) {
+                visible = value;
+                if (visible) {
                     CheckWinPosition();
                     return;
                 }

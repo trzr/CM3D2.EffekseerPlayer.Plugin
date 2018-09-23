@@ -137,7 +137,7 @@ namespace EffekseerPlayer.CM3D2.UI {
             allSelectToggle.CheckChanged += SelectItems;
             expandToggle.CheckChanged += ExpandTree;
 
-            editViewToggle.CheckChanged = (obj, args) => { _editView.Visibled = ((CustomToggle) obj).Value; };
+            editViewToggle.CheckChanged = (obj, args) => { _editView.Visible = ((CustomToggle) obj).Value; };
             listView.clickRecipe     = ClickRecipe;
             listView.clickRecipeSet  = ClickRecipeSet;
             listView.deleteRecipe    = DeleteRecipe;
@@ -157,7 +157,7 @@ namespace EffekseerPlayer.CM3D2.UI {
         }
 
         public override void OnGUI() {
-            if (!Visibled) return;
+            if (!Visible) return;
 
             try {
                 GUI.Box(Rect, Text, WinStyle);
@@ -183,54 +183,53 @@ namespace EffekseerPlayer.CM3D2.UI {
 
         protected override void Layout(UIParamSet uiParams) {
             if (!_initialized) return;
+            Margin = uiParams.margin;
 
             var margin2 = margin * 2;
             var margin6 = margin * 6;
 
-//            var lineTop = Top + uiParams.unitHeight;
             var itemHeight = uiParamSet.itemHeight;
             var subButtonWidth = uiParamSet.FixPx(20f);
-            var align = new Rect(margin, uiParamSet.unitHeight, subButtonWidth, itemHeight*2);
-            editViewToggle.Align(ref align);
+            var topLayout = new AttachData(null, 0f, subButtonWidth);
+            var rightLayout = new AttachData(null, 0f, subButtonWidth);
+            var formData = new FormData(null, topLayout) { Right = rightLayout };
+            closeButton.Align(formData);
 
-            align.y = 0f;
-            align.x = Width - subButtonWidth;
-            align.height = subButtonWidth;
-            align.width = subButtonWidth;
-            closeButton.Align(ref align);
+            var leftLayout = new AttachData(null, margin, subButtonWidth);
+            formData.Left = leftLayout;
+            formData.Top.offset = uiParams.unitHeight;
+            formData.Top.length = itemHeight * 2;
+            formData.Right = null;
+            editViewToggle.Align(formData);
 
             var buttonWidth = (Width - margin6 - subButtonWidth) / 4f;
-            align.x = margin;
-            align.y = uiParamSet.unitHeight;
-            align.width = buttonWidth;
-            align.height = itemHeight;
-            playButton.AlignLeft(editViewToggle, ref align);
-            stopButton.AlignLeft(playButton, ref align);
-            stopRButton.AlignLeft(stopButton, ref align);
-            pauseButton.AlignLeft(stopRButton, ref align);
+            formData.Left.Set(editViewToggle, margin, buttonWidth);
+            formData.Top.length = itemHeight;
+            playButton.Align(formData);
+            stopButton.AlignLeft(playButton, formData);
+            stopRButton.AlignLeft(stopButton, formData);
+            pauseButton.AlignLeft(stopRButton, formData);
 
-            align.y = margin;
-            deleteButton.AlignLeftTop(editViewToggle, playButton, ref align);
-            reloadButton.AlignLeftTop(deleteButton, playButton, ref align);
+            formData.Left.obj = editViewToggle;
+            formData.Top.Set(playButton, margin, itemHeight);
+            deleteButton.Align(formData);
+            reloadButton.AlignLeft(deleteButton, formData);
 
-            align.x = margin2;
-            align.y = margin2;
-            align.width = subButtonWidth;
-            align.height = subButtonWidth;
-            allSelectToggle.AlignTop(editViewToggle, ref align);
-            align.x = margin;
-            align.width = buttonWidth;
-            expandToggle.AlignLeftTop(editViewToggle, editViewToggle, ref align);
+            formData.Left.Set(null, margin2, subButtonWidth);
+            formData.Top.Set(editViewToggle, margin2, subButtonWidth);
+            allSelectToggle.Align(formData);
+
+            formData.Left.Set(editViewToggle, margin, buttonWidth);
+            expandToggle.Align(formData);
 
             // filter
+            formData.Left.Set(null, margin);
+            formData.Right = rightLayout;
+            formData.Right.Set(null, margin);
+            formData.Top.Set(allSelectToggle, margin);
+            formData.Bottom = new AttachData(margin);
+            listView.Align(formData);
 
-            //var subAreaHeight = (itemHeight+margin) *4;
-            //listView.rect.Set(Left, Top + subAreaHeight, Width, Height - subAreaHeight);
-            align.x = margin;
-            align.y = margin;
-            align.width = -margin;
-            align.height = - margin;
-            listView.AlignTop(allSelectToggle, ref align);
 #if DEBUG
             DebugLog(listView.Rect,  "mainView list ");
 #endif
@@ -317,7 +316,7 @@ namespace EffekseerPlayer.CM3D2.UI {
         }
 
         public void Close(object obj, EventArgs args) {
-            Visibled = false;
+            Visible = false;
         } 
 
         public void Play(object obj, EventArgs args) {
@@ -355,7 +354,7 @@ namespace EffekseerPlayer.CM3D2.UI {
         /// <param name="set">レシピセット</param>
         /// <param name="recipe">レシピ</param>
         public void ClickRecipe(RecipeSet set, PlayRecipe recipe) {
-            if (!_editView.Visibled) return;
+            if (!_editView.Visible) return;
 
             _editView.SetGroupName(set.name);
             _editView.ToEditView(recipe);
@@ -366,7 +365,7 @@ namespace EffekseerPlayer.CM3D2.UI {
         /// </summary>
         /// <param name="recipeSet">レシピセット</param>
         public void ClickRecipeSet(RecipeSet recipeSet) {
-            if (!_editView.Visibled) return;
+            if (!_editView.Visible) return;
 
             _editView.SetGroupName(recipeSet.name);
         }
@@ -389,14 +388,14 @@ namespace EffekseerPlayer.CM3D2.UI {
         internal string Version {
             set { _version = value; }
         }
-        public override bool Visibled {
-            get { return visibled; }
+        public override bool Visible {
+            get { return visible; }
             set {
-                visibled = value;
+                visible = value;
                 
-                if (visibled) {
+                if (visible) {
                     if (editViewToggle != null) {
-                        _editView.Visibled = editViewToggle.Value;
+                        _editView.Visible = editViewToggle.Value;
                     }
                     return;
                 }

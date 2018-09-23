@@ -21,9 +21,16 @@ namespace EffekseerPlayer.Unity.Data {
         public EditTextValue(string name, float val1, EditRange range, EventHandler handler, bool decimalCheck = false)
             : base(val1, range, decimalCheck) {
             this.name = name;
+
+            UpdateText();
             if (handler != null) {
                 ValueChanged += handler;
             }
+        }
+
+        private void UpdateText() {
+            text = val.ToString(range.Format);
+            isSynched = true;
         }
 
         /// <inheritdoc />
@@ -38,8 +45,8 @@ namespace EffekseerPlayer.Unity.Data {
         /// <returns>変更した場合にtrueを返す</returns>
         public override bool Set(float val1, bool notify=false, bool withCheck=false) {
             var changed = base.Set(val1, notify, withCheck);
-            text = val.ToString(range.Format);
-            isSynched = true;
+            if (changed) UpdateText();
+
             return changed;
         }
 
@@ -48,11 +55,12 @@ namespace EffekseerPlayer.Unity.Data {
         /// notifyに応じて変更通知、
         /// withCheckに応じて範囲チェックを行う.
         /// テキスト値の場合はテキスト値の変更で戻り値の変更を判定する.
+        /// ただし、テキスト値が変更されたとしても、数値が変わっているとは限らないものとする.
         /// </summary>
         /// <param name="val1">変更値</param>
         /// <param name="notify">変更通知</param>
         /// <param name="withCheck">範囲チェックの有無</param>
-        /// <returns>変更した場合にtrueを返す</returns>
+        /// <returns>変更した場合にtrueを返す.</returns>
         public virtual bool Set(string val1, bool notify=false, bool withCheck=false) {
             if (text == val1) return false;
             text = val1;

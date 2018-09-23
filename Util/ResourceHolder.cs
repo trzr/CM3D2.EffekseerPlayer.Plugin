@@ -38,63 +38,84 @@ namespace EffekseerPlayer.Util {
         private Texture2D _pauseImage;
         private Texture2D _deleteImage;
 
+        private Texture2D _presetBaseIcon;
+        private Texture2D _presetEmptyIcon;
+        private Texture2D _presetFocusIcon;
+        private Texture2D _circleIcon;
+        private Texture2D _crossIcon;
+
         private Texture2D _frameImage;
         public Texture2D PictImage {
-            get { return _pictImage ? _pictImage : (_pictImage = LoadTex("picture")); }
+            get { return _pictImage ? _pictImage : _pictImage = LoadTex("picture"); }
         }
         public Texture2D FileImage {
-            get { return _fileImage ? _fileImage : (_fileImage = LoadTex("file")); }
+            get { return _fileImage ? _fileImage : _fileImage = LoadTex("file"); }
         }
         public Texture2D DirImage {
-            get { return _dirImage ? _dirImage : (_dirImage = LoadTex("folder")); }
+            get { return _dirImage ? _dirImage : _dirImage = LoadTex("folder"); }
         }
         public Texture2D CopyImage {
-            get { return _copyImage ? _copyImage : (_copyImage = LoadTex("copy")); }
+            get { return _copyImage ? _copyImage : _copyImage = LoadTex("copy"); }
         }
         public Texture2D PasteImage {
-            get { return _pasteImage ? _pasteImage : (_pasteImage = LoadTex("paste")); }
+            get { return _pasteImage ? _pasteImage : _pasteImage = LoadTex("paste"); }
         }
         public Texture2D PlusImage {
-            get { return _plusImage ? _plusImage : (_plusImage = LoadTex("node_plus")); }
+            get { return _plusImage ? _plusImage : _plusImage = LoadTex("node_plus"); }
         }
         public Texture2D MinusImage {
-            get { return _minusImage ? _minusImage : (_minusImage = LoadTex("node_minus")); }
+            get { return _minusImage ? _minusImage : _minusImage = LoadTex("node_minus"); }
         }
         public Texture2D CheckoffImage {
-            get { return _checkoffImage ? _checkoffImage : (_checkoffImage = LoadTex("check_off")); }
+            get { return _checkoffImage ? _checkoffImage : _checkoffImage = LoadTex("check_off"); }
         }
         public Texture2D CheckonImage {
-            get { return _checkonImage ? _checkonImage : (_checkonImage = LoadTex("check_on")); }
+            get { return _checkonImage ? _checkonImage : _checkonImage = LoadTex("check_on"); }
         }
         public Texture2D CheckpartImage {
-            get { return _checkpartImage ? _checkpartImage : (_checkpartImage = LoadTex("check_part")); }
+            get { return _checkpartImage ? _checkpartImage : _checkpartImage = LoadTex("check_part"); }
         }
         public Texture2D FrameImage {
-            get { return _frameImage ? _frameImage : (_frameImage = LoadTex("frame")); }
+            get { return _frameImage ? _frameImage : _frameImage = LoadTex("frame"); }
         }
         public Texture2D ReloadImage {
-            get { return _reloadImage ? _reloadImage : (_reloadImage = LoadTex("reload")); }
+            get { return _reloadImage ? _reloadImage : _reloadImage = LoadTex("reload"); }
         }
         public Texture2D RepeatImage {
-            get { return _repeatImage ? _repeatImage : (_repeatImage = LoadTex("repeat")); }
+            get { return _repeatImage ? _repeatImage : _repeatImage = LoadTex("repeat"); }
         }
         public Texture2D RepeatOffImage {
-            get { return _repeatoffImage ? _repeatoffImage : (_repeatoffImage = LoadTex("repeat_off")); }
+            get { return _repeatoffImage ? _repeatoffImage : _repeatoffImage = LoadTex("repeat_off"); }
         }
         public Texture2D PlayImage {
-            get { return _playImage ? _playImage : (_playImage = LoadTex("play")); }
+            get { return _playImage ? _playImage : _playImage = LoadTex("play"); }
         }
         public Texture2D StopImage {
-            get { return _stopImage ? _stopImage : (_stopImage = LoadTex("stop")); }
+            get { return _stopImage ? _stopImage : _stopImage = LoadTex("stop"); }
         }
         public Texture2D StopRImage {
-            get { return _stopRImage ? _stopRImage : (_stopRImage = LoadTex("stopr")); }
+            get { return _stopRImage ? _stopRImage : _stopRImage = LoadTex("stopr"); }
         }
         public Texture2D PauseImage {
-            get { return _pauseImage ? _pauseImage : (_pauseImage = LoadTex("pause")); }
+            get { return _pauseImage ? _pauseImage : _pauseImage = LoadTex("pause"); }
         }
         public Texture2D DeleteImage {
-            get { return _deleteImage ? _deleteImage : (_deleteImage = LoadTex("delete")); }
+            get { return _deleteImage ? _deleteImage : _deleteImage = LoadTex("delete"); }
+        }
+        public Texture2D PresetBaseIcon {
+            get { return _presetBaseIcon ? _presetBaseIcon : _presetBaseIcon = LoadTex("preset_base"); }
+        }
+        public Texture2D PresetEmptyIcon {
+            get { return _presetEmptyIcon ? _presetEmptyIcon : _presetEmptyIcon = LoadTex("preset_empty"); }
+        }
+        public Texture2D PresetFocusIcon {
+            get { return _presetFocusIcon ? _presetFocusIcon : _presetFocusIcon = LoadTex("preset_focus"); }
+        }
+        public Texture2D CircleIcon {
+            get { return _circleIcon ? _circleIcon : _circleIcon = LoadTex("circle"); }
+        }
+        public Texture2D CrossIcon {
+            get { return _crossIcon ? _crossIcon : _crossIcon = LoadTex("cross"); }
         }
 
         private Texture2D LoadTex(string name) {
@@ -106,12 +127,12 @@ namespace EffekseerPlayer.Util {
                     return tex2D;
                 }
             } catch(Exception e) {
-                Log.Info("アイコンリソースのロードに失敗しました。空の画像として扱います", name, e);
+                Log.Info("アイコンリソースのロードに失敗しました。空の画像として扱います。 resource:", name, e);
                 return new Texture2D(2, 2);
             }
         }
 
-        public static Texture2D LoadTexture(Stream stream) {
+        public Texture2D LoadTexture(Stream stream) {
             var bytes = new byte[stream.Length];
             stream.Read(bytes, 0, bytes.Length);
 
@@ -161,6 +182,11 @@ namespace EffekseerPlayer.Util {
             Delete(ref _stopRImage);
             Delete(ref _pauseImage);
             Delete(ref _deleteImage);
+            Delete(ref _presetBaseIcon);
+            Delete(ref _presetEmptyIcon);
+            Delete(ref _presetFocusIcon);
+            Delete(ref _circleIcon);
+            Delete(ref _crossIcon);
         }
 
         private void Delete(ref Texture2D tex) {

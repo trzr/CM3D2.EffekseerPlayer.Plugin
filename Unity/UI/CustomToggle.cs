@@ -79,6 +79,9 @@ namespace EffekseerPlayer.Unity.UI {
             button2._pair = button1;
         }
 
+        public float CalcWidth(bool useSelected=true) {
+            return useSelected ? CheckStyle.CalcSize(_selectedContent).x : CheckStyle.CalcSize(_content).x;
+        }
         #endregion
 
         #region Properties
@@ -133,6 +136,9 @@ namespace EffekseerPlayer.Unity.UI {
         }
 
         private readonly GUIContent _selectedContent = new GUIContent();
+        public GUIContent SelectedContent {
+            get { return _selectedContent; }
+        }
         public string SelectText {
             get { return _selectedContent.text; }
             set { _selectedContent.text = value; }
@@ -142,6 +148,10 @@ namespace EffekseerPlayer.Unity.UI {
             set { _selectedContent.image = value; }
         }
         private readonly GUIContent _content = new GUIContent();
+        public GUIContent Content {
+            get { return _content; }
+        }
+
         public override string Text {
             get { return _content.text; }
             set { _content.text = value; }

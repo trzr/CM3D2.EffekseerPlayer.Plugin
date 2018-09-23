@@ -11,11 +11,13 @@ namespace EffekseerPlayer.Unity.UI {
         #region Methods
         protected GUIControl(UIParamSet uiParamSet) {
             this.uiParamSet = uiParamSet;
+            margin = uiParamSet.margin;
             root = this;
         }
 
         protected GUIControl(GUIControl parent) {
             uiParamSet = parent.uiParamSet;
+            margin = uiParamSet.margin;
             parent.Add(this);
         }
 
@@ -52,7 +54,7 @@ namespace EffekseerPlayer.Unity.UI {
             try {
                 DrawGUI();
 //            } catch(Exception e) {
-//                Log.Error("Failed to Drawa GUI", e);
+//                Log.Error("Failed to Draw GUI", e);
             } finally {
                 enabledStore.Restore();
             }
@@ -98,62 +100,191 @@ namespace EffekseerPlayer.Unity.UI {
             child.root = root;
         }
 
+        public void AlignLeft(GUIControl obj, FormData fd) {
+            fd.Left.obj = obj;
+            Align(fd);
+        }
+
+        public void AlignTop(GUIControl obj, FormData fd) {
+            fd.Top.obj = obj;
+            Align(fd);
+        }
+
         /// <summary>
-        /// 親コントロールの位置と、指定されたalignを元に配置する.
-        /// widthとheightは、0以下の値の場合 親コントロールの位置とサイズから
-        /// 最大サイズからの差分としてサイズを決定する.
-        /// ex) 0の場合:最大値,
-        ///    -1の場合:最大値-1のサイズとなる
+        /// 左端・上端の位置から優先的に配置する.
+        ///
+        /// ただし、Left=nullの場合は右端から配置、 Top=nullの場合は下端から配置
         /// </summary>
-        /// <param name="align"></param>
-        public virtual void Align(ref Rect align) {
-            Align(align.x, align.y, align.width, align.height);
+        /// <param name="fd">フォームデータ</param>
+        public void Align(FormData fd) {
+            if (fd.Left != null) AlignLeft(fd.Left, fd.Right);
+            else AlignRight(fd.Left, fd.Right);
+
+            if (fd.Top != null) AlignTop(fd.Top, fd.Bottom);
+            else AlignBottom(fd.Top, fd.Bottom);
         }
 
-        public virtual void Align(float left, float top, float width, float height) {
-            Left = parent.Left + left;
-            Top = parent.Top + top;
-            AlignSize(width, height);
+        /// <summary>
+        /// 右端・下端の位置から配置する.
+        /// Widthが指定されていれば、offsetを用いて右端からLeftを特定する.
+        /// Heightが指定されていれば、offsetを用いて下端からTopを特定する.
+        ///
+        /// </summary>
+        /// <param name="fd">フォームデータ</param>
+        public void AlignRev(FormData fd) {
+            if (fd.Right != null) AlignRight(fd.Left, fd.Right);
+            else AlignLeft(fd.Left, fd.Right);
+
+            if (fd.Bottom != null) AlignBottom(fd.Top, fd.Bottom);
+            else AlignTop(fd.Top, fd.Bottom);
         }
 
-        public virtual void AlignLeft(GUIControl ctrl, ref Rect align) {
-            AlignLeft(ctrl, align.x, align.y, align.width, align.height);
+        /// <summary>
+        /// 左から詰めて配置する.
+        ///
+        /// * 幅の算出優先度
+        /// right配置情報が指定された場合は、そこからWidthを算出する.
+        /// rが指定されていなければ、l.lengthをWidthとする.
+        /// l.lengthが指定されていない場合は、Widthは設定しない
+        /// </summary>
+        /// <param name="l">left配置情報</param>
+        /// <param name="r">right配置情報</param>
+        protected void AlignLeft(AttachData l, AttachData r) {
+            if (l == null) return;
+
+            if (l.obj != null) {
+                Left = l.obj.xMax + l.offset;
+            } else {
+                Left = parent.Left + l.offset;
+            }
+
+            if (r != null) {
+                var rightPos = (r.obj != null) ? r.obj.Left - r.offset : parent.xMax - r.offset;
+                Width = rightPos - Left;
+            } else if (l.length > 0) {
+                Width = l.length;
+            }
         }
 
-        /// ctrl を左側に並べて配置する
-        public virtual void AlignLeft(GUIControl ctrl, float left, float top, float width, float height) {
-            Left = ctrl.xMax + left;
-            Top = parent.Top + top;
-            AlignSize(width, height);
+        /// <summary>
+        /// 右から順に配置する
+        /// </summary>
+        /// <param name="l">left配置情報</param>
+        /// <param name="r">right配置情報</param>
+        protected void AlignRight(AttachData l, AttachData r) {
+            if (r == null) return;
+
+            if (r.length > 0) {
+                Width = r.length;
+
+                var rightPos = (r.obj != null) ? r.obj.Left - r.offset : parent.xMax - r.offset;
+                var left  = rightPos - Width;
+                if (l != null) left -= l.offset;
+
+                if (left < parent.Left) {
+                    if (Width > rightPos - parent.Left) {
+                        Width = rightPos - parent.Left;
+                    }
+                    left = parent.Left;
+                }
+                Left = left;
+            } else {
+                if (l != null) {
+                    var rightPos = (r.obj != null) ? r.obj.Left - r.offset : parent.xMax - r.offset;
+                    var leftPos = (l.obj != null) ? l.obj.xMax + l.offset : parent.Left + l.offset;
+                    Width = rightPos - leftPos;
+                    if (Width < 0) {
+                        Width = 0;
+                        return;
+                    }
+                    Left = leftPos;
+
+                } else {
+                    var rightPos = (r.obj != null) ? r.obj.Left - r.offset : parent.xMax - r.offset;
+                    // 親の左端から、ad.objの左端まで
+                    Width = rightPos  - parent.Left;
+                    Left = parent.Left;
+                }
+            }
         }
 
-        public virtual void AlignTop(GUIControl ctrl, ref Rect align) {
-            AlignTop(ctrl, align.x, align.y, align.width, align.height);
+        protected void AlignTop(AttachData t, AttachData b) {
+            if (t == null) return;
+            if (t.obj != null) {
+                Top = t.obj.yMax + t.offset;
+            } else {
+                Top = parent.Top + t.offset;
+            }
+
+            if (b != null) {
+                var topPos = (b.obj != null) ? b.obj.Top - b.offset: parent.yMax - b.offset;
+                Height = topPos - Top;
+            } else if (t.length > 0) {
+                Height = t.length;
+            }
         }
 
-        public virtual void AlignTop(GUIControl ctrl, float left, float top, float width, float height) {
-            Left = parent.Left + left;
-            Top = ctrl.yMax + top;
-            AlignSize(width, height);
+        /// <summary>
+        /// 下から順に配置する
+        /// </summary>
+        /// <param name="t">top配置情報</param>
+        /// <param name="b">bottom配置情報</param>
+        protected void AlignBottom(AttachData t, AttachData b) {
+            if (b == null) return;
+
+            if (b.length > 0) {
+                Height = b.length;
+
+                var bottomPos = (b.obj != null) ? b.obj.Top - b.offset : parent.yMax - b.offset;
+                var top  = bottomPos - Height;
+                if (t != null) top -= t.offset;
+
+                if (top < parent.Top) {
+                    if (Height > bottomPos - parent.Top) {
+                        Height = bottomPos - parent.Top;
+                    }
+                    top = parent.Top;
+                }
+                Top = top;
+            } else {
+                if (t != null) {
+                    var bottomPos = (b.obj != null) ? b.obj.Top - b.offset : parent.yMax - b.offset;
+                    var topPos = (t.obj != null) ? t.obj.yMax + t.offset : parent.Top + t.offset;
+                    Height = bottomPos - topPos;
+                    if (Height < 0) {
+                        Height = 0;
+                        return;
+                    }
+                    Top = topPos;
+
+                } else {
+                    var bottomPos = (b.obj != null) ? b.obj.Top - b.offset : parent.yMax - b.offset;
+                    // 親の上端から、b.objの下端まで
+                    Height = bottomPos  - parent.Top;
+                    Top = parent.Top;
+                }
+            }
         }
 
-        public virtual void AlignLeftTop(GUIControl ctrlL, GUIControl ctrlT, ref Rect align) {
-            AlignLeftTop(ctrlL, ctrlT, align.x, align.y, align.width, align.height);
+
+        // Leftを先に設定する場合
+        protected void AlignRight(AttachData ad) {
+            if (ad == null) return;
+            if (ad.obj != null) {
+                Width = ad.obj.Left - Left - ad.offset;
+            } else {
+                Width = parent.xMax - Left - ad.offset;
+            }
         }
 
-        public virtual void AlignLeftTop(GUIControl ctrlL, GUIControl ctrlT, float left, float top, float width, float height) {
-            Left = ctrlL.xMax + left;
-            Top = ctrlT.yMax + top;
-            AlignSize(width, height);
-        }
-
-        //private void AlignSize(float width, float height) {
-        //    Width = (width >= 0) ? width : parent.Width + width;
-        //    Height = (height >= 0) ? height : parent.Height + height;
-        //}
-        private void AlignSize(float width, float height) {
-            Width = (width > 0) ? width : parent.Width - (Left - parent.Left) + width;
-            Height = (height > 0) ? height : parent.Height - (Top - parent.Top) + height;
+        // Topを先に設定する
+        protected void AlignBottom(AttachData ad) {
+            if (ad == null) return;
+            if (ad.obj != null) {
+                Height = ad.obj.Top - Top - ad.offset;
+            } else {
+                Height = parent.yMax - Top - ad.offset;
+            }
         }
 
         #endregion
@@ -163,8 +294,8 @@ namespace EffekseerPlayer.Unity.UI {
     
         private bool _enabled = true;
         public virtual bool Enabled {
-            get {  return _enabled;  }
-            set {  _enabled = value; }
+            get { return _enabled;  }
+            set { _enabled = value; }
         }
 
         protected string text;

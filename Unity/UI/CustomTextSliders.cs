@@ -103,7 +103,7 @@ namespace EffekseerPlayer.Unity.UI {
                         subPresetRect.x = xPos + margin;
                         subPresetRect.width = listener.width;
                         if (GUI.Button(subPresetRect, listener.label, ButtonStyle)) {
-                            listener.action(editVal);
+                            listener.action(i, Value);
                         }
                         xPos += listener.width + margin;
                     }
@@ -115,7 +115,7 @@ namespace EffekseerPlayer.Unity.UI {
                         subPresetRect.width = listener.width;
                         xPos += (listener.width + margin);
                         if (GUI.Button(subPresetRect, listener.label, ButtonStyle)) {
-                            listener.action(editVal);
+                            listener.action(i, Value);
                         }
                     }
                 }
@@ -134,7 +134,8 @@ namespace EffekseerPlayer.Unity.UI {
 
             // 各コントロールの位置調整
             if (Text != null) {
-                labelRect.Set(Left, Top, Text.Length * fontSize, TextHeight);
+                var labelWidth = LabelStyle.CalcSize(new GUIContent(Text)).x;
+                labelRect.Set(Left, Top, labelWidth, TextHeight);
 //                Log.Debug("MultiSlider.label:(w,h)=(", labelRect.width, ",", labelRect.height, ")");
 
                 presetRect.y = labelRect.y;
@@ -162,6 +163,7 @@ namespace EffekseerPlayer.Unity.UI {
             //sliderRect.y = Top + Margin * 2;
             sliderRect.x = textRect.xMax + margin + prevWidth;
             sliderRect.width  = Width - textRect.width - subLabelRect.width - indent - margin * 2 - prevWidth - nextWidth;
+            // sliderRect.width  = xMax - textRect.xMax - margin * 2 - prevWidth - nextWidth;
             sliderRect.height = TextHeight - margin * 2;
         }
         #endregion
@@ -170,8 +172,8 @@ namespace EffekseerPlayer.Unity.UI {
         public float subLabelWidth;
         public Rect subLabelRect;
         public Rect subPresetRect;
-        public PresetListener<EditTextValue>[] prevListeners;
-        public PresetListener<EditTextValue>[] nextListeners;
+        public SubPresetListener<int, EditTextValues>[] prevListeners;
+        public SubPresetListener<int, EditTextValues>[] nextListeners;
 
         #endregion
 

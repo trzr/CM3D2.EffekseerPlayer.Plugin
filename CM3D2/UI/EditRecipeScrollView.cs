@@ -3,6 +3,7 @@ using EffekseerPlayer.CM3D2.Render;
 using EffekseerPlayer.CM3D2.Util;
 using EffekseerPlayer.Unity.Data;
 using EffekseerPlayer.Unity.UI;
+using EffekseerPlayer.Unity.Util;
 using EffekseerPlayer.Util;
 using UnityEngine;
 
@@ -138,28 +139,36 @@ namespace EffekseerPlayer.CM3D2.UI {
                     new PresetListener<EditTextValue>(">>", 30, val => val.Add(+120, true)),
                 },
             };
-            colorSlider = new CustomTextSliders(this,
-                new[] {"R", "G", "B", "A"},
-                new[] {1f, 1f, 1f, 1f},
-                new[] {RGB_RANGE, RGB_RANGE, RGB_RANGE, RGB_RANGE,}) {
+            var defaultColor = Color.white;
+            var presetMgr = ColorPresetManager.Instance;
+            var rgbMapTex = ColorUtils.CreateRGBMapTex(257, 257);
+            var borderWidth = 1;
+            var lightTex = ColorUtils.CreateLightTex(16, 256, borderWidth);
+            var editColor = new EditRGBATex(ref defaultColor, rgbMapTex, lightTex) {
+                colorIconBorder = borderWidth,
+                colorIconHeight = (int) uiParamSet.itemHeight
+            };
+            var btnStyle = new GUIStyle("button") {
+                    alignment = TextAnchor.MiddleCenter,
+                    fontSize = uiParamSet.fontSizeS,
+                };
+            colorSlider = new CustomColorSlider(this, editColor, presetMgr) {
                 Text = "◆色",
+                ButtonStyle = btnStyle,
                 listeners = new[] {
-                    new PresetListener<EditTextValues>("<<", 30,
-                        vals => vals.Add(new[] {-0.25f, -0.25f, -0.25f, 0f}, true)),
-                    new PresetListener<EditTextValues>("<", 20,
-                        vals => vals.Add(new[] {-0.1f, -0.1f, -0.1f, 0f}, true)),
-                    new PresetListener<EditTextValues>(">", 20, vals => vals.Add(new[] {0.1f, 0.1f, 0.1f, 0f}, true)),
-                    new PresetListener<EditTextValues>(">>", 30,
-                        vals => vals.Add(new[] {0.25f, 0.25f, 0.25f, 0f}, true)),
-                    new PresetListener<EditTextValues>("reset", WIDTH_RESET, vals => vals.SetWithNotify(1, 1, 1, 1)),
+                    new PresetListener<EditColorTex>("<<", btnStyle, val => val.Add(-0.25f, true)),
+                    new PresetListener<EditColorTex>("<", btnStyle, val => val.Add(-0.1f, true)),
+                    new PresetListener<EditColorTex>(">", btnStyle, val => val.Add(0.1f,　true)),
+                    new PresetListener<EditColorTex>(">>", btnStyle, val => val.Add(0.25f, true)),
+                    new PresetListener<EditColorTex>("reset", btnStyle, val => val.SetColor(ref defaultColor)),
                 },
                 prevListeners = new[] {
-                    new PresetListener<EditTextValue>("0", 20, val => val.Set(0, true)),
-                    new PresetListener<EditTextValue>("<", 20, val => val.Add(-0.1f, true)),
+                    new SubPresetListener<int, EditColorTex>("0", btnStyle, (i, val) => val.SetColorValue(i, 0f, true)),
+                    new SubPresetListener<int, EditColorTex>("<", btnStyle, (i, val) => val.Add(i, -0.1f, true)),
                 },
                 nextListeners = new[] {
-                    new PresetListener<EditTextValue>(">", 20, val => val.Add(0.1f, true)),
-                    new PresetListener<EditTextValue>("1", 20, val => val.Set(1, true)),
+                    new SubPresetListener<int, EditColorTex>(">", btnStyle, (i, val) => val.Add(i, 0.1f, true)),
+                    new SubPresetListener<int, EditColorTex>("1", btnStyle, (i, val) => val.SetColorValue(i, 1f, true)),
                 },
             };
             attachLabel = new CustomLabel(this, "◆アタッチ");
@@ -227,24 +236,30 @@ namespace EffekseerPlayer.CM3D2.UI {
                 Enabled = false
             };
 
+
+            var btnStyle2 = new GUIStyle("button") {
+                alignment = TextAnchor.MiddleCenter,
+                fontSize = uiParamSet.fontSizeS,
+            };
             posSlider = new CustomTextSliders(this,
                 new[] {"X", "Y", "Z"}, new[] {0f, 0f, 0f}, posRange) {
                 Text = "◆位置",
+                ButtonStyle = btnStyle2,
                 listeners = new[] {
-                    new PresetListener<EditTextValues>("reset", WIDTH_RESET, vals => vals.SetWithNotify(0, 0, 0)),
+                    new PresetListener<EditTextValues>("reset", btnStyle2, vals => vals.SetWithNotify(0, 0, 0)),
                 },
                 prevListeners = new[] {
-                    new PresetListener<EditTextValue>("<", 20, val => val.Add(-0.1f, true)),
+                    new SubPresetListener<int, EditTextValues>("<", btnStyle2, (i, val) => val[i].Add(-0.1f, true)),
                 },
                 nextListeners = new[] {
-                    new PresetListener<EditTextValue>(">", 20, val => val.Add(0.1f, true)),
-                    new PresetListener<EditTextValue>("0", 20, val => val.Set(0, true)),
+                    new SubPresetListener<int, EditTextValues>(">", btnStyle2, (i, val) => val[i].Add(0.1f, true)),
+                    new SubPresetListener<int, EditTextValues>("0", btnStyle2, (i, val) => val.Set(i, 0, true)),
                 },
             };
 
             rotToggle = new CustomToggle(this) {
                 Text = "ToEuler",
-                SelectText = "ToQuatenion",
+                SelectText = "ToQuaternion",
                 TextColor = Color.white,
                 SelectTextColor = Color.white,
                 //SelectBackgroundColor =  Color.green,
@@ -262,19 +277,25 @@ namespace EffekseerPlayer.CM3D2.UI {
                 SelectTextColor = Color.white,
             };
 
+            var rotBtnStyle = new GUIStyle("button") {
+                alignment = TextAnchor.MiddleCenter,
+                fontSize = uiParamSet.fontSizeS,
+            };
+
             eulerSlider = new CustomTextSliders(this,
                 new[] {"X", "Y", "Z"}, new[] {0f, 0f, 0f}, EULER_RANGE) {
                 Text = "◆回転(Euler)",
                 Enabled = false,
+                ButtonStyle = rotBtnStyle,
                 listeners = new[] {
-                    new PresetListener<EditTextValues>("reset", WIDTH_RESET, vals => vals.SetWithNotify(0, 0, 0)),
+                    new PresetListener<EditTextValues>("reset", rotBtnStyle, vals => vals.SetWithNotify(0, 0, 0)),
                 },
                 prevListeners = new[] {
-                    new PresetListener<EditTextValue>("-90", 40, val => val.Add(-90, true)),
+                    new SubPresetListener<int, EditTextValues>("-90", rotBtnStyle, (i, val) => val[i].Add(-90, true)),
                 },
                 nextListeners = new[] {
-                    new PresetListener<EditTextValue>("+90", 40, val => val.Add(+90, true)),
-                    new PresetListener<EditTextValue>("0", 20, val => val.Set(0, true)),
+                    new SubPresetListener<int, EditTextValues>("+90", rotBtnStyle, (i, val) => val[i].Add(+90, true)),
+                    new SubPresetListener<int, EditTextValues>("0", rotBtnStyle, (i, val) => val.Set(i, 0, true)),
                 }
             };
 
@@ -284,15 +305,16 @@ namespace EffekseerPlayer.CM3D2.UI {
                 new[] {ROT_RANGE, ROT_RANGE, ROT_RANGE, ROT_RANGEW}) {
                 Text = "◆回転(Quaternion)",
                 Enabled = true,
+                ButtonStyle = rotBtnStyle,
                 listeners = new[] {
-                    new PresetListener<EditTextValues>("reset", WIDTH_RESET, vals => vals.SetWithNotify(0f, 0f, 0f, 1f)),
+                    new PresetListener<EditTextValues>("reset", rotBtnStyle, vals => vals.SetWithNotify(0f, 0f, 0f, 1f)),
                 },
                 prevListeners = new[] {
-                    new PresetListener<EditTextValue>("-0.5", 40, val => val.Add(-0.5f, true)),
+                    new SubPresetListener<int, EditTextValues>("-0.5", rotBtnStyle, (i, val) => val[i].Add(-0.5f, true)),
                 },
                 nextListeners = new[] {
-                    new PresetListener<EditTextValue>("+0.5", 40, val => val.Add(+0.5f, true)),
-                    new PresetListener<EditTextValue>("0", 20, val => val.Set(0, true)),
+                    new SubPresetListener<int, EditTextValues>("+0.5", rotBtnStyle, (i, val) => val[i].Add(+0.5f, true)),
+                    new SubPresetListener<int, EditTextValues>("0", rotBtnStyle, (i, val) => val.Set(i, 0, true)),
                 },
             };
 
@@ -304,11 +326,8 @@ namespace EffekseerPlayer.CM3D2.UI {
             endFrameSlider.Value.ValueChanged += EndFrameChanged;
             delaySlider.Value.ValueChanged += DelayChanged;
             postDelaySlider.Value.ValueChanged += PostDelayChanged;
-            colorSlider.Value[0].ValueChanged += ColorRChanged;
-            colorSlider.Value[1].ValueChanged += ColorGChanged;
-            colorSlider.Value[2].ValueChanged += ColorBChanged;
-            colorSlider.Value[3].ValueChanged += ColorAChanged;
-            colorSlider.Value.ValueChanged += ColorsChanged;
+            colorSlider.EditVal.ValueChanged += ColorsChanged;
+            colorSlider.ExpandChanged += (obj, args) => { UpdateLayout(uiParamSet); };
 
             attachToggle.CheckChanged += (obj, args) => {
                 UpdateLayout(uiParamSet);
@@ -453,13 +472,17 @@ namespace EffekseerPlayer.CM3D2.UI {
             };
         }
 
+        private int updateFrame;
         public override void Update() {
             // メイド情報更新
             CheckItemChanged();
 
             if (_boneRenderer != null) _boneRenderer.Update();
             if (currentEmitter != null && currentEmitter.Exists) {
-                frameSlider.Num = currentEmitter.Frame;
+                if (++updateFrame > 1) {
+                    frameSlider.Num = currentEmitter.Frame;
+                    updateFrame = 0;
+                }
             }
         }
 
@@ -531,134 +554,169 @@ namespace EffekseerPlayer.CM3D2.UI {
             var viewWidth = Width - WIDTH_SCROLLBAR;
             var buttonWidth = (viewWidth - margin6) / 4f;
             var itemHeight = uiParamSet.itemHeight;
-            var labelWidth = uiParamSet.FixPx(100);
-            var align = new Rect(margin2, 0, labelWidth, itemHeight);
-
             var textWidth = viewWidth * 0.20f;
-            align.width = -margin * 2 - WIDTH_SCROLLBAR;
 
-            scaleSlider.Align(ref align);
+            var formData = new FormData(margin, 0);
+            var rightLayout = new AttachData(margin + WIDTH_SCROLLBAR);
+            formData.Right = rightLayout;
+            formData.Height = itemHeight;
+
+            scaleSlider.Align(formData);
             scaleSlider.indent = margin*4;
             scaleSlider.TextWidth = textWidth;
             scaleSlider.TextHeight = itemHeight;
 
-            speedSlider.AlignTop(scaleSlider, ref align);
+            formData.Top = new AttachData(scaleSlider, margin2);
+            speedSlider.Align(formData);
             speedSlider.indent = margin*4;
             speedSlider.TextWidth = textWidth;
             speedSlider.TextHeight = itemHeight;
 
-            endFrameSlider.AlignTop(speedSlider, ref align);
+            formData.Top.obj = speedSlider;
+            endFrameSlider.Align(formData);
             endFrameSlider.indent = margin*4;
             endFrameSlider.TextWidth = textWidth;
             endFrameSlider.TextHeight = itemHeight;
 
-            frameSlider.AlignTop(endFrameSlider, ref align);
+            formData.Top.obj = endFrameSlider;
+            frameSlider.Align(formData);
             frameSlider.indent = margin*4;
             frameSlider.TextWidth = textWidth;
             frameSlider.TextHeight = itemHeight;
 
-            delaySlider.AlignTop(frameSlider, ref align);
+            formData.Top.obj = frameSlider;
+            delaySlider.Align(formData);
             delaySlider.indent = margin*4;
             delaySlider.TextWidth = textWidth;
             delaySlider.TextHeight = itemHeight;
 
-            postDelaySlider.AlignTop(delaySlider, ref align);
+            formData.Top.obj = delaySlider;
+            postDelaySlider.Align(formData);
             postDelaySlider.indent = margin*4;
             postDelaySlider.TextWidth = textWidth;
             postDelaySlider.TextHeight = itemHeight;
 
-            align.x = margin;
-            align.y = margin;
-            align.width = viewWidth - margin2;
+            formData.Left.offset = margin;
+            formData.Top.Set(postDelaySlider, margin, 0);
+            formData.Right = rightLayout;
             var indent = uiParamSet.FixPx(14);
-            colorSlider.indent = indent;
-            colorSlider.subLabelWidth = indent;
-            colorSlider.TextWidth  = textWidth;
-            colorSlider.TextHeight = itemHeight;
-            colorSlider.AlignTop(postDelaySlider, ref align);
+            colorSlider.subLabelIndent = indent;
+//            colorSlider.TextWidth  = textWidth;
+            colorSlider.RowHeight = itemHeight;
+            colorSlider.Align(formData);
 
-            align.x = margin;
-            align.y = margin2;
-            align.width = buttonWidth;
-            attachLabel.AlignTop(colorSlider, ref align);
-            align.x = margin;
-            align.width = buttonWidth *0.5f;
-            attachToggle.AlignLeftTop(attachLabel, colorSlider, ref align);
+            formData.Top.Set(colorSlider, margin2, itemHeight);
+            formData.Right = null;
+            formData.Width = buttonWidth;
+            attachLabel.Align(formData);
+            formData.Left.obj = attachLabel;
+            formData.Width = buttonWidth * 0.5f;
+            attachToggle.Align(formData);
 
             GUIControl baseObj = attachToggle;
             if (attachToggle.Value) {
-                align.x = margin2;
-                align.width = buttonWidth;
-                fixOffsetToggle.AlignLeftTop(attachToggle, colorSlider, ref align);
-                fixPosToggle.AlignLeftTop(fixOffsetToggle, colorSlider, ref align);
+                formData.Left.offset = margin2;
+                formData.Width = buttonWidth;
 
-                boneToggle.AlignTop(attachToggle, ref align);
-                rotScopeToggle.AlignLeftTop(attachToggle, attachToggle, ref align);
-                fixRotToggle.AlignLeftTop(rotScopeToggle, attachToggle, ref align);
+                formData.Left.obj = attachToggle;
+                fixOffsetToggle.Align(formData);
+
+                formData.Left.obj = fixOffsetToggle;
+                fixPosToggle.Align(formData);
+
+                formData.Left.obj = null;
+                formData.Top.obj = attachToggle;
+                boneToggle.Align(formData);
+
+                formData.Left.obj = attachToggle;
+                rotScopeToggle.Align(formData);
+                formData.Left.obj = rotScopeToggle;
+                fixRotToggle.Align(formData);
 
                 var subButtonWidth = uiParamSet.FixPx(20f);
-                align.x = margin2;
-                align.width = subButtonWidth;
-                align.height = itemHeight * 2;
-                prevMaidButton.AlignTop(fixRotToggle, ref align);
-                align.x = margin;
-                align.width = viewWidth - margin * 10 - subButtonWidth*3;
-                maidCombo.AlignLeftTop(prevMaidButton, fixRotToggle, ref align);
-                
-                align.width = subButtonWidth;
-                nextMaidButton.AlignLeftTop(maidCombo, fixRotToggle, ref align);
-                align.width = -margin2 - WIDTH_SCROLLBAR;
-                maidRefreshButton.AlignLeftTop(nextMaidButton, fixRotToggle, ref align);
+                formData.Left.Set(null, margin2, subButtonWidth);
+                formData.Top.Set(fixRotToggle, margin2, itemHeight * 2);
+                prevMaidButton.Align(formData);
 
-                align.x = margin2;
-                align.height = itemHeight;
-                align.y = 0;
-                align.width = viewWidth * 0.5f - margin6;
-                slotLabel.AlignTop(maidCombo, ref align);
-                slotFilterText.AlignTop(slotLabel, ref align);
-                slotCombo.AlignTop(slotFilterText, ref align);
+                var leftLayout = formData.Left;
+                // 右から順に配置 ( combo <- next <- refresh )
+                formData.Left = null;
+                formData.Right = new AttachData(null, margin2 + WIDTH_SCROLLBAR, subButtonWidth+margin2);
+                formData.Top.obj = fixRotToggle;
+                maidRefreshButton.AlignRev(formData);
 
-                align.x = margin2 + viewWidth * 0.5f;
-                boneLabel.AlignTop(maidCombo, ref align);
-                boneFilterText.AlignTop(boneLabel, ref align);
-                boneCombo.AlignTop(boneFilterText, ref align);
+                formData.Right.Set(maidRefreshButton, margin, subButtonWidth);
+                nextMaidButton.AlignRev(formData);
+
+                formData.Left = leftLayout;
+                formData.Left.Set(prevMaidButton, margin, 0);
+                formData.Right.Set(nextMaidButton, margin, 0);
+                maidCombo.Align(formData);
+
+                formData.Top.Set(maidCombo, 0, itemHeight);
+                formData.Left.Set(null, margin2, viewWidth * 0.5f - margin6);
+                formData.Right = null;
+                slotLabel.Align(formData);
+                formData.Top.obj = slotLabel;
+                slotFilterText.Align(formData);
+                formData.Top.obj = slotFilterText;
+                slotCombo.Align(formData);
+
+                formData.Left.obj = null;
+                formData.Left.offset = margin2 + viewWidth * 0.5f;
+                formData.Top.obj = maidCombo;
+                boneLabel.Align(formData);
+                formData.Top.obj = boneLabel;
+                boneFilterText.Align(formData);
+                formData.Top.obj = boneFilterText;
+                boneCombo.Align(formData);
 
                 baseObj = boneCombo;
             }
 
-            align.x = margin;
-            align.y = margin;
-            align.width = viewWidth - margin2;
+            formData.Left.Set(null, margin);
+            formData.Right = new AttachData(null, margin + WIDTH_SCROLLBAR);
+            formData.Top.obj = baseObj;
+            formData.Top.offset = margin;
             posSlider.indent = indent;
             posSlider.subLabelWidth = indent;
             posSlider.TextWidth  = textWidth;
             posSlider.TextHeight = itemHeight;
-            posSlider.AlignTop(baseObj, ref align);
-            align.x = viewWidth - margin2 - WIDTH_RESET - buttonWidth;
-            align.width = buttonWidth;
-            posGizmoToggle.AlignTop(baseObj, ref align);
+            posSlider.Align(formData);
 
-            align.x = margin;
-            align.y = margin2;
-            align.width = viewWidth - margin2;
+            var leftBackup = formData.Left;
+            formData.Left = null;
+            var gizmoWidth = posGizmoToggle.CalcWidth();
+            formData.Right.Set(null, margin2 + WIDTH_RESET + WIDTH_SCROLLBAR, gizmoWidth);
+            posGizmoToggle.Align(formData);
+
+            formData.Left = leftBackup;
+            formData.Left.Set(null, margin);
+            formData.Top.obj = posSlider;
+            formData.Top.offset = margin2;
+            formData.Right.Set(null, margin + WIDTH_SCROLLBAR);
             eulerSlider.indent = indent;
             eulerSlider.subLabelWidth = indent;
             eulerSlider.TextWidth = textWidth;
             eulerSlider.TextHeight = itemHeight;
-            eulerSlider.AlignTop(posSlider, ref align);
+            eulerSlider.Align(formData);
+
             quatSlider.indent = indent;
             quatSlider.subLabelWidth = indent;
             quatSlider.TextWidth = textWidth;
             quatSlider.TextHeight = itemHeight;
-            quatSlider.AlignTop(posSlider, ref align);
+            quatSlider.Align(formData);
 
-            align.x = viewWidth - margin2 - WIDTH_RESET - buttonWidth;
-            align.width = buttonWidth;
-            rotGizmoToggle.AlignTop(posSlider, ref align);
+            formData.Top.obj = posSlider;
+            formData.Left = null;
+            formData.Right.Set(null, margin2 + WIDTH_RESET + WIDTH_SCROLLBAR, gizmoWidth);
+            rotGizmoToggle.Align(formData);
 
-            align.x = margin2 + textWidth + indent * 3;
-            align.width = uiParamSet.FixPx(100);
-            rotToggle.AlignTop(posSlider, ref align);
+            var rotToggleWidth = rotToggle.CalcWidth();
+            formData.Left = leftBackup;
+            formData.Left.Set(null, margin2 + textWidth + indent * 3, rotToggleWidth);
+            formData.Right = null;
+            rotToggle.Align(formData);
 
             CalcViewHeight();
             base.Layout(uiParamSet);
@@ -734,7 +792,7 @@ namespace EffekseerPlayer.CM3D2.UI {
         public CustomTextSlider frameSlider;
         public CustomTextSlider delaySlider;
         public CustomTextSlider postDelaySlider;
-        public CustomTextSliders colorSlider;
+        public CustomColorSlider colorSlider;
 
         public CustomLabel attachLabel;
         public CustomToggle attachToggle;

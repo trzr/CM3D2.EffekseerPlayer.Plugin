@@ -79,25 +79,25 @@ namespace EffekseerPlayer.CM3D2 {
             var keyHolder = new KeyHolder();
             var keyCodes = new List<KeyCode>();
             foreach (var key in keysArray) {
-                var trimed = key.Trim();
-                if (trimed.Length == 0) continue;
+                var trimmed = key.Trim();
+                if (trimmed.Length == 0) continue;
 
                 KeyCode parsedCode;
-                if (EnumUtil.TryParse(trimed, true, out parsedCode)) {
+                if (EnumUtil.TryParse(trimmed, true, out parsedCode)) {
                     keyCodes.Add(parsedCode);
                 } else {
                     EventModifiers parsedModifiers;
-                    if (EnumUtil.TryParse(trimed, true, out parsedModifiers)) {
+                    if (EnumUtil.TryParse(trimmed, true, out parsedModifiers)) {
                         keyHolder.modifierKeys |= parsedModifiers;
                     } else {
-                        if (trimed.StartsWith(PREFIX_OVR_BUTTON)) {
-                            var ovrKey = trimed.Substring(PREFIX_OVR_BUTTON.Length);
+                        if (trimmed.StartsWith(PREFIX_OVR_BUTTON)) {
+                            var ovrKey = trimmed.Substring(PREFIX_OVR_BUTTON.Length);
                             OVRInput.RawButton rawButton;
                             if (EnumUtil.TryParse(ovrKey, true, out rawButton)) {
                                 keyHolder.ovrButton |= rawButton;
                             }
-                        } else if (trimed.StartsWith(PREFIX_VIVE_BUTTON)) {
-                            var viveKey = trimed.Substring(PREFIX_VIVE_BUTTON.Length);
+                        } else if (trimmed.StartsWith(PREFIX_VIVE_BUTTON)) {
+                            var viveKey = trimmed.Substring(PREFIX_VIVE_BUTTON.Length);
                             VIVEButton viveButton;
                             if (EnumUtil.TryParse(viveKey, true, out viveButton)) {
                                 switch (viveButton) {
@@ -128,14 +128,14 @@ namespace EffekseerPlayer.CM3D2 {
                                 }
                                 //keyHolder.ovrButton |= viveButton;
                             }
-//                        } else if (trimed.StartsWith(PREFIX_TOUCH)) {
-//                            var ovrKey = trimed.Substring(PREFIX_TOUCH.Length);
+//                        } else if (trimmed.StartsWith(PREFIX_TOUCH)) {
+//                            var ovrKey = trimmed.Substring(PREFIX_TOUCH.Length);
 //                            OVRInput.RawTouch rawTouch;
 //                            if (Enum.TryParse(ovrKey, true, out rawTouch)) {
 //                                setKey.ovrTouch |= rawTouch;
 //                            }
                         } else {
-                            Log.Info("parse failed:", trimed);
+                            Log.Info("parse failed:", trimmed);
                         }
                     }
                 }
@@ -197,11 +197,11 @@ namespace EffekseerPlayer.CM3D2 {
                 // OVRInput.GetDownは単一キーの判断しかできないため、複数キー同時押下を判定するためのクロージャを用意する必要がある.
                 // ただし、non-publicのフィールドやクラスがあるため、reflectionを駆使して無理やり呼び出しを実現している. (可視性を変えてしまった方が早い)
                 var type = typeof(OVRInput);
-                var ctrollerField =  type.GetField("controllers", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
-                if (ctrollerField == null) return;
+                var ctrlrField =  type.GetField("controllers", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
+                if (ctrlrField == null) return;
 
                 // 参考 https://stackoverflow.com/questions/17114110/cast-listobject-to-unknown-t-using-reflection
-                var list = ctrollerField.GetValue(type);
+                var list = ctrlrField.GetValue(type);
                 var castElemType = typeof(object[]).GetElementType();
                 // ReSharper disable once PossibleNullReferenceException
                 var castMethod = typeof(Enumerable).GetMethod("Cast").MakeGenericMethod(castElemType);

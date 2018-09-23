@@ -20,9 +20,7 @@ namespace EffekseerPlayer.Unity.Data {
             EventHandler handler, bool decimalCheck=false)
             : this(names, vals, range, decimalCheck) {
 
-            if (handler != null) {
-                ValueChanged += handler;
-            }
+            if (handler != null) ValueChanged += handler;
         }
         public EditTextValues(IList<string> names, IList<float> vals, EditRange range1, bool decimalCheck=false) {
             values = new EditTextValue[vals.Count];
@@ -35,9 +33,7 @@ namespace EffekseerPlayer.Unity.Data {
             EventHandler handler, bool decimalCheck=false)
             : this(names, vals, ranges, decimalCheck) {
 
-            if (handler != null) {
-                ValueChanged += handler;
-            }
+            if (handler != null) ValueChanged += handler;
         }
         public EditTextValues(IList<string> names, IList<float> vals, IList<EditRange> ranges, bool decimalCheck=false) {
             values = new EditTextValue[vals.Count];
@@ -48,9 +44,8 @@ namespace EffekseerPlayer.Unity.Data {
         }
         public EditTextValues(IList<EditTextValue> vals, EventHandler handler=null) {
             values = vals;
-            if (handler != null) {
-                ValueChanged += handler;
-            }
+
+            if (handler != null) ValueChanged += handler;
         }
 
         /// <summary>

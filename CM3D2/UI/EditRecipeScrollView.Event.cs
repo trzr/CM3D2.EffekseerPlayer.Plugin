@@ -76,8 +76,7 @@ namespace EffekseerPlayer.CM3D2.UI {
             delaySlider.Num     = recipe.delayFrame;
             postDelaySlider.Num = recipe.postDelayFrame;
             _color = recipe.color;
-            var cols = new[]{_color.r, _color.g, _color.b, _color.a };
-            colorSlider.Value.Set(cols, true);
+            colorSlider.EditVal.SetColor(ref _color, true);
             attachToggle.Value = recipe.attach;
             if (recipe.attach) {
                 fixOffsetToggle.Value = recipe.fixOffset;
@@ -263,43 +262,13 @@ namespace EffekseerPlayer.CM3D2.UI {
             currentEmitter.postDelayFrame = val.Value;
         }
 
-        private void ColorsChanged(object obj, EventArgs args) {
-            var vals = (EditTextValues)obj;
-
-            _color.r = vals[0].Value;
-            _color.g = vals[1].Value;
-            _color.b = vals[2].Value;
-            _color.a = vals[3].Value;
+        private void ColorsChanged(ref Color col) {
+            _color = col;
 
             if (currentEmitter == null) return;
             currentEmitter.SetAllColor(_color);
         }
 
-        private void ColorChanged(float val, ref float col) {
-
-            if (Math.Abs(col - val) < ConstantValues.EPSILON_RGB) return;
-
-            col = val;
-            if (currentEmitter == null) return;
-            currentEmitter.SetAllColor(_color);
-        }
-
-        private void ColorRChanged(object obj, EventArgs args) {
-            var val = (EditTextValue)obj;
-            ColorChanged(val.Value, ref _color.r);
-        }
-        private void ColorGChanged(object obj, EventArgs args) {
-            var val = (EditTextValue)obj;
-            ColorChanged(val.Value, ref _color.g);
-        }
-        private void ColorBChanged(object obj, EventArgs args) {
-            var val = (EditTextValue)obj;
-            ColorChanged(val.Value, ref _color.b);
-        }
-        private void ColorAChanged(object obj, EventArgs args) {
-            var val = (EditTextValue)obj;
-            ColorChanged(val.Value, ref _color.a);
-        }
 
         private void ApplyLocation() {
             if (currentEmitter == null) return;
@@ -796,7 +765,6 @@ namespace EffekseerPlayer.CM3D2.UI {
         private static readonly EditRange ROT_RANGE = new EditRange(5, -1f, 1f);
         private static readonly EditRange ROT_RANGEW = new EditRange(5, 0, 1f);
         private static readonly EditRange EULER_RANGE = new EditRange(5, -180, 180, true);
-        private static readonly EditRange RGB_RANGE = new EditRange(2, 0f, 1f);
 
         //private static readonly EditRange POS_RANGE = new EditRange(5, -2f, 2f);
         //private static readonly EditRange SCALE_RANGE = new EditRange(5, 0.00001f, 2f);

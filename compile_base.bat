@@ -75,6 +75,13 @@
 @set OPTS=%OPTS% /resource:Resource\repeat_off16.png,repeat_off.png
 @set OPTS=%OPTS% /resource:Resource\stop16.png,stop.png
 @set OPTS=%OPTS% /resource:Resource\stopr16.png,stopr.png
+@set OPTS=%OPTS% /resource:Resource\circle16.png,circle.png
+@set OPTS=%OPTS% /resource:Resource\cross16.png,cross.png
+@set OPTS=%OPTS% /resource:Resource\circle20.png,preset_base.png
+@set OPTS=%OPTS% /resource:Resource\empty20.png,preset_empty.png
+@set OPTS=%OPTS% /resource:Resource\focus20.png,preset_focus.png
+@set OPTS=%OPTS% /resource:Resource\copy24.png,copy.png
+@set OPTS=%OPTS% /resource:Resource\paste24.png,paste.png
 
 @rem @set CSC=%windir%\Microsoft.NET\Framework\v3.5\csc
 @set CSC=%windir%\Microsoft.NET\Framework\v4.0.30319\csc

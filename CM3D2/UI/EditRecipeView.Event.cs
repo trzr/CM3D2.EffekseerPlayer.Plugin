@@ -11,7 +11,7 @@ namespace EffekseerPlayer.CM3D2.UI {
             if (efkCombo.SelectedIndex == -1) return;
 
             var recipe = CreateRecipe();
-            var filename = groupnameText.Text;
+            var filename = groupNameText.Text;
             recipeMgr.Register(filename, recipe);
         }
 
@@ -27,7 +27,7 @@ namespace EffekseerPlayer.CM3D2.UI {
         }
 
         public void SetGroupName(string name) {
-            groupnameText.Text = name;
+            groupNameText.Text = name;
         }
 
         /// <summary>
@@ -99,8 +99,8 @@ namespace EffekseerPlayer.CM3D2.UI {
         }
 
         private bool CanRegister() {
-            return groupnameText.Text.Length > 0
-                   && !groupnameText.hasError
+            return groupNameText.Text.Length > 0
+                   && !groupNameText.hasError
                    && nameText.Text.Length > 0;
         }
 

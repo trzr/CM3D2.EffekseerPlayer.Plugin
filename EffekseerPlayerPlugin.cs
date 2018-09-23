@@ -95,6 +95,22 @@ namespace EffekseerPlayer {
                 settings.efkDir = efkDir;
             }
 
+            // colorPresetDir
+            // 未指定時：efkDirと同等
+            // 指定時　：絶対パスか判定し、絶対パスであればそのまま使用し、
+            //           そうでなければconfからの想定パスとして扱う
+            if (settings.colorPresetDir == null) {
+                settings.colorPresetDir = settings.efkDir;
+            } else {
+                if (!Path.IsPathRooted(settings.colorPresetDir)) {
+                    settings.colorPresetDir = Path.Combine(confDir, settings.colorPresetDir);
+                }
+                if (!Directory.Exists(settings.colorPresetDir)) {
+                    Directory.CreateDirectory(settings.colorPresetDir);
+                    Log.Info("directory created: ", settings.colorPresetDir);
+                }
+            }
+
             Log.Debug("Effekseer Dir: ", settings.efkDir);
             _efkMgr = new EfkManager(settings.efkDir);
             _playMgr = new PlayManager();
@@ -111,6 +127,10 @@ namespace EffekseerPlayer {
                 _recipeMgr.SetupStopKey(settings.playStopKeyCodeVR);
                 _recipeMgr.SetupPauseKey(settings.playPauseKeyCodeVR);
             }
+            var colorPresetMgr = ColorPresetManager.Instance;
+            var colorPresetFile = Path.Combine(settings.colorPresetDir, "_ColorPreset.csv");
+            colorPresetMgr.maxCount = settings.colorPresetMax;
+            colorPresetMgr.SetPath(colorPresetFile);
 
             EffekseerSystem.baseDirectory = settings.efkDir;
             keyDetector.Init();
@@ -169,9 +189,9 @@ namespace EffekseerPlayer {
             try {
                 if (InputVisibleKey()) {
                     if (_state != InitState.NotInitialized) {
-                        _playView.Visibled = !_playView.Visibled;
-                        Log.Debug("Visibled:", _playView.Visibled);
-                        if (_playView.Visibled && _state == InitState.Initialized) uiParamSet.Update();
+                        _playView.Visible = !_playView.Visible;
+                        Log.Debug("Visible:", _playView.Visible);
+                        if (_playView.Visible && _state == InitState.Initialized) uiParamSet.Update();
                     }
                 }
             } catch (Exception e) {
@@ -182,7 +202,7 @@ namespace EffekseerPlayer {
 
             keyDetector.Detect();
 
-            if (_playView.Visibled) uiHelper.UpdateCursor();
+            if (_playView.Visible) uiHelper.UpdateCursor();
             uiHelper.UpdateCameraControl();
 
             _playView.Update();
@@ -192,7 +212,7 @@ namespace EffekseerPlayer {
         public void OnGUI() {
             if (!_isTargetScene) return;
 
-            if (_state != InitState.Initialized || !_playView.Visibled) return;
+            if (_state != InitState.Initialized || !_playView.Visible) return;
             if (settings.ssWithoutUI && !uiHelper.IsEnabledUICamera()) return; // UI無し撮影
 
             _playView.OnGUI();
@@ -267,7 +287,7 @@ namespace EffekseerPlayer {
 
             SetActive(true);
             _state = InitState.Initialized;
-            _playView.Visibled = true;
+            _playView.Visible = true;
             Log.Debug("Initialized");
         }
 
@@ -284,9 +304,9 @@ namespace EffekseerPlayer {
             // 以下はCM3D2向け  (Sybaris 2以降では不要)
             // リダイレクトで存在しないパスが渡されてしまうケースがあるため、
             // 旧Sybarisチェックを先に行う (リダイレクトによるパスではディレクトリ作成・削除が動作しない）
-            var dllpath = Path.Combine(DataPath, @"..\..\opengl32.dll");
+            var dllPath = Path.Combine(DataPath, @"..\..\opengl32.dll");
             var dirPath = Path.Combine(DataPath, @"..\..\Sybaris");
-            if (File.Exists(dllpath) && Directory.Exists(dirPath)) {
+            if (File.Exists(dllPath) && Directory.Exists(dirPath)) {
                 dirPath = Path.GetFullPath(dirPath);
                 var confPath = Path.Combine(dirPath, @"UnityInjector\Config");
                 if (Directory.Exists(confPath)) return confPath;

@@ -20,6 +20,9 @@ namespace EffekseerPlayer {
         public string playPauseKeyCode;
         public string playPauseKeyCodeVR;
 
+        public string colorPresetDir;
+        public int  colorPresetMax = 50;
+
         public string efkDir;
         //internal string currentDir;
 
@@ -105,6 +108,8 @@ namespace EffekseerPlayer {
             if (listStr.Length > 0) ParseList(listStr, ref disableOHScenes);
 
             Get(getValue("efkDir"), ref efkDir);
+            Get(getValue("ColorPresetDir"), ref colorPresetDir);
+            Get(getValue("ColorPresetMax"), ref colorPresetMax);
 
             Get(getValue("SSWithoutUI"), ref ssWithoutUI);
             Get(getValue("WindowSizeRate"), ref sizeRate);

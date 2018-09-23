@@ -19,7 +19,7 @@ namespace EffekseerPlayer.Unity.UI {
         /// <param name="min">最小値</param>
         /// <param name="max">最大値</param>
         /// <param name="dec">小数点桁数</param>
-        public BaseSingleTextSlider(GUIControl parent, float value, 
+        protected BaseSingleTextSlider(GUIControl parent, float value,
             float min, float max, int dec) : this(parent, value, new EditRange(dec, min, max))  {
         }
 
@@ -27,7 +27,7 @@ namespace EffekseerPlayer.Unity.UI {
         /// <param name="parent">親要素</param>
         /// <param name="value">初期値</param>
         /// <param name="range">値の範囲</param>
-        public BaseSingleTextSlider(GUIControl parent, float value, EditRange range)
+        protected BaseSingleTextSlider(GUIControl parent, float value, EditRange range)
             : this(parent) {
             //Value = new EditTextValue(string.Empty, value, range);
             var type = typeof(T);
@@ -37,7 +37,7 @@ namespace EffekseerPlayer.Unity.UI {
         /// <summary>コンストラクタ</summary>
         /// <param name="parent">親要素</param>
         /// <param name="val">編集値オブジェクト</param>
-        public BaseSingleTextSlider(GUIControl parent, T val) : this(parent) {
+        protected BaseSingleTextSlider(GUIControl parent, T val) : this(parent) {
             Value = val;
         }
 
@@ -106,7 +106,8 @@ namespace EffekseerPlayer.Unity.UI {
             // 各コントロールの位置調整
             var yPos = Top;
             if (Text != null) {
-                labelRect.Set(Left, Top, Text.Length * fontSize, TextHeight);
+                var labelWidth = LabelStyle.CalcSize(new GUIContent(Text)).x;
+                labelRect.Set(Left, Top, labelWidth, TextHeight);
                 yPos = labelRect.yMax;
             }
             if (listeners != null) { 
