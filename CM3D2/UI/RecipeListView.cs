@@ -31,13 +31,14 @@ namespace EffekseerPlayer.CM3D2.UI {
 
                 var tex = new Texture2D(2, 2);
                 var pixels = tex.GetPixels(0);
-                var col = new Color(0.3f, 0.3f, 0.3f, 0.2f);
+                var col = new Color(0.3f, 0.3f, 0.3f, 0.25f);
                 for (var i = 0; i < pixels.Length; i++) {
                     pixels[i] = col;
                 }
                 tex.SetPixels(pixels, 0);
                 tex.Apply();
                 LabelStyle.hover.background = tex;
+                LabelStyle.hover.textColor = new Color(0.7f, 0.7f, 0.7f);
             }
             if (ButtonAStyle == null) {
                 ButtonAStyle = new GUIStyle("button") {
