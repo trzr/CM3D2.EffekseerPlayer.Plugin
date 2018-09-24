@@ -14,7 +14,7 @@ using UnityEngine.SceneManagement;
 using UnityInjector;
 using UnityInjector.Attributes;
 
-[assembly: AssemblyVersion("0.3.0")]
+[assembly: AssemblyVersion("0.3.1")]
 namespace EffekseerPlayer {
 #if COM3D2    
     [PluginFilter("COM3D2x64"),
@@ -23,7 +23,7 @@ namespace EffekseerPlayer {
      PluginFilter("CM3D2OHx64"),
 #endif
      PluginName("EffekseerPlayerPlugin"),
-     PluginVersion("0.3.0")]
+     PluginVersion("0.3.1")]
     public class EffekseerPlayerPlugin : PluginBase {
         #region Variables
         private const EventModifiers MODIFIER_KEYS = EventModifiers.Shift | EventModifiers.Control | EventModifiers.Alt;
