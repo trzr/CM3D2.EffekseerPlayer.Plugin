@@ -20,6 +20,7 @@ namespace EffekseerPlayer.CM3D2.Render {
         private Material _lineMaterial;
         private Material _sublineMaterial;
         private readonly float _lineWidth = 0.006f;
+        public int ItemID { get; private set; }
         private Color _color = Color.white;
         public Color Color {
             get { return _color;}
@@ -38,7 +39,7 @@ namespace EffekseerPlayer.CM3D2.Render {
         private Transform _rootBone;
         private readonly HashSet<string> _boneNames = new HashSet<string>();
         private bool _isVisible;
-        private bool _skipVisble;
+        private bool _skipVisible;
         // bool _isFirst = true;
         #endregion
 
@@ -53,7 +54,7 @@ namespace EffekseerPlayer.CM3D2.Render {
             return _meshRenderer != null && _rootBone != null;
         }
 
-        public bool IsVisibled() {
+        public bool IsVisible() {
             return _isVisible;
         }
 
@@ -70,7 +71,8 @@ namespace EffekseerPlayer.CM3D2.Render {
             }
         }
 
-        public void Setup(GameObject go) {
+        public void Setup(GameObject go, int id=-1) {
+            ItemID = id;
             Clear();
             _boneNames.Clear();
 
@@ -100,8 +102,12 @@ namespace EffekseerPlayer.CM3D2.Render {
                 parentBone = go.transform;
                 foreach (Transform child in parentBone) {
                     if (child.childCount == 0) continue;
-                    _rootBone = child;
+
+                    var before = _lineDict.Count;
                     SetupBone(child);
+                    _rootBone = child;
+
+                    if (_lineDict.Count - before > 1) break; // 有効な子ノードを抽出した場合に終了
                 }
             }
 
@@ -113,7 +119,6 @@ namespace EffekseerPlayer.CM3D2.Render {
         private void SetupBone(Transform bone) {
             if (_lineDict.ContainsKey(bone.name)) return;
 
-            // Log.Debug("bone:", bone.name);
             var lineRenderer = CreateComponent(_lineMaterial, _lineWidth, _lineWidth * 0.2f);
             lineRenderer.gameObject.name = NAME_LINE_PREFIX + bone.name;
             _lineDict.Add(bone.name, lineRenderer);
@@ -122,7 +127,6 @@ namespace EffekseerPlayer.CM3D2.Render {
             if (!_boneNames.Contains(bone.name)) {
                 lineRenderer.materials = new[] { _sublineMaterial, };
             }
-            // lineRenderer.transform.SetParent(bone, false);
 
             foreach (Transform child in bone) {
                 if (child.childCount == 0) continue;
@@ -133,9 +137,9 @@ namespace EffekseerPlayer.CM3D2.Render {
         }
 
         private void UpdateVisible(bool visible) {
-            if (_skipVisble != visible) return;
+            if (_skipVisible != visible) return;
 
-            _skipVisble = !visible;
+            _skipVisible = !visible;
             SetVisibleAll(visible);
         }
 
@@ -164,7 +168,6 @@ namespace EffekseerPlayer.CM3D2.Render {
                     UpdatePosition(child, false, true);
                 }
             }
-            // _isFirst = false;
         }
 
         private void EmptyBone(LineRenderer renderer) {
@@ -174,7 +177,6 @@ namespace EffekseerPlayer.CM3D2.Render {
             renderer.SetVertexCount(0);
 #endif
             renderer.enabled = false;
-            // if (_isFirst) Log.Debug(renderer.name, " is leaf");
         }
 
         public void UpdatePosition(Transform bone, bool isRoot=false, bool isRecursive=false) {
@@ -220,10 +222,7 @@ namespace EffekseerPlayer.CM3D2.Render {
                             if (length > maxLength) maxLength = length;
                         }
                     }
-                    //if (_isFirst) {
-                    //    Log.Debug(bone.name, " has multi-child. ", bone.childCount, ", length=", maxLength);
-                    //    //boneLine.material.color = Color.magenta;
-                    //}
+
                     pos = bone.position + bone.rotation * new Vector3(-maxLength, 0f, 0f);
 
                     // オフセットラインを表示
@@ -252,16 +251,10 @@ namespace EffekseerPlayer.CM3D2.Render {
             }
             boneLine.SetPosition(1, pos.Value);
 
-            // if (_isFirst) OutputLog(bone.position, pos.Value, bone.name);
             if (!isRecursive) return;
             foreach (Transform childBone in bone) {
                 UpdatePosition(childBone, false, true);
             }
-        }
-
-        // ReSharper disable once UnusedMember.Local
-        private void OutputLog(Vector3 pos, Vector3 pos2, string name) {
-            Log.Debug(name, "(", pos.x, ",", pos.y, ",", pos.z, ")=>(", pos2.x, ",", pos2.y, ",", pos2.z, ")");
         }
 
         public void Clear() {

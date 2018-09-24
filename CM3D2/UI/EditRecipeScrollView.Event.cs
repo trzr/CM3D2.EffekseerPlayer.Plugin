@@ -547,7 +547,10 @@ namespace EffekseerPlayer.CM3D2.UI {
             var boneNames = CreateBoneContents(validSlot);
             if (boneNames.Length == 0) return false;
 
-            if (boneToggle.Value) _boneRenderer.Setup(validSlot.obj);
+            if (boneToggle.Value) {
+                _boneRenderer.Setup(validSlot.obj, validSlot.RID);
+            }
+
 
             _boneItems = boneNames;
             FilterBoneCombo();

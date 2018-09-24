@@ -373,7 +373,7 @@ namespace EffekseerPlayer.CM3D2.UI {
                 if (boneToggle.Value && _currentMaid != null) {
                     var slot = SelectedSlot();
                     if (slot != null && slot.obj != null) {
-                        _boneRenderer.Setup(slot.obj);
+                        _boneRenderer.Setup(slot.obj, slot.RID);
                     }
                 }
                 _boneRenderer.SetVisible(boneToggle.Value);
